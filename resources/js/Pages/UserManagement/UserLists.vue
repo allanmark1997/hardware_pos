@@ -1,4 +1,6 @@
 <script setup>
+import Pagination2 from "@/Components/Pagination2.vue";
+import Pagination from "@/Components/Pagination.vue";
 import moment from "moment";
 const props = defineProps(["users"]);
 
@@ -10,7 +12,7 @@ const function_extract_date_time = (date) => {
   <ul class="max-w-full divide-y divide-gray-200 p-2">
     <li
       class="pb-3 hover:bg-blue-50"
-      v-for="(user, index) in props.users"
+      v-for="(user, index) in props.users.data"
       :key="index"
     >
       <div class="flex items-center space-x-4">
@@ -99,5 +101,7 @@ const function_extract_date_time = (date) => {
         </div>
       </div>
     </li>
+    <Pagination2 :links="props.users.links" />
+    <!-- <Pagination :links="props.users.links" /> -->
   </ul>
 </template>
