@@ -36,5 +36,6 @@ Route::middleware([
 
     Route::prefix('usermanagement')->name('users.')->group(function() {
         Route::get('/users', [User::class, 'index'])->name('index');
+        Route::post('/users/add', [User::class, 'add_user'])->name('add_user');
     });
 });

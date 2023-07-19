@@ -78,7 +78,19 @@ const select_type = (data) => {
   type_.value = !type_.value;
 };
 
-const add_user = () => {};
+const add_user = () => {
+  form.post(route("users.add_user"), {
+    preserveScroll: true,
+    onSuccess: () => {
+      alert("success");
+      addModal.value = !addModal.value;
+      form.reset();
+      sex_label.value.reset();
+      status_label.value.reset();
+      type_label.value.reset();
+    },
+  });
+};
 </script>
 
 <template>
