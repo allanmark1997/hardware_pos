@@ -14,6 +14,9 @@ const addModal = ref(false);
 const sex_ = ref(false);
 const status_ = ref(false);
 const type_ = ref(false);
+const sex_label = ref("Select Sex");
+const status_label = ref("Select Status");
+const type_label = ref("Select Type");
 const form = useForm({
   name: "",
   fname: "",
@@ -44,6 +47,37 @@ const open_selection_status = () => {
 const open_selection_type = () => {
   type_.value = !type_.value;
 };
+
+const select_sex = (data) => {
+  form.sex = data;
+  if (data == false) {
+    sex_label.value = "Female";
+  } else {
+    sex_label.value = "Male";
+  }
+  sex_.value = !sex_.value;
+};
+
+const select_status = (data) => {
+  form.status = data;
+  if (data == false) {
+    status_label.value = "Inactive";
+  } else {
+    status_label.value = "Active";
+  }
+  status_.value = !status_.value;
+};
+
+const select_type = (data) => {
+  form.type = data;
+  if (data == 1) {
+    type_label.value = "Administrator";
+  } else {
+    type_label.value = "Cashier";
+  }
+  type_.value = !type_.value;
+};
+
 const add_user = () => {};
 </script>
 
@@ -135,7 +169,7 @@ const add_user = () => {};
               class="text-gray-500 bg-white focus:ring-1 focus:outline-none focus:ring-blue-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center border border-gray-300 mt-5 w-full"
               type="button"
             >
-              Select Sex
+              {{ sex_label }}
               <svg
                 class="w-2.5 h-2.5 ml-2.5"
                 aria-hidden="true"
@@ -160,10 +194,14 @@ const add_user = () => {};
             >
               <ul class="py-2 text-sm text-gray-700">
                 <li>
-                  <a href="#" class="block px-4 py-2 hover:bg-gray-100"
+                  <a
+                    @click="select_sex(false)"
+                    class="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
                     >Female
                   </a>
-                  <a href="#" class="block px-4 py-2 hover:bg-gray-100"
+                  <a
+                    @click="select_sex(true)"
+                    class="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
                     >Male
                   </a>
                 </li>
@@ -211,7 +249,7 @@ const add_user = () => {};
               class="text-gray-500 bg-white focus:ring-1 focus:outline-none focus:ring-blue-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center border border-gray-300 mt-5 w-full"
               type="button"
             >
-              Select Status
+              {{ status_label }}
               <svg
                 class="w-2.5 h-2.5 ml-2.5"
                 aria-hidden="true"
@@ -236,10 +274,14 @@ const add_user = () => {};
             >
               <ul class="py-2 text-sm text-gray-700">
                 <li>
-                  <a href="#" class="block px-4 py-2 hover:bg-gray-100"
+                  <a
+                    @click="select_status(true)"
+                    class="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
                     >Active
                   </a>
-                  <a href="#" class="block px-4 py-2 hover:bg-gray-100"
+                  <a
+                    @click="select_status(false)"
+                    class="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
                     >Inactive
                   </a>
                 </li>
@@ -257,7 +299,7 @@ const add_user = () => {};
               class="text-gray-500 bg-white focus:ring-1 focus:outline-none focus:ring-blue-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center border border-gray-300 mt-5 w-full"
               type="button"
             >
-              Select Type
+              {{ type_label }}
               <svg
                 class="w-2.5 h-2.5 ml-2.5"
                 aria-hidden="true"
@@ -282,10 +324,14 @@ const add_user = () => {};
             >
               <ul class="py-2 text-sm text-gray-700">
                 <li>
-                  <a href="#" class="block px-4 py-2 hover:bg-gray-100"
+                  <a
+                    @click="select_type(1)"
+                    class="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
                     >Administrator
                   </a>
-                  <a href="#" class="block px-4 py-2 hover:bg-gray-100"
+                  <a
+                    @click="select_type(3)"
+                    class="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
                     >Cashier
                   </a>
                 </li>
