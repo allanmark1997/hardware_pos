@@ -19,11 +19,20 @@ class User extends Controller
 
     public function add_user(Request $request){
         $request->validate([
-            'fname' => 'required',
-            'lname' => 'required',
-            'fname' => 'required',
+            'fname' => ['required', 'string', 'max:255'],
+            'lname' => ['required', 'string', 'max:255'],
+            'sex' => 'required',
+            'birthday' => ['required', 'date'],
+            'address' => 'required',
+            'contact_no' => 'required',
+            'status' => 'required',
+            'type' => 'required',
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => 'required',
+
         ]);
         $fullname = $request->fname.' '.$request->mname.' '.$request->lname;
+        
         ModelsUser::create([
             'name' => $fullname,
             'fname' => $request->fname,
@@ -37,6 +46,17 @@ class User extends Controller
             'type' => $request->type,
             'email'=>  $request->email,
             'password'=> Hash::make($request->password),
+        ]);
+        return Redirect::back();
+
+    }
+
+    public function update_user(Request $request, ModelsUser $user){
+    //    dd($request);
+        
+        $user -> update([
+            'status' => $request->status,
+            'type' => $request->type,
         ]);
         return Redirect::back();
 

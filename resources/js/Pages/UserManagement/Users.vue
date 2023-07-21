@@ -8,6 +8,7 @@ import { useForm, usePage } from "@inertiajs/vue3";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import Button from "@/Components/Button.vue";
 import Input2 from "@/Components/InputCustom.vue";
+import JetInputError from "@/Components/InputError.vue";
 
 const props = defineProps(["users"]);
 const addModal = ref(false);
@@ -18,15 +19,14 @@ const sex_label = ref("Select Sex");
 const status_label = ref("Select Status");
 const type_label = ref("Select Type");
 const form = useForm({
-  name: "",
   fname: "",
   mname: "",
   lname: "",
-  sex: false,
-  birthday: "",
+  sex: null,
+  birthday: null,
   address: "",
   contact_no: "",
-  status: true,
+  status: null,
   type: null,
   email: "",
   password: "password",
@@ -88,6 +88,9 @@ const add_user = () => {
       sex_label.value.reset();
       status_label.value.reset();
       type_label.value.reset();
+    },
+    onError: (error) => {
+      console.log(error);
     },
   });
 };
@@ -365,7 +368,7 @@ const add_user = () => {
           <div class="col-span-6">
             <Input
               label="Password"
-              type="text"
+              type="password"
               class="block w-full"
               v-model="form.password"
               autofocus
