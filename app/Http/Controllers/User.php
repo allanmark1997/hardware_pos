@@ -61,4 +61,14 @@ class User extends Controller
         return Redirect::back();
 
     }
+
+    public function update_user_position(Request $request){
+        //    dd($request);
+            $user = ModelsUser::find($request->id);
+            $user -> update([
+                'type' => $request->type,
+            ]);
+            return Redirect::back();
+    
+        }
 }

@@ -4,6 +4,7 @@ import Pagination from "@/Components/Pagination.vue";
 import JetDialogModal from "@/Components/DialogModal.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import Button from "@/Components/Button.vue";
+import Dropdown from "@/Components/CustomDropdownPosition.vue";
 
 import moment from "moment";
 import { ref } from "vue";
@@ -11,6 +12,7 @@ import { useForm } from "@inertiajs/vue3";
 const props = defineProps(["users"]);
 const condfirmationModal = ref(false);
 const selected_user = ref("");
+
 const form = useForm({
   status: null,
   type: true,
@@ -99,22 +101,27 @@ const function_update = () => {
             Contact number
           </p>
         </div>
-        <div class="items-center text-sm text-gray-900">
+        <!-- <div class="items-center text-sm text-gray-900">
           {{ user.type == 0 || user.type == 1 ? "Administrator" : "Cashier" }}
           <p
             class="text-center text-xs text-gray-500 bg-gray-200 rounded-sm p-[0.1vmin]"
           >
             Position
           </p>
-        </div>
-        <div class="items-center text-sm text-gray-900 p-2">
+        </div> -->
+        <Dropdown
+          :status="user.type"
+          :id="user.id"
+          v-if="user.status == 0 && user.type != 0"
+        />
+        <!-- <div class="items-center text-sm text-gray-900 p-2">
           {{ user.status == 1 ? "Active" : "Deactivated" }}
           <p
             class="text-center text-xs text-gray-500 bg-gray-200 rounded-sm p-[0.1vmin]"
           >
             Status
           </p>
-        </div>
+        </div> -->
         <div class="items-center text-sm text-gray-900 p-2">
           <!-- <button class="p-2 bg-orange-400 rounded-lg mr-2 hover:bg-orange-600">
             Edit

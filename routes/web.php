@@ -38,5 +38,6 @@ Route::middleware([
         Route::get('/users', [User::class, 'index'])->name('index');
         Route::post('/users/add', [User::class, 'add_user'])->name('add_user');
         Route::put('/users/update/{user}', [User::class, 'update_user'])->name('update_user');
+        Route::put('/users/update_position', [User::class, 'update_user_position'])->name('update_user_position');
     });
 });
