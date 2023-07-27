@@ -109,11 +109,7 @@ const function_update = () => {
             Position
           </p>
         </div> -->
-        <Dropdown
-          :status="user.type"
-          :id="user.id"
-          v-if="user.status == 0 && user.type != 0"
-        />
+        <Dropdown v-if="user.type != 0" :status="user.type" :id="user.id" />
         <!-- <div class="items-center text-sm text-gray-900 p-2">
           {{ user.status == 1 ? "Active" : "Deactivated" }}
           <p
