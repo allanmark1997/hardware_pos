@@ -24,7 +24,7 @@ onMounted(() => {});
       </div>
       <Link
         v-else
-        class="mr-1 mb-1 px-2 bg-white py-1 text-sm shadow-sm border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
+        class="mr-1 mb-1 px-2 bg-white py-1 text-sm shadow-sm border rounded hover:bg-white focus:border-yellow-500 focus:text-yellow-500"
         :class="{
           'bg-white': link.active,
           'ml-auto': links.length === key + 1,
