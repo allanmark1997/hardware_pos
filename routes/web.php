@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -39,5 +40,9 @@ Route::middleware([
         Route::post('/users/add', [User::class, 'add_user'])->name('add_user');
         Route::put('/users/update/{user}', [User::class, 'update_user'])->name('update_user');
         Route::put('/users/update_position', [User::class, 'update_user_position'])->name('update_user_position');
+    });
+
+    Route::prefix('products')->name('products.')->group(function() {
+        Route::get('/products', [ProductController::class, 'index'])->name('index');
     });
 });
