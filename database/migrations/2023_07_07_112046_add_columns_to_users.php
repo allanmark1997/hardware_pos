@@ -12,15 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string("fname")->after("name");
+            $table->string("fname")->after("name")->nullable();
             $table->string("mname")->nullable()->after("fname");
-            $table->string("lname")->after("mname");
-            $table->boolean("sex")->after("lname");
-            $table->date("bday")->after("sex");
-            $table->string("address")->after("bday");
-            $table->string("contact_no")->after("address");
-            $table->boolean("status")->after("contact_no");
-            $table->integer("type")->after("status");
+            $table->string("lname")->after("mname")->nullable();
+            $table->boolean("sex")->after("lname")->nullable();
+            $table->date("bday")->after("sex")->nullable();
+            $table->string("address")->after("bday")->nullable();
+            $table->string("contact_no")->after("address")->nullable();
+            $table->boolean("status")->after("contact_no")->nullable();
+            $table->integer("type")->after("status")->nullable();
             $table->softDeletes();
 
         });
