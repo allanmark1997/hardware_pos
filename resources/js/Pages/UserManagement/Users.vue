@@ -114,7 +114,7 @@ const add_user = () => {
           />
           <button
             @click="open_modal_add"
-            class="bg-green-300 p-2 mb-2 mt-5 rounded-lg w-[15vmin] hover:bg-green-500"
+            class="bg-yellow-300 p-2 mb-2 mt-5 rounded-lg w-[15vmin] hover:bg-yellow-500"
           >
             Add user
           </button>
@@ -181,7 +181,7 @@ const add_user = () => {
             </select> -->
             <button
               @click="open_selection_sex"
-              class="text-gray-500 bg-white focus:ring-1 focus:outline-none focus:ring-blue-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center border border-gray-300 mt-5 w-full"
+              class="text-gray-500 bg-white focus:ring-1 focus:outline-none focus:ring-yellow-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center border border-gray-300 mt-5 w-full"
               type="button"
             >
               {{ sex_label }}
@@ -261,7 +261,7 @@ const add_user = () => {
             </select> -->
             <button
               @click="open_selection_status"
-              class="text-gray-500 bg-white focus:ring-1 focus:outline-none focus:ring-blue-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center border border-gray-300 mt-5 w-full"
+              class="text-gray-500 bg-white focus:ring-1 focus:outline-none focus:ring-yellow-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center border border-gray-300 mt-5 w-full"
               type="button"
             >
               {{ status_label }}
@@ -311,7 +311,7 @@ const add_user = () => {
             </select> -->
             <button
               @click="open_selection_type"
-              class="text-gray-500 bg-white focus:ring-1 focus:outline-none focus:ring-blue-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center border border-gray-300 mt-5 w-full"
+              class="text-gray-500 bg-white focus:ring-1 focus:outline-none focus:ring-yellow-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center border border-gray-300 mt-5 w-full"
               type="button"
             >
               {{ type_label }}
@@ -385,7 +385,7 @@ const add_user = () => {
           :class="{ 'opacity-25': form.processing }"
           :disabled="form.processing"
           @click="add_user"
-          class="bg-green-200 hover:bg-green-400"
+          class="bg-yellow-200 hover:bg-yellow-400"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

@@ -1,5 +1,5 @@
 <template>
-    <button :type="type" :class="getClass" class="inline-flex items-center bg-sky-300 border border-gray-300 rounded-md font-medium text-gray-800 uppercase tracking-wide shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:ring focus:ring-blue-200 active:text-gray-800 active:bg-gray-50 disabled:opacity-25 transition">
+    <button :type="type" :class="getClass" class="inline-flex items-center bg-yellow-300 border border-gray-300 rounded-md font-medium text-gray-800 uppercase tracking-wide shadow-sm hover:text-gray-500 focus:outline-none focus:border-yellow-300 focus:ring focus:ring-yellow-200 active:text-gray-800 active:bg-gray-50 disabled:opacity-25 transition">
         <slot />
     </button>
 
