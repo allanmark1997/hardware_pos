@@ -24,10 +24,9 @@ const form = useForm({
   description: "",
   remarks: "",
   product_image: [],
-  quantity: 0,
-  category: 0,
-  sale_discount: 0,
-  price: 0,
+  category: "",
+  sale_discount: "",
+  price: "",
 });
 
 const form_cat = useForm({
@@ -37,6 +36,19 @@ const form_cat = useForm({
 const form_update_cat = useForm({
   name: null,
 });
+
+const add_product = () => {
+  form.post(route("products.store"), {
+    preserveScroll: true,
+    onSuccess: () => {
+      alert("Successfully added product");
+      form.reset();
+    },
+    onError: (error) => {
+      alert("Error adding new product");
+    },
+  });
+};
 
 const open_modal_add = () => {
   add_modal.value = !add_modal.value;
@@ -53,7 +65,7 @@ const add_category = () => {
     preserveScroll: true,
     onSuccess: () => {
       alert("Successfully added category");
-      form.reset();
+      form_cat.reset();
       open_modal_add_category();
     },
     onError: (error) => {
@@ -110,16 +122,14 @@ const search_remove = () => {
               label="Search product"
               @keyup.enter="search_"
             />
-            <button class="h-10 my-auto mt-5" @click="search_remove">
-              <span class="bg-red-400 p-2 rounded-lg">x</span>
-            </button>
+
             <label
               for="countries"
               class="block text-sm font-medium text-gray-900 w-auto my-auto"
               >Select an option</label
             >
             <select
-              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-auto h-10 my-auto"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-auto h-10 mt-5"
               v-model="category"
               @change="search_"
             >
@@ -128,6 +138,9 @@ const search_remove = () => {
                 <option :value="category.id">{{ category.name }}</option>
               </template>
             </select>
+            <button class="h-10 my-auto mt-5" @click="search_remove">
+              <span class="bg-red-400 p-2 rounded-lg">x</span>
+            </button>
           </div>
 
           <div class="flex gap-2">
@@ -168,6 +181,7 @@ const search_remove = () => {
         <div class="grid grid-cols-12 gap-1">
           <div class="col-span-12">
             <Input type="text" label="Enter product name" v-model="form.name" />
+            <JetInputError :message="form.errors.name" class="mt-2" />
           </div>
           <div class="col-span-12">
             <textarea
@@ -176,15 +190,31 @@ const search_remove = () => {
               v-model="form.description"
             >
             </textarea>
+            <JetInputError :message="form.errors.description" class="mt-2" />
           </div>
-          <div class="col-span-6">
+          <div class="col-span-12">
             <Input type="text" label="Product remarks" v-model="form.remarks" />
+            <JetInputError :message="form.errors.remarks" class="mt-2" />
           </div>
           <div class="col-span-6">
             <Input type="text" label="Product price" v-model="form.price" />
+            <JetInputError :message="form.errors.price" class="mt-2" />
+          </div>
+          <div class="col-span-6">
+            <select
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full h-10 my-auto mt-5"
+              v-model="form.category"
+            >
+              <option selected value="">Choose a category</option>
+              <template v-for="(category, key) in props.categories" :key="key">
+                <option :value="category.id">{{ category.name }}</option>
+              </template>
+            </select>
+            <JetInputError :message="form.errors.category" class="mt-2" />
           </div>
           <div class="col-span-12">
             <Input type="text" label="Image" />
+            <JetInputError :message="form.errors.product_image" class="mt-2" />
           </div>
         </div>
       </template>
@@ -196,6 +226,7 @@ const search_remove = () => {
           :class="{ 'opacity-25': form.processing }"
           :disabled="form.processing"
           class="bg-green-200 hover:bg-green-400"
+          @click="add_product"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

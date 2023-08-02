@@ -48,8 +48,9 @@ class ProductController extends Controller
             'name'=>"required",
             'description'=>"required",
             'remarks'=>"required",
-            'image'=>"required",
-            'price'=>"required"
+            'price'=>"required",
+            'category'=>"required",
+            'product_image'=>"required",
         ]);
     }
 
