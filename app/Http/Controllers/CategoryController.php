@@ -28,7 +28,12 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            "name" => "required"
+        ]);
+        Category::create([
+            "name" => $request->name
+        ]);
     }
 
     /**
@@ -44,7 +49,7 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        //
+        
     }
 
     /**
@@ -52,7 +57,12 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        //
+        $request->validate([
+            "name" => "required"
+        ]);
+        $category->update([
+            "name" => $request->name
+        ]);
     }
 
     /**

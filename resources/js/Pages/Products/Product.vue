@@ -15,6 +15,9 @@ const search = ref(props.search);
 const category = ref(props.category);
 const add_modal = ref(false);
 const add_modal_category = ref(false);
+const update_modal_category = ref(false);
+
+const category_object = ref(false);
 
 const form = useForm({
   name: "",
@@ -31,12 +34,49 @@ const form_cat = useForm({
   name: null,
 });
 
+const form_update_cat = useForm({
+  name: null,
+});
+
 const open_modal_add = () => {
   add_modal.value = !add_modal.value;
 };
 
 const open_modal_add_category = () => {
   add_modal_category.value = !add_modal_category.value;
+};
+const open_modal_update_category = () => {
+  update_modal_category.value = !update_modal_category.value;
+};
+const add_category = () => {
+  form_cat.post(route("categories.store"), {
+    preserveScroll: true,
+    onSuccess: () => {
+      alert("Successfully added category");
+      form.reset();
+      open_modal_add_category();
+    },
+    onError: (error) => {
+      alert("Error adding new category");
+    },
+  });
+};
+
+const update_selected_category = (category) => {
+  category_object.value = category;
+  form_update_cat.name = category.name;
+};
+const save_selected_category = () => {
+  // temp_data_categories.value[temp_data_selected_category_id.value - 1]["name"] =
+  //   temp_data_selected_category.value;
+
+  form_update_cat.put(route("categories.update", category_object.value), {
+    preserveScroll: true,
+    onSuccess: () => {
+      form_update_cat.reset();
+      // alert("Updated selected category");
+    },
+  });
 };
 
 const search_ = () => {
@@ -102,6 +142,12 @@ const search_remove = () => {
               class="bg-yellow-300 p-2 mb-2 mt-5 rounded-lg w-[15vmin] hover:bg-yellow-500"
             >
               Add category
+            </button>
+            <button
+              @click="open_modal_update_category"
+              class="bg-yellow-300 p-2 mb-2 mt-5 rounded-lg w-[15vmin] hover:bg-yellow-500"
+            >
+              Update category
             </button>
           </div>
         </div>
@@ -183,6 +229,7 @@ const search_remove = () => {
               label="Enter product category name"
               v-model="form_cat.name"
             />
+            <JetInputError :message="form_cat.errors.name" class="mt-2" />
           </div>
         </div>
       </template>
@@ -194,6 +241,7 @@ const search_remove = () => {
           :class="{ 'opacity-25': form.processing }"
           :disabled="form.processing"
           class="bg-green-200 hover:bg-green-400"
+          @click="add_category"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -210,6 +258,65 @@ const search_remove = () => {
             /></svg
           >&nbsp;Submit
         </Button>
+      </template>
+    </JetDialogModal>
+
+    <JetDialogModal
+      :show="update_modal_category"
+      @close="update_modal_category = false"
+      maxWidth="2xl"
+    >
+      <template #title> Update category here!</template>
+      <template #content>
+        <div class="grid grid-cols-12 gap-1">
+          <div class="col-span-10">
+            <Input
+              type="text"
+              label="Enter product category name"
+              v-model="form_update_cat.name"
+            />
+            <JetInputError
+              :message="form_update_cat.errors.name"
+              class="mt-2"
+            />
+          </div>
+          <div class="col-span-2 my-auto">
+            <SecondaryButton
+              @click="save_selected_category"
+              class="mr-2 bg-green-300 mt-4"
+            >
+              Save
+            </SecondaryButton>
+          </div>
+        </div>
+        <div class="grid grid-cols-12 gap-1 mt-2 p-2">
+          <template v-for="(category, key) in props.categories" :key="key">
+            <div class="col-span-9 border-b hover:border-gray-200">
+              <p class="">
+                {{ category.name }}
+              </p>
+              <small> Category name </small>
+            </div>
+            <div class="col-span-3 border-b">
+              <div class="mx-auto">
+                <button
+                  @click="update_selected_category(category)"
+                  class="bg-orange-300 mt-3 ml-[50%] rounded-lg h-8 w-10"
+                >
+                  Edit
+                </button>
+              </div>
+            </div>
+          </template>
+        </div>
+      </template>
+      <template #footer>
+        <SecondaryButton
+          @click="update_modal_category = false"
+          class="mr-2 bg-red-300"
+        >
+          Close
+        </SecondaryButton>
       </template>
     </JetDialogModal>
   </AppLayout>

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\User;
 use Illuminate\Foundation\Application;
@@ -44,5 +45,10 @@ Route::middleware([
 
     Route::prefix('products')->name('products.')->group(function() {
         Route::get('/products', [ProductController::class, 'index'])->name('index');
+    });
+
+    Route::prefix('categories')->name('categories.')->group(function() {
+        Route::post('/add_cat', [CategoryController::class, 'store'])->name('store');
+        Route::put('/update_cat/{category}', [CategoryController::class, 'update'])->name('update');
     });
 });
