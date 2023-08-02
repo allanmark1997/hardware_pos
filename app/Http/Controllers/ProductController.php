@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Price;
 use App\Models\Product;
+use App\Models\sale_discount;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ProductController extends Controller
@@ -17,10 +20,10 @@ class ProductController extends Controller
         // dd($request->search);
         $search = $request->search ?? '';
         $category = $request->category ?? '';
-        $products = Product::with('user')->with('current_price')->when($search != null || $search != "", function($query) use($search){
+        $products = Product::with('user')->with('current_price')->with('current_discount')->when($search != null || $search != "", function($query) use($search){
             $query->where("name", "LIKE", "%{$search}%");
         })->when($category != null || $category != "", function($query) use($category){
-            $query->where("id", "LIKE", "%{$category}%");
+            $query->where("category_id", "LIKE", "%{$category}%");
         })->paginate(10);
         $categories = Category::get();
         return Inertia::render('Products/Product',[
@@ -51,6 +54,31 @@ class ProductController extends Controller
             'price'=>"required",
             'category'=>"required",
             'product_image'=>"required",
+            'sale_discount'=>"required",
+        ]);
+
+        $product = Product::create([
+            'name'=>$request->name,
+            'description'=>$request->description,
+            'remarks'=>$request->remarks,
+            'category_id'=>$request->category,
+            'product_image'=>$request->product_image,
+            'quantity'=>0,
+            'user_id'=> Auth::user()->id
+
+        ]);
+
+        Price::create([
+            'price'=>$request->price,
+            'product_id' => $product->id,
+            'user_id'=> Auth::user()->id
+        ]);
+
+        sale_discount::create([
+            'discount' => $request->sale_discount,
+            'type'=>1,
+            'product_id' => $product->id,
+            'user_id'=> Auth::user()->id
         ]);
     }
 

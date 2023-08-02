@@ -6,8 +6,12 @@ import { ref } from "vue";
 const props = defineProps(["products", "search", "category"]);
 
 const convert_money = (data) => {
-  let temp_data = data.toFixed(2);
-  return temp_data;
+  const formatter = new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+  });
+  formatter.format(data);
+  return formatter.format(data);
 };
 
 const date_time = (data) => {
@@ -60,7 +64,7 @@ const date_time = (data) => {
           </p>
         </div>
         <div class="items-center text-sm text-gray-900">
-          &#8369; {{ convert_money(product.current_price.price) }}
+          {{ convert_money(product.current_price.price) }}
           <p
             class="text-center text-xs text-gray-500 bg-gray-200 rounded-sm p-[0.1vmin]"
           >
@@ -68,7 +72,7 @@ const date_time = (data) => {
           </p>
         </div>
         <div class="items-center text-sm text-gray-900">
-          {{ product.sale_discount }}%
+          {{ product.current_discount.discount }}%
           <p
             class="text-center text-xs text-gray-500 bg-gray-200 rounded-sm p-[0.1vmin]"
           >

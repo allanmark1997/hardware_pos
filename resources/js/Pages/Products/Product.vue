@@ -23,7 +23,7 @@ const form = useForm({
   name: "",
   description: "",
   remarks: "",
-  product_image: [],
+  product_image: "",
   category: "",
   sale_discount: "",
   price: "",
@@ -41,8 +41,9 @@ const add_product = () => {
   form.post(route("products.store"), {
     preserveScroll: true,
     onSuccess: () => {
-      alert("Successfully added product");
       form.reset();
+      alert("Successfully added product");
+      open_modal_add();
     },
     onError: (error) => {
       alert("Error adding new product");
@@ -201,6 +202,14 @@ const search_remove = () => {
             <JetInputError :message="form.errors.price" class="mt-2" />
           </div>
           <div class="col-span-6">
+            <Input
+              type="text"
+              label="Product discount"
+              v-model="form.sale_discount"
+            />
+            <JetInputError :message="form.errors.sale_discount" class="mt-2" />
+          </div>
+          <div class="col-span-12">
             <select
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full h-10 my-auto mt-5"
               v-model="form.category"
@@ -213,7 +222,7 @@ const search_remove = () => {
             <JetInputError :message="form.errors.category" class="mt-2" />
           </div>
           <div class="col-span-12">
-            <Input type="text" label="Image" />
+            <Input type="text" label="Image" v-model="form.product_image" />
             <JetInputError :message="form.errors.product_image" class="mt-2" />
           </div>
         </div>

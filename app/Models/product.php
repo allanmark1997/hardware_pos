@@ -20,4 +20,7 @@ class Product extends Model
     public function current_price(){
         return $this->hasOne(Price::class, "product_id", "id")->latestOfMany();
     }
+    public function current_discount(){
+        return $this->hasOne(sale_discount::class, "product_id", "id")->latestOfMany();
+    }
 }
