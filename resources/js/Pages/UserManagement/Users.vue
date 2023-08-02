@@ -137,7 +137,7 @@ const search_remove = () => {
         </div>
 
         <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-          <UserLists :users="props.users" />
+          <UserLists :users="props.users" :search="search" />
         </div>
       </div>
     </div>
