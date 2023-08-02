@@ -1,6 +1,10 @@
 <script setup>
 import moment from "moment";
-const props = defineProps(["products"]);
+import Pagination2 from "@/Components/Pagination2.vue";
+import { ref } from "vue";
+
+const props = defineProps(["products", "search", "category"]);
+
 const convert_money = (data) => {
   let temp_data = data.toFixed(2);
   return temp_data;
@@ -25,9 +29,15 @@ const date_time = (data) => {
             :alt="product.name"
           />
         </div>
-        <div class="flex-1 min-w-0">
-          <p class="text-sm font-medium text-gray-900 truncate">
-            {{ product.name }}
+        <div
+          class="items-center text-sm text-gray-900 w-1/4 truncate text-center"
+          :title="product.name"
+        >
+          {{ product.name }}
+          <p
+            class="text-center text-xs text-gray-500 bg-gray-200 rounded-sm p-[0.1vmin]"
+          >
+            Name
           </p>
         </div>
         <div
@@ -98,28 +108,61 @@ const date_time = (data) => {
           </p>
         </div>
 
-        <!-- <div class="items-center text-sm text-gray-900 p-2"> -->
-        <!-- <button class="p-2 bg-orange-400 rounded-lg mr-2 hover:bg-orange-600">
-            Edit
-          </button> -->
-        <!-- <button
+        <div class="items-center text-sm text-gray-900 p-2">
+          <button
             @click="function_open_modal_confirmation(true, user)"
-            class="p-2 bg-green-400 rounded-lg hover:bg-green-600 mr-2"
-            v-if="user.status == 0 && user.type != 0"
+            class="p-2 bg-green-400 rounded-lg hover:bg-green-600 mr-2 w-full"
           >
-            Activate
+            Edit
           </button>
           <button
             @click="function_open_modal_confirmation(false, user)"
-            class="p-2 bg-red-400 rounded-lg hover:bg-red-600"
-            v-else-if="user.status == 1 && user.type != 0"
+            class="p-2 bg-red-400 rounded-lg hover:bg-red-600 w-full mt-1"
           >
-            Deactivate
+            Remove
           </button>
-        </div> -->
+        </div>
       </div>
     </li>
-    <!-- <Pagination2 :links="props.users.links" /> -->
-    <!-- <Pagination :links="props.users.links" /> -->
+    <Pagination2
+      :links="props.products.links"
+      :search="props.search"
+      :category="category"
+    />
   </ul>
+
+  <!-- <JetDialogModal :show="add_modal" @close="add_modal = false" maxWidth="2xl">
+    <template #title> Are you sure you want to update this user?</template>
+    <template #content>
+      <p class="text-red-500">
+        Clicking can update the system and this is not reversible!
+      </p>
+    </template>
+    <template #footer>
+      <SecondaryButton @click="add_modal = false" class="mr-2">
+        nevermind
+      </SecondaryButton>
+      <Button
+        :class="{ 'opacity-25': form.processing }"
+        :disabled="form.processing"
+        class="bg-green-200 hover:bg-green-400"
+        @click="function_update"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-auto"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+          /></svg
+        >&nbsp;Submit
+      </Button>
+    </template>
+  </JetDialogModal> -->
 </template>

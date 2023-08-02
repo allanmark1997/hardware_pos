@@ -15,7 +15,7 @@ class User extends Controller
         $search = $request->search ?? "";
         $users = ModelsUser::when($search != null || $search != "", function($query) use($search){
             $query->where("name", "LIKE", "%{$search}%");
-        })->paginate(1);
+        })->paginate(10);
         return Inertia::render('UserManagement/Users',[
             'users'=>$users,
             'search'=>$search

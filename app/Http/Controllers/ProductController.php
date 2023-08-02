@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -11,11 +12,22 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with('user')->with('current_price')->paginate(10);
+        // dd($request->search);
+        $search = $request->search ?? '';
+        $category = $request->category ?? '';
+        $products = Product::with('user')->with('current_price')->when($search != null || $search != "", function($query) use($search){
+            $query->where("name", "LIKE", "%{$search}%");
+        })->when($category != null || $category != "", function($query) use($category){
+            $query->where("id", "LIKE", "%{$category}%");
+        })->paginate(10);
+        $categories = Category::get();
         return Inertia::render('Products/Product',[
-            "products" => $products
+            "products" => $products,
+            "search" => $search,
+            "categories" => $categories,
+            "category" => $category
         ]);
     }
 
@@ -32,7 +44,13 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name'=>"required",
+            'description'=>"required",
+            'remarks'=>"required",
+            'image'=>"required",
+            'price'=>"required"
+        ]);
     }
 
     /**
