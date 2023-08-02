@@ -4,13 +4,13 @@ import UserLists from "./UserLists.vue";
 import Input from "@/Components/Input.vue";
 import JetDialogModal from "@/Components/DialogModal.vue";
 import { ref } from "vue";
-import { useForm, usePage } from "@inertiajs/vue3";
+import { router, useForm, usePage } from "@inertiajs/vue3";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import Button from "@/Components/Button.vue";
 import Input2 from "@/Components/InputCustom.vue";
 import JetInputError from "@/Components/InputError.vue";
 
-const props = defineProps(["users"]);
+const props = defineProps(["users", "search"]);
 const addModal = ref(false);
 const sex_ = ref(false);
 const status_ = ref(false);
@@ -18,6 +18,7 @@ const type_ = ref(false);
 const sex_label = ref("Select Sex");
 const status_label = ref("Select Status");
 const type_label = ref("Select Type");
+const search = ref(props.search);
 const form = useForm({
   fname: "",
   mname: "",
@@ -94,6 +95,13 @@ const add_user = () => {
     },
   });
 };
+const search_ = () => {
+  router.get(route("users.index", { search: search.value }));
+};
+const search_remove = () => {
+  search.value = "";
+  router.get(route("users.index", { search: search.value }));
+};
 </script>
 
 <template>
@@ -107,11 +115,19 @@ const add_user = () => {
     <div class="py-">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="flex justify-between">
-          <Input
-            class="rounded-lg mb-2 w-[30vmin]"
-            type="text"
-            label="Search users"
-          />
+          <div class="flex">
+            <Input
+              v-model="search"
+              class="rounded-lg mb-2 w-[30vmin]"
+              type="text"
+              label="Search users"
+              @keyup.enter="search_"
+            />
+            <button class="p-2 h-10 my-auto mt-5" @click="search_remove">
+              <span class="bg-red-400 p-2 rounded-lg">x</span>
+            </button>
+          </div>
+
           <button
             @click="open_modal_add"
             class="bg-yellow-300 p-2 mb-2 mt-5 rounded-lg w-[15vmin] hover:bg-yellow-500"

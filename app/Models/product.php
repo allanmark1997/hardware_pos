@@ -18,6 +18,6 @@ class Product extends Model
     }
 
     public function current_price(){
-        return $this->hasOne(Price::class, "product_id", "id");
+        return $this->hasOne(Price::class, "product_id", "id")->latestOfMany();
     }
 }

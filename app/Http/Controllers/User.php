@@ -10,10 +10,15 @@ use Inertia\Inertia;
 
 class User extends Controller
 {
-    public function index(){
-        $users = ModelsUser::paginate(10);
+    public function index(Request $request){
+        // dd($request->search);
+        $search = $request->search ?? "";
+        $users = ModelsUser::when($search != null || $search != "", function($query) use($search){
+            $query->where("name", "LIKE", "%{$search}%");
+        })->paginate(10);
         return Inertia::render('UserManagement/Users',[
-            'users'=>$users
+            'users'=>$users,
+            'search'=>$search
         ]);
     }
 
@@ -29,7 +34,6 @@ class User extends Controller
             'type' => 'required',
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => 'required',
-
         ]);
         $fullname = $request->fname.' '.$request->mname.' '.$request->lname;
         
