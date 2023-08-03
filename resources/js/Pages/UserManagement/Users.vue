@@ -123,14 +123,16 @@ const search_remove = () => {
               label="Search users"
               @keyup.enter="search_"
             />
-            <button class="p-2 h-10 my-auto mt-5" @click="search_remove">
-              <span class="bg-red-400 p-2 rounded-lg">x</span>
+            <button class="p-2 h-10 my-auto mt-5" v-if="search" @click="search_remove">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-red-500">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
             </button>
           </div>
 
           <button
             @click="open_modal_add"
-            class="bg-yellow-300 p-2 mb-2 mt-5 rounded-lg w-[15vmin] hover:bg-yellow-500"
+            class="bg-yellow-400 p-2 mb-2 mt-5 rounded-lg w-[15vmin] hover:bg-yellow-500"
           >
             Add user
           </button>

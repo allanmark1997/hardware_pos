@@ -19,121 +19,73 @@ const date_time = (data) => {
 };
 </script>
 <template>
-  <ul class="max-w-full divide-y divide-gray-200 p-2">
-    <li
-      class="pb-3 hover:bg-blue-50"
-      v-for="(product, index) in products.data"
-      :key="index"
-    >
-      <div class="flex items-center space-x-4">
-        <div class="flex-shrink-0">
-          <img
-            class="w-8 h-8 rounded-full"
-            :src="product.product_image"
-            :alt="product.name"
-          />
-        </div>
-        <div
-          class="items-center text-sm text-gray-900 w-1/4 truncate text-center"
-          :title="product.name"
-        >
-          {{ product.name }}
-          <p
-            class="text-center text-xs text-gray-500 bg-gray-200 rounded-sm p-[0.1vmin]"
-          >
-            Name
-          </p>
-        </div>
-        <div
-          class="items-center text-sm text-gray-900 w-1/4 truncate text-center"
-          :title="product.description"
-        >
-          {{ product.description }}
-          <p
-            class="text-center text-xs text-gray-500 bg-gray-200 rounded-sm p-[0.1vmin]"
-          >
-            Description
-          </p>
-        </div>
-        <div class="items-center text-sm text-gray-900">
-          {{ product.remarks }}
-          <p
-            class="text-center text-xs text-gray-500 bg-gray-200 rounded-sm p-[0.1vmin]"
-          >
-            Remarks
-          </p>
-        </div>
-        <div class="items-center text-sm text-gray-900">
-          {{ convert_money(product.current_price.price) }}
-          <p
-            class="text-center text-xs text-gray-500 bg-gray-200 rounded-sm p-[0.1vmin]"
-          >
-            Current Price
-          </p>
-        </div>
-        <div class="items-center text-sm text-gray-900">
-          {{ product.current_discount.discount }}%
-          <p
-            class="text-center text-xs text-gray-500 bg-gray-200 rounded-sm p-[0.1vmin]"
-          >
-            Sale Discount
-          </p>
-        </div>
-        <div class="items-center text-sm text-gray-900">
-          {{ product.quantity }}
-          <p
-            class="text-center text-xs text-gray-500 bg-gray-200 rounded-sm p-[0.1vmin]"
-          >
-            Quantity
-          </p>
-        </div>
-        <div class="items-center text-sm text-gray-900">
-          {{ product.user.name }}
-          <p
-            class="text-center text-xs text-gray-500 bg-gray-200 rounded-sm p-[0.1vmin]"
-          >
-            Updated by
-          </p>
-        </div>
-        <div class="items-center text-sm text-gray-900">
-          {{ date_time(product.updated_at) }}
-          <p
-            class="text-center text-xs text-gray-500 bg-gray-200 rounded-sm p-[0.1vmin]"
-          >
-            Updated
-          </p>
-        </div>
-        <div class="items-center text-sm text-gray-900">
-          {{ date_time(product.created_at) }}
-          <p
-            class="text-center text-xs text-gray-500 bg-gray-200 rounded-sm p-[0.1vmin]"
-          >
-            Created
-          </p>
+<div>
+  <section class="text-gray-600 bg-white rounded-lg py-5 px-5  mb-5 ">
+    <div class="container  mx-auto">
+      <div class="flex flex-wrap -m-4">
+        <div class="p-4 md:w-1/4" v-for="(product, index) in products.data" :key="index">
+          <div class="h-full border-2 border-gray-100 shadow-md rounded-lg overflow-hidden">
+            <img v-if="product.product_image" class="lg:h-48 md:h-36 w-full object-cover object-center"
+              :src="product.product_image" alt="blog">
+            <img v-if="!product.product_image" class="lg:h-48 md:h-36 w-full object-cover object-center"
+              src="https://dummyimage.com/720x400" alt="blog">
+            <div class="p-6">
+              <h2 class="tracking-widest text-md title-font font-bold text-yellow-500 mb-1">ID: {{ product.id }}</h2>
+              <h1 class="title-font text-3xl capitalize font-medium text-gray-900 mb-3">{{ product.name }}</h1>
+              <p class="leading-relaxed mb-3"><span class="font-bold text-sm">Description: </span> {{ product.description
+              }}</p>
+              <p class="leading-relaxed mb-3"><span class="font-bold text-sm">Remarks: </span> {{ product.remarks }}</p>
+              <p class="leading-relaxed mb-3"><span class="font-bold text-sm">Current Price: </span> {{
+                convert_money(product.current_price.price) }}</p>
+              <p class="leading-relaxed mb-3"><span class="font-bold text-sm">Sale Discount: </span> {{
+                product.current_discount.discount }}%</p>
+              <p class="leading-relaxed mb-3"><span class="font-bold text-sm">Quantity: </span> {{ product.quantity }}
+              </p>
+              <p class="leading-relaxed mb-3"><span class="font-bold text-sm">Updated by: </span> {{ product.user.name }}
+              </p>
+              <p class="leading-relaxed mb-3"><span class="font-bold text-sm">Updated at: </span> {{
+                date_time(product.updated_at) }}</p>
+              <p class="leading-relaxed mb-3"><span class="font-bold text-sm">Created at: </span> {{
+                date_time(product.created_at) }}</p>
+
+              <div class="flex items-center  w-10  ">
+                <button @click="function_open_modal_confirmation(true, user)"
+                  class="p-2  bg-yellow-400 rounded-lg hover:bg-yellow-600 mr-2 w-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-6 h-6 text-white">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                  </svg>
+
+                </button>
+                <button @click="function_open_modal_confirmation(false, user)"
+                  class="p-2  bg-red-400 rounded-lg hover:bg-red-600 w-full ">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-6 h-6 text-white">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                  </svg>
+
+                </button>
+
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="items-center text-sm text-gray-900 p-2">
-          <button
-            @click="function_open_modal_confirmation(true, user)"
-            class="p-2 bg-green-400 rounded-lg hover:bg-green-600 mr-2 w-full"
-          >
-            Edit
-          </button>
-          <button
-            @click="function_open_modal_confirmation(false, user)"
-            class="p-2 bg-red-400 rounded-lg hover:bg-red-600 w-full mt-1"
-          >
-            Remove
-          </button>
-        </div>
       </div>
-    </li>
-    <Pagination2
-      :links="props.products.links"
-      :search="props.search"
-      :category="category"
-    />
-  </ul>
+      
+      <div class="flex items-center justify-between ">
+        <Pagination2 :links="props.products.links" :search="props.search" :category="category" />
+      <p class="mt-6 text-sm text-gray-500">
+      Showing {{ products.data.length }} Products
+    </p>
+    </div>
+    </div>
+    
+    
+  </section>
+</div>
 
   <!-- <JetDialogModal :show="add_modal" @close="add_modal = false" maxWidth="2xl">
     <template #title> Are you sure you want to update this user?</template>
@@ -168,5 +120,4 @@ const date_time = (data) => {
         >&nbsp;Submit
       </Button>
     </template>
-  </JetDialogModal> -->
-</template>
+  </JetDialogModal> --></template>
