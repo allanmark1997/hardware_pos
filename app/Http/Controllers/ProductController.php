@@ -24,7 +24,7 @@ class ProductController extends Controller
             $query->where("name", "LIKE", "%{$search}%");
         })->when($category != null || $category != "", function($query) use($category){
             $query->where("category_id", "LIKE", "%{$category}%");
-        })->paginate(10);
+        })->paginate(12);
         $categories = Category::get();
         return Inertia::render('Products/Product',[
             "products" => $products,

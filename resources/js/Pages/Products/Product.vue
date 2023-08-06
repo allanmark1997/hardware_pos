@@ -137,23 +137,8 @@ const search_remove = () => {
           </div>
 
           <div class="flex gap-2">
-
-            <button @click="open_modal_add_category"
-              class="bg-yellow-400 text-sm font-bold  mb-2 mt-5 rounded-lg w-[15vmin] hover:bg-yellow-500 flex gap-2 item-center justify-center">
-              <a class="my-auto gap-2 flex">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                  stroke="currentColor" class="w-5 h-5">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" />
-                </svg>
-                <span>Add category</span>
-              </a>
-
-
-            </button>
             <button @click="open_modal_add"
-              class="bg-yellow-400 text-sm font-bold p-2 mb-2 mt-5 rounded-lg w-[15vmin] hover:bg-yellow-500">
+              class="bg-yellow-400 text-sm font-bold p-2 mb-2 mt-5 rounded-lg w-[20vmin] hover:bg-yellow-500">
               <a class="my-auto gap-2 flex">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                   stroke="currentColor" class="w-5 h-5">
@@ -164,8 +149,21 @@ const search_remove = () => {
                 <span>Add product</span>
               </a>
             </button>
+            <button @click="open_modal_add_category"
+              class="bg-yellow-400 text-sm font-bold  mb-2 mt-5 rounded-lg w-[20vmin] hover:bg-yellow-500 flex gap-2 item-center justify-center">
+              <a class="my-auto gap-2 flex">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                  stroke="currentColor" class="w-5 h-5">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" />
+                </svg>
+                <span>Add category</span>
+              </a>
+            </button>
+            
             <button @click="open_modal_update_category"
-              class="bg-yellow-400 text-sm font-bold p-2 mb-2 mt-5 rounded-lg w-[15vmin] hover:bg-yellow-500">
+              class="bg-yellow-400 text-sm font-bold p-2 mb-2 mt-5 rounded-lg w-[20vmin] hover:bg-yellow-500">
               <a class="my-auto gap-1 flex">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                   stroke="currentColor" class="w-5 h-5">
@@ -194,7 +192,7 @@ const search_remove = () => {
             <JetInputError :message="form.errors.name" class="mt-2" />
           </div>
           <div class="col-span-12">
-            <textarea class="w-full rounded-lg border-1 border-gray-300 h-[100px]" placeholder="Product description"
+            <textarea class="w-full rounded-lg border-1 border-gray-300 h-[100px] focus:ring-yellow-500 focus:border-yellow-500" placeholder="Product description"
               v-model="form.description">
             </textarea>
             <JetInputError :message="form.errors.description" class="mt-2" />
@@ -229,7 +227,7 @@ const search_remove = () => {
         </div>
       </template>
       <template #footer>
-        <SecondaryButton @click="add_modal = false" class="mr-2">
+        <SecondaryButton @click="add_modal = false" class="mr-2 hover:bg-red-500">
           nevermind
         </SecondaryButton>
         <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing"
@@ -277,12 +275,12 @@ const search_remove = () => {
             <JetInputError :message="form_update_cat.errors.name" class="mt-2" />
           </div>
           <div class="col-span-2 my-auto">
-            <SecondaryButton @click="save_selected_category" class="mr-2 bg-green-300 mt-4">
+            <SecondaryButton @click="save_selected_category" class="mr-2 hover:bg-green-300 mt-4">
               Save
             </SecondaryButton>
           </div>
         </div>
-        <div class="grid  gap-1 mt-2 p-2">
+        <div class="grid  gap-1 mt-2 p-2 overflow-auto h-[380px]">
           <template v-for="(category, key) in props.categories" :key="key">
             <div class="col-span-9 flex justify-between border-2 border-gray-200 p-2 rounded-lg shadow-sm hover:border-gray-200">
               <div>
@@ -306,7 +304,7 @@ const search_remove = () => {
         </div>
       </template>
       <template #footer>
-        <SecondaryButton @click="update_modal_category = false" class="mr-2 bg-red-300">
+        <SecondaryButton @click="update_modal_category = false" class="mr-2 hover:bg-red-300">
           Close
         </SecondaryButton>
       </template>
