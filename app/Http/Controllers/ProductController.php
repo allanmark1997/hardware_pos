@@ -24,8 +24,8 @@ class ProductController extends Controller
             $query->where("name", "LIKE", "%{$search}%");
         })->when($category != null || $category != "", function($query) use($category){
             $query->where("category_id", "LIKE", "%{$category}%");
-        })->paginate(12);
-        $categories = Category::get();
+        })->orderBy('created_at', 'desc')->paginate(12);
+        $categories = Category::orderBy('name','asc')->get();
         return Inertia::render('Products/Product',[
             "products" => $products,
             "search" => $search,
