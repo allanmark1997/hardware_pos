@@ -54,7 +54,7 @@ class ProductController extends Controller
             'price'=>["required", "integer"],
             'category'=>"required",
             'product_image'=>"required",
-            'sale_discount'=>["required", "integer"],
+            'sale_discount'=>["required", "integer", "max:2"],
         ]);
 
         $product = Product::create([
@@ -101,7 +101,7 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Product $product)
     {
         //
     }
