@@ -21,7 +21,7 @@ const select_position = (data) => {
 };
 </script>
 <template>
-  <div class="col-span-4">
+  <div class="col-span-4 relative">
     <button
       @click="open_modal_position"
       class="text-gray-500 bg-white focus:ring-1 focus:outline-none focus:ring-yellow-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center border border-gray-300  w-full"

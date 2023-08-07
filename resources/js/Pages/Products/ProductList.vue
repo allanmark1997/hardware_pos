@@ -1,9 +1,39 @@
 <script setup>
 import moment from "moment";
 import Pagination2 from "@/Components/Pagination2.vue";
+import ConfirmDialogModal from "@/Components/ConfirmationModal.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
+import Button from "@/Components/Button.vue";
+
+
 import { ref } from "vue";
+import { router, useForm } from "@inertiajs/vue3";
 
 const props = defineProps(["products", "search", "category"]);
+const condfirmationModal = ref(false);
+
+const form = useForm({
+  product:false
+})
+
+const function_open_modal_confirmation = (product) => {
+  form.product = product;
+  condfirmationModal.value = !condfirmationModal.value;
+};
+
+const remove_product = () => {
+  form.put(route('products.remove', form.product), {
+    preserveScroll:true,
+    onSuccess: () => {
+      alert('Product removed');
+      condfirmationModal.value = false;
+      form.reset()
+    },
+    onError: (error) => {
+      alert("Something went wrong " + error)
+    },
+  })
+}
 
 const convert_money = (data) => {
   const formatter = new Intl.NumberFormat("en-PH", {
@@ -36,7 +66,7 @@ const date_time = (data) => {
                   class="lg:h-48 md:h-36 w-full object-scale-down object-center bg-gray-100"
                   src="https://dummyimage.com/720x400" :alt="product.name" />
                 <div class="absolute hidden group-hover:block top-0 right-0 text-white p-2 rounded  ">
-                  <button @click="function_open_modal_confirmation(true, user)"
+                  <button 
                     class="p-2 bg-yellow-400 rounded-lg hover:bg-yellow-600  mr-2 w-auto">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                       stroke="currentColor" class="w-6 h-6 text-white">
@@ -44,7 +74,7 @@ const date_time = (data) => {
                         d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                     </svg>
                   </button>
-                  <button @click="function_open_modal_confirmation(false, user)"
+                  <button @click="function_open_modal_confirmation(product)"
                     class="p-2 bg-red-400 rounded-lg hover:bg-red-600 w-auto mt-2">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                       stroke="currentColor" class="w-6 h-6 text-white">
@@ -137,7 +167,44 @@ const date_time = (data) => {
       </div>
     </section>
   </div>
-
+  <ConfirmDialogModal
+    :show="condfirmationModal"
+    @close="condfirmationModal = false"
+    maxWidth="2xl"
+  >
+    <template #title> Are you sure you want to remove this product?</template>
+    <template #content>
+      <p class="text-red-500">
+        This action can update the system and this is not reversible!
+      </p>
+    </template>
+    <template #footer>
+      <SecondaryButton @click="condfirmationModal = false" class="mr-2">
+        nevermind
+      </SecondaryButton>
+      <Button
+        :class="{ 'opacity-25': form.processing }"
+        :disabled="form.processing"
+        class="bg-green-200 hover:bg-green-400"
+        @click="remove_product"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-auto"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+          /></svg
+        >&nbsp;Submit
+      </Button>
+    </template>
+  </ConfirmDialogModal>
   <!-- <JetDialogModal :show="add_modal" @close="add_modal = false" maxWidth="2xl">
     <template #title> Are you sure you want to update this user?</template>
     <template #content>

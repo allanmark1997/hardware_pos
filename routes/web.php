@@ -46,6 +46,7 @@ Route::middleware([
     Route::prefix('products')->name('products.')->group(function() {
         Route::get('/products', [ProductController::class, 'index'])->name('index');
         Route::post('/add_products', [ProductController::class, 'store'])->name('store');
+        Route::put('/remove_products/{product}', [ProductController::class, 'destroy'])->name('remove');
     });
 
     Route::prefix('categories')->name('categories.')->group(function() {

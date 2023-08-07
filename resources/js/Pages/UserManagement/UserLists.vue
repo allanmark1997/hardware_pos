@@ -2,6 +2,7 @@
 import Pagination2 from "@/Components/Pagination2.vue";
 import Pagination from "@/Components/Pagination.vue";
 import JetDialogModal from "@/Components/DialogModal.vue";
+import ConfirmDialogModal from "@/Components/ConfirmationModal.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import Button from "@/Components/Button.vue";
 import Dropdown from "@/Components/CustomDropdownPosition.vue";
@@ -101,7 +102,7 @@ const function_update = () => {
                     scope="col"
                     class="px-4 py-3.5 text-sm font-bold text-left rtl:text-right text-gray-900"
                   >
-                    Birthday
+                    Birthday & Contact #
                   </th>
 
                   <th
@@ -111,12 +112,12 @@ const function_update = () => {
                     Hometown
                   </th>
 
-                  <th
+                  <!-- <th
                     scope="col"
                     class="px-4 py-3.5 text-sm font-bold text-left rtl:text-right text-gray-900"
                   >
                     Contact #
-                  </th>
+                  </th> -->
 
                   <th
                     scope="col"
@@ -167,11 +168,17 @@ const function_update = () => {
                     </div>
                   </td>
                   <td class="px-4 py-4 text-sm whitespace-nowrap">
-                    <div class="flex gap-1">
+                    <div class="flex gap-1 mb-1">
                       <Icon icon="birthday" size="sm" />
                       <h4 class="text-gray-700">
                         {{ function_extract_date_time(user.bday) }}
                       </h4>
+                    </div>
+                    <div class="flex gap-2">
+                      <Icon icon="mobile" size="sm" />
+                      <p class="text-sm">
+                        {{ user.contact_no }}
+                      </p>
                     </div>
                   </td>
 
@@ -183,14 +190,14 @@ const function_update = () => {
                       </p>
                     </div>
                   </td>
-                  <td class="px-4 py-4 whitespace-nowrap">
+                  <!-- <td class="px-4 py-4 whitespace-nowrap">
                     <div class="flex gap-2">
                       <Icon icon="mobile" size="sm" />
                       <p class="text-sm">
                         {{ user.contact_no }}
                       </p>
                     </div>
-                  </td>
+                  </td> -->
 
                   <td v-if="user.type != 0" class="text-sm whitespace-nowrap">
                     <Dropdown :status="user.type" :id="user.id" />
@@ -241,7 +248,7 @@ const function_update = () => {
       </p>
     </div>
   </section>
-  <JetDialogModal
+  <ConfirmDialogModal
     :show="condfirmationModal"
     @close="condfirmationModal = false"
     maxWidth="2xl"
@@ -278,5 +285,5 @@ const function_update = () => {
         >&nbsp;Submit
       </Button>
     </template>
-  </JetDialogModal>
+  </ConfirmDialogModal>
 </template>
