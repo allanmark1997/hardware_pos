@@ -29,7 +29,7 @@ class User extends Controller
             'sex' => 'required',
             'birthday' => ['required', 'date'],
             'address' => 'required',
-            'contact_no' => 'required',
+            'contact_no' => ['required', 'string', 'max:13'],
             'status' => 'required',
             'type' => 'required',
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],

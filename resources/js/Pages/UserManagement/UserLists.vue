@@ -168,7 +168,7 @@ const function_update = () => {
                   </td>
                   <td class="px-4 py-4 text-sm whitespace-nowrap">
                     <div class="flex gap-1">
-                      <Icon icon="calendar" size="sm" />
+                      <Icon icon="birthday" size="sm" />
                       <h4 class="text-gray-700">
                         {{ function_extract_date_time(user.bday) }}
                       </h4>
@@ -196,9 +196,13 @@ const function_update = () => {
                     <Dropdown :status="user.type" :id="user.id" />
                   </td>
                   <td v-else class="text-sm whitespace-nowrap">
-                    <p class="text-sm text-gray-700 text-center font-bold">
-                      Root admin
-                    </p>
+                    <div class="flex my-auto gap-1">
+                      <Icon icon="administrator" size="sm" />
+
+                      <p class="text-sm text-gray-700 text-center font-bold">
+                        Root admin
+                      </p>
+                    </div>
                   </td>
                   <td v-if="user.type != 0" class="text-sm whitespace-nowrap">
                     <button

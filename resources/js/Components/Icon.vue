@@ -12,6 +12,9 @@ const icons = {
   mobile: "mobile",
   phone: "phone",
   sex: "sex",
+  birthday: "birthday",
+  calendar_minus: "calendar_minus",
+  calendar_plus: "calendar_plus",
 };
 
 const size = computed(() => {
@@ -202,6 +205,30 @@ const size = computed(() => {
   <img
     v-if="icon_default === icons.sex"
     src="./images/gender.png"
+    :class="size"
+  />
+
+  <img
+    v-if="icon_default === icons.administrator"
+    src="./images/administrator.png"
+    :class="size"
+  />
+
+  <img
+    v-if="icon_default === icons.birthday"
+    src="./images/birthday.png"
+    :class="size"
+  />
+
+  <img
+    v-if="icon_default === icons.calendar_plus"
+    src="./images/calendar_plus.png"
+    :class="size"
+  />
+
+  <img
+    v-if="icon_default === icons.calendar_minus"
+    src="./images/calendar_minus.png"
     :class="size"
   />
 </template>
