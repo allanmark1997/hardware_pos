@@ -87,7 +87,7 @@ const date_time = (data) => {
                 src="https://dummyimage.com/720x400"
                 :alt="product.name"
               />
-              <div class="flex justify-between -mt-6">
+              <div class="flex justify-between -mt-5">
                 <h2
                   class="tracking-widest text-sm title-font font-bold text-yellow-500 mb-1 bg-white rounded-lg p-1"
                 >
