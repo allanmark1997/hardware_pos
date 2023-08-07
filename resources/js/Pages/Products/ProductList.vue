@@ -89,12 +89,12 @@ const date_time = (data) => {
               />
               <div class="flex justify-between -mt-6">
                 <h2
-                  class="tracking-widest text-sm title-font font-bold text-yellow-500 mb-1 bg-white"
+                  class="tracking-widest text-sm title-font font-bold text-yellow-500 mb-1 bg-white rounded-lg p-1"
                 >
                   Stocks: {{ product.quantity }}
                 </h2>
                 <h2
-                  class="tracking-widest text-sm title-font font-bold text-orange-500 mb-1 bg-white"
+                  class="tracking-widest text-sm title-font font-bold text-orange-500 mb-1 bg-white rounded-lg p-1"
                 >
                   Discount: {{ product.current_discount.discount }}%
                 </h2>
