@@ -266,12 +266,12 @@ const search_remove = () => {
             <JetInputError :message="form.errors.remarks" class="mt-2" />
           </div>
           <div class="col-span-6">
-            <Input type="text" label="Product price" v-model="form.price" />
+            <Input type="number" label="Product price" v-model="form.price" />
             <JetInputError :message="form.errors.price" class="mt-2" />
           </div>
           <div class="col-span-6">
             <Input
-              type="text"
+              type="number"
               label="Product discount"
               v-model="form.sale_discount"
             />

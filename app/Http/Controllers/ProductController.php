@@ -48,13 +48,13 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'=>"required",
+            'name'=>["required","max:30"],
             'description'=>"required",
-            'remarks'=>"required",
-            'price'=>"required",
+            'remarks'=>["required","max:20"],
+            'price'=>["required", "integer"],
             'category'=>"required",
             'product_image'=>"required",
-            'sale_discount'=>"required",
+            'sale_discount'=>["required", "integer"],
         ]);
 
         $product = Product::create([
