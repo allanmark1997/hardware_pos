@@ -159,7 +159,7 @@ const search_remove = () => {
           <div class="flex gap-2">
             <button
               @click="open_modal_add"
-              class="bg-yellow-400 text-sm font-bold p-2 mb-2 mt-5 rounded-lg w-[20vmin] hover:bg-yellow-500"
+              class="bg-yellow-400 text-sm font-bold mb-2 mt-5 rounded-lg w-[20vmin] hover:bg-yellow-500 flex gap-2 item-center justify-center"
             >
               <a class="my-auto gap-2 flex">
                 <svg
@@ -210,7 +210,7 @@ const search_remove = () => {
 
             <button
               @click="open_modal_update_category"
-              class="bg-yellow-400 text-sm font-bold p-2 mb-2 mt-5 rounded-lg w-[20vmin] hover:bg-yellow-500"
+              class="bg-yellow-400 text-sm font-bold mb-2 mt-5 rounded-lg w-[20vmin] hover:bg-yellow-500 flex gap-2 item-center justify-center"
             >
               <a class="my-auto gap-1 flex">
                 <svg
