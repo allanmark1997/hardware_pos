@@ -103,7 +103,37 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        //
+        $request->validate([
+            'name'=>["required","max:30"],
+            'description'=>"required",
+            'remarks'=>["required","max:20"],
+            'price'=>["required", "integer"],
+            'category'=>"required",
+            'sale_discount'=>["required", "integer", "max:2"],
+        ]);
+
+        $product -> update([
+            'name'=>$request->name,
+            'description'=>$request->description,
+            'remarks'=>$request->remarks,
+            'category_id'=>$request->category,
+            'user_id'=> Auth::user()->id
+        ]);
+
+        Price::create([
+            'price'=>$request->price,
+            'product_id' => $product->id,
+            'user_id'=> Auth::user()->id
+        ]);
+
+        sale_discount::create([
+            'discount' => $request->sale_discount,
+            'type'=>1,
+            'product_id' => $product->id,
+            'user_id'=> Auth::user()->id
+        ]);
+
+        return back();
     }
 
     /**

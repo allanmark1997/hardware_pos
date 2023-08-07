@@ -239,6 +239,7 @@ const search_remove = () => {
             :products="products"
             :search="search"
             :category="category"
+            :categories="categories"
           />
         </div>
       </div>

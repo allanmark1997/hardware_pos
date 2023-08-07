@@ -4,16 +4,32 @@ import Pagination2 from "@/Components/Pagination2.vue";
 import ConfirmDialogModal from "@/Components/ConfirmationModal.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import Button from "@/Components/Button.vue";
+import JetInputError from "@/Components/InputError.vue";
+import Input from "@/Components/Input.vue";
+import JetDialogModal from "@/Components/DialogModal.vue";
+import Icon from "@/Components/Icon.vue";
 
 
 import { ref } from "vue";
 import { router, useForm } from "@inertiajs/vue3";
 
-const props = defineProps(["products", "search", "category"]);
+const props = defineProps(["products", "search", "category", "categories"]);
 const condfirmationModal = ref(false);
+const updateModal = ref(false);
 
 const form = useForm({
-  product:false
+  product: false
+})
+
+const form_update = useForm({
+  product: false,
+  name: "",
+  description: "",
+  remarks: "",
+  product_image: "",
+  category: "",
+  sale_discount: "",
+  price: "",
 })
 
 const function_open_modal_confirmation = (product) => {
@@ -21,13 +37,38 @@ const function_open_modal_confirmation = (product) => {
   condfirmationModal.value = !condfirmationModal.value;
 };
 
+const function_open_modal_update = (product) => {
+  form_update.product = product;
+  form_update.name = product.name;
+  form_update.description = product.description;
+  form_update.remarks = product.remarks;
+  form_update.category = product.category_id;
+  form_update.sale_discount = product.current_discount.discount;
+  form_update.price = product.current_price.price;
+  updateModal.value = !updateModal.value;
+};
+
 const remove_product = () => {
   form.put(route('products.remove', form.product), {
-    preserveScroll:true,
+    preserveScroll: true,
     onSuccess: () => {
       alert('Product removed');
       condfirmationModal.value = false;
       form.reset()
+    },
+    onError: (error) => {
+      alert("Something went wrong " + error)
+    },
+  })
+}
+
+const update_product = () => {
+  form_update.post(route('products.update', form_update.product), {
+    preserveScroll: true,
+    onSuccess: () => {
+      alert('Product update');
+      updateModal.value = false;
+      form_update.reset()
     },
     onError: (error) => {
       alert("Something went wrong " + error)
@@ -66,7 +107,7 @@ const date_time = (data) => {
                   class="lg:h-48 md:h-36 w-full object-scale-down object-center bg-gray-100"
                   src="https://dummyimage.com/720x400" :alt="product.name" />
                 <div class="absolute hidden group-hover:block top-0 right-0 text-white p-2 rounded  ">
-                  <button 
+                  <button @click="function_open_modal_update(product)"
                     class="p-2 bg-yellow-400 rounded-lg hover:bg-yellow-600  mr-2 w-auto">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                       stroke="currentColor" class="w-6 h-6 text-white">
@@ -83,7 +124,7 @@ const date_time = (data) => {
                     </svg>
                   </button>
                 </div>
-                
+
               </div>
 
               <div class="flex justify-between -mt-5 relative">
@@ -96,7 +137,8 @@ const date_time = (data) => {
               </div>
               <div class="p-4">
                 <h1 class="title-font text-lg capitalize font-bold text-gray-900">
-                  {{ product.name }} <span v-if="product.quantity == 0" class="italic text-xs text-red-500">- (Out of stocks)</span>
+                  {{ product.name }} <span v-if="product.quantity == 0" class="italic text-xs text-red-500">- (Out of
+                    stocks)</span>
                 </h1>
 
                 <h2 class="tracking-widest text-lg title-font font-bold text-gray-500 mb-3">
@@ -117,17 +159,24 @@ const date_time = (data) => {
                   product.current_discount.discount }}%</p>
                 <p class="leading-relaxed mb-3"><span class="font-bold text-sm">Quantity: </span> {{ product.quantity }}
                 </p> -->
-                <p class="leading-relaxed text-xs">
-                  <span class="font-bold text-sm">Updated by: </span>
+                <p class="leading-relaxed text-xs flex gap-2 mb-2">
+                 <img
+                          class="w-6 h-6 rounded-full"
+                          :src="product.user.profile_photo_url"
+                          :alt="product.user.name"
+                        />
                   {{ product.user.name }}
                 </p>
                 <div class="flex">
-                  <p class="leading-relaxed text-xs truncate" :title="date_time(product.updated_at)">
-                    <span class="font-bold text-xs">Updated at: </span>
+                  <p class="flex leading-relaxed text-xs truncate" :title="date_time(product.updated_at)">
+                    <!--<span class="font-bold text-xs">Updated at: </span>-->
+                    <Icon icon="calendar_minus" size="xs" />
                     {{ date_time(product.updated_at) }}
                   </p>
-                  <p class="leading-relaxed mb-3 text-xs truncate" :title="date_time(product.created_at)">
-                    <span class="font-bold text-xs">Created at: </span>
+                  <p class="flex leading-relaxed mb-3 text-xs truncate" :title="date_time(product.created_at)">
+                   <!-- <span class="font-bold text-xs">Created at: </span> -->
+                    <Icon icon="calendar_plus" size="xs" />
+
                     {{ date_time(product.created_at) }}
                   </p>
                 </div>
@@ -167,11 +216,7 @@ const date_time = (data) => {
       </div>
     </section>
   </div>
-  <ConfirmDialogModal
-    :show="condfirmationModal"
-    @close="condfirmationModal = false"
-    maxWidth="2xl"
-  >
+  <ConfirmDialogModal :show="condfirmationModal" @close="condfirmationModal = false" maxWidth="2xl">
     <template #title> Are you sure you want to remove this product?</template>
     <template #content>
       <p class="text-red-500">
@@ -182,61 +227,72 @@ const date_time = (data) => {
       <SecondaryButton @click="condfirmationModal = false" class="mr-2">
         nevermind
       </SecondaryButton>
-      <Button
-        :class="{ 'opacity-25': form.processing }"
-        :disabled="form.processing"
-        class="bg-green-200 hover:bg-green-400"
-        @click="remove_product"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-auto"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-          /></svg
-        >&nbsp;Submit
+      <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing"
+        class="bg-green-200 hover:bg-green-400" @click="remove_product">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+        </svg>&nbsp;Submit
       </Button>
     </template>
   </ConfirmDialogModal>
-  <!-- <JetDialogModal :show="add_modal" @close="add_modal = false" maxWidth="2xl">
-    <template #title> Are you sure you want to update this user?</template>
+  <JetDialogModal :show="updateModal" @close="updateModal = false" maxWidth="2xl">
+    <template #title> Are you sure you want to update this product?</template>
     <template #content>
-      <p class="text-red-500">
-        Clicking can update the system and this is not reversible!
-      </p>
+      <div class="grid grid-cols-12 gap-1">
+        <div class="col-span-12">
+          <Input type="text" label="Enter product name" v-model="form_update.name" />
+          <JetInputError :message="form_update.errors.name" class="mt-2" />
+        </div>
+        <div class="col-span-12">
+          <textarea
+            class="w-full rounded-lg border-1 border-gray-300 h-[100px] focus:ring-yellow-500 focus:border-yellow-500"
+            placeholder="Product description" v-model="form_update.description">
+            </textarea>
+          <JetInputError :message="form_update.errors.description" class="mt-2" />
+        </div>
+        <div class="col-span-12">
+          <Input type="text" label="Product remarks" v-model="form_update.remarks" />
+          <JetInputError :message="form_update.errors.remarks" class="mt-2" />
+        </div>
+        <div class="col-span-6">
+          <Input type="number" label="Product price" v-model="form_update.price" />
+          <JetInputError :message="form_update.errors.price" class="mt-2" />
+        </div>
+        <div class="col-span-6">
+          <Input type="number" label="Product discount" v-model="form_update.sale_discount" />
+          <JetInputError :message="form_update.errors.sale_discount" class="mt-2" />
+        </div>
+        <div class="col-span-12">
+          <select
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full h-10 my-auto mt-5"
+            v-model="form_update.category">
+            <option selected value="">Choose a category</option>
+            <template v-for="(category, key) in props.categories" :key="key">
+              <option :value="category.id">{{ category.name }}</option>
+            </template>
+          </select>
+          <JetInputError :message="form_update.errors.category" class="mt-2" />
+        </div>
+        <div class="col-span-12">
+          <Input type="text" label="Image" v-model="form_update.product_image" />
+          <JetInputError :message="form_update.errors.product_image" class="mt-2" />
+        </div>
+      </div>
     </template>
     <template #footer>
-      <SecondaryButton @click="add_modal = false" class="mr-2">
+      <SecondaryButton @click="updateModal = false" class="mr-2">
         nevermind
       </SecondaryButton>
-      <Button
-        :class="{ 'opacity-25': form.processing }"
-        :disabled="form.processing"
-        class="bg-green-200 hover:bg-green-400"
-        @click="function_update"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-auto"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-          /></svg
-        >&nbsp;Submit
+      <Button :class="{ 'opacity-25': form_update.processing }" :disabled="form_update.processing"
+        class="bg-green-200 hover:bg-green-400" @click="update_product">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+        </svg>&nbsp;Submit
       </Button>
     </template>
-  </JetDialogModal> -->
+  </JetDialogModal>
 </template>
