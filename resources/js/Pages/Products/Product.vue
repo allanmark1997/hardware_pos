@@ -53,6 +53,8 @@ const add_product = () => {
       form.reset();
       alert("Successfully added product");
       open_modal_add();
+      post_images.value = [];
+
     },
     onError: (error) => {
       alert("Error adding new product " + error);

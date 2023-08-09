@@ -39,6 +39,7 @@ class User extends Authenticatable
         'contact_no',
         'status',
         'type',
+        'profile_photo_path',
     ];
 
     /**

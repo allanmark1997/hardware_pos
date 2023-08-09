@@ -34,9 +34,18 @@ class User extends Controller
             'type' => 'required',
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => 'required',
+            'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:1024'],
+
         ]);
         $fullname = $request->fname.' '.$request->mname.' '.$request->lname;
-        
+
+        $imageName = $request->input('image');
+        if($request->hasfile('image')){
+            // Product::initStorage();
+            $photo = $request->file('image');
+            $imageName = $photo->hashName();
+            $photo->store('public/profile-photos'); 
+        }
         ModelsUser::create([
             'name' => $fullname,
             'fname' => $request->fname,
@@ -50,6 +59,7 @@ class User extends Controller
             'type' => $request->type,
             'email'=>  $request->email,
             'password'=> Hash::make($request->password),
+            'profile_photo_path' => "profile-photos/".$imageName
         ]);
         return Redirect::back();
 

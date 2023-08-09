@@ -62,14 +62,14 @@ class ProductController extends Controller
             // Product::initStorage();
             $photo = $request->file('text_image');
             $imageName = $photo->hashName();
-            $photo->store('images/products'); 
+            $photo->store('public/images/products'); 
         }
 
         $product = Product::create([
             'name'=>$request->name,
             'description'=>$request->description,
             'category_id'=>$request->category,
-            'product_image'=>env('APP_URL').'/images/products'.$imageName,
+            'product_image'=>env('APP_URL').'/storage/images/products/'.$imageName,
             'quantity'=>0,
             'user_id'=> Auth::user()->id
         ]);
