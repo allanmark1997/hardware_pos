@@ -19,10 +19,17 @@ const update_modal_category = ref(false);
 
 const category_object = ref(false);
 
+const specification = ref({});
+
 const form = useForm({
   name: "",
-  description: "",
-  remarks: "",
+  description: {
+    details: "",
+    specification: {
+      spec_title: "",
+      spec_details: [],
+    },
+  },
   product_image: "",
   category: "",
   sale_discount: "",
@@ -103,6 +110,11 @@ const search_remove = () => {
   router.get(
     route("products.index", { search: search.value, category: category.value })
   );
+};
+
+const add_specification = () => {
+  form.description.specification.spec_details.push(specification.value);
+  specification.value = {};
 };
 </script>
 <template>
@@ -253,7 +265,7 @@ const search_remove = () => {
             <Input type="text" label="Enter product name" v-model="form.name" />
             <JetInputError :message="form.errors.name" class="mt-2" />
           </div>
-          <div class="col-span-12">
+          <!-- <div class="col-span-12">
             <textarea
               class="w-full rounded-lg border-1 border-gray-300 h-[100px] focus:ring-yellow-500 focus:border-yellow-500"
               placeholder="Product description"
@@ -261,10 +273,81 @@ const search_remove = () => {
             >
             </textarea>
             <JetInputError :message="form.errors.description" class="mt-2" />
-          </div>
-          <div class="col-span-12">
+          </div> -->
+          <!-- <div class="col-span-12">
             <Input type="text" label="Product remarks" v-model="form.remarks" />
             <JetInputError :message="form.errors.remarks" class="mt-2" />
+          </div> -->
+          <div class="col-span-12">
+            <textarea
+              class="w-full rounded-lg border-1 border-gray-300 h-[100px] focus:ring-yellow-500 focus:border-yellow-500"
+              placeholder="Product description"
+              v-model="form.description.details"
+            >
+            </textarea>
+            <!-- <JetInputError
+              :message="form.errors.description.details"
+              class="mt-2"
+            /> -->
+          </div>
+          <div class="col-span-12">
+            <Input
+              type="text"
+              label="Specification title"
+              v-model="form.description.specification.spec_title"
+            />
+            <!-- <JetInputError
+              :message="form.errors.description.specification.spec_title"
+              class="mt-2"
+            /> -->
+          </div>
+          <div class="col-span-3">
+            <Input
+              type="text"
+              label="Specification name"
+              v-model="specification.spec_name"
+            />
+            <!-- <JetInputError
+              :message="form.errors.description.specification.spec_name"
+              class="mt-2"
+            /> -->
+          </div>
+          <div class="col-span-6">
+            <Input
+              type="text"
+              label="Specification details"
+              v-model="specification.spec_details"
+            />
+            <!-- <JetInputError
+              :message="form.errors.description.specification.spec_details"
+              class="mt-2"
+            /> -->
+          </div>
+          <div class="col-span-3 mx-auto mt-3">
+            <SecondaryButton
+              @click="add_specification"
+              class="bg-green-200 hover:bg-green-400"
+            >
+              Add Specification
+            </SecondaryButton>
+          </div>
+          <div class="col-span-12">
+            <div class="grid grid-cols-12 border p-2 gap-2">
+              <template
+                v-for="(spec, key) in form.description.specification
+                  .spec_details"
+                :key="key"
+              >
+                <div class="col-span-6 border-b-1">
+                  <p>{{ spec.spec_name }}</p>
+                  <span>Name</span>
+                </div>
+                <div class="col-span-6 border-b-1">
+                  <p>{{ spec.spec_details }}</p>
+                  <span>Details</span>
+                </div>
+              </template>
+            </div>
           </div>
           <div class="col-span-6">
             <Input type="number" label="Product price" v-model="form.price" />

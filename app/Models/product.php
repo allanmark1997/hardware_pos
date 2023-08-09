@@ -12,6 +12,9 @@ class Product extends Model
     use SoftDeletes;
 
     protected $guarded = [];
+    protected $casts = [
+        'description' => 'json',
+    ];
 
     public function user(){
         return $this->belongsTo(User::class);

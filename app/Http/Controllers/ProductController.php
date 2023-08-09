@@ -49,8 +49,8 @@ class ProductController extends Controller
     {
         $request->validate([
             'name'=>["required","max:30"],
-            'description'=>"required",
-            'remarks'=>["required","max:20"],
+            'title'=>["required","max:20"],
+            // 'description'=>["required"],
             'price'=>["required", "integer"],
             'category'=>"required",
             'product_image'=>"required",
@@ -60,12 +60,10 @@ class ProductController extends Controller
         $product = Product::create([
             'name'=>$request->name,
             'description'=>$request->description,
-            'remarks'=>$request->remarks,
             'category_id'=>$request->category,
             'product_image'=>$request->product_image,
             'quantity'=>0,
             'user_id'=> Auth::user()->id
-
         ]);
 
         Price::create([
@@ -105,8 +103,7 @@ class ProductController extends Controller
     {
         $request->validate([
             'name'=>["required","max:30"],
-            'description'=>"required",
-            'remarks'=>["required","max:20"],
+            // 'description'=>"required",
             'price'=>["required", "integer"],
             'category'=>"required",
             'sale_discount'=>["required", "integer", "max:2"],
@@ -115,7 +112,6 @@ class ProductController extends Controller
         $product -> update([
             'name'=>$request->name,
             'description'=>$request->description,
-            'remarks'=>$request->remarks,
             'category_id'=>$request->category,
             'user_id'=> Auth::user()->id
         ]);
