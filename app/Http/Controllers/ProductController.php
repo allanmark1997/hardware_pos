@@ -49,19 +49,27 @@ class ProductController extends Controller
     {
         $request->validate([
             'name'=>["required","max:30"],
-            'title'=>["required","max:20"],
+            // 'title'=>["required","max:20"],
             // 'description'=>["required"],
             'price'=>["required", "integer"],
             'category'=>"required",
-            'product_image'=>"required",
-            'sale_discount'=>["required", "integer", "max:2"],
+            'text_image'=>"required",
+            'sale_discount'=>["required", "integer"],
         ]);
+
+        $imageName = $request->input('text_image');
+        if($request->hasfile('text_image')){
+            // Product::initStorage();
+            $photo = $request->file('text_image');
+            $imageName = $photo->hashName();
+            $photo->store('images/products'); 
+        }
 
         $product = Product::create([
             'name'=>$request->name,
             'description'=>$request->description,
             'category_id'=>$request->category,
-            'product_image'=>$request->product_image,
+            'product_image'=>env('APP_URL').'/images/products'.$imageName,
             'quantity'=>0,
             'user_id'=> Auth::user()->id
         ]);

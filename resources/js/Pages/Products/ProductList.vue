@@ -195,7 +195,7 @@ const date_time = (data) => {
 
                 <p class="leading-relaxed mb-3 text-xs truncate">
                   <span class="font-bold text-sm">Description: </span>
-                  {{ product.description }}
+                  {{ product.description.details }}
                 </p>
                 <p class="leading-relaxed mb-3 text-xs truncate">
                   <span class="font-bold text-sm">Remarks: </span>
