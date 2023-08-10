@@ -54,7 +54,6 @@ const add_product = () => {
       alert("Successfully added product");
       open_modal_add();
       post_images.value = [];
-
     },
     onError: (error) => {
       alert("Error adding new product " + error);
@@ -155,6 +154,46 @@ const remove_image = (key) => {
   post_images.value.splice(key, 1);
   form.text_image = null;
 };
+
+// const openFile = () => {
+//     let hidden = document.getElementById("post_image");
+//     hidden.click();
+//     hidden.onchange = (e) => {
+//         if (post_images.value.length + e.target.files.length > 1) {
+//             toast.error("Only 1 image can be selected");
+//             return;
+//         } else {
+//             for (let index = 0; index < e.target.files.length; index++) {
+//                 post_images.value.push(
+//                     window.URL.createObjectURL(e.target.files[index])
+//                 );
+//                 form.text_image = e.target.files[index];
+//             }
+//         }
+//     };
+// };
+
+// const dragFile = (e) => {
+//     e.preventDefault();
+//     try {
+//         if (e.dataTransfer.files.length > 1) {
+//             toast.error("Only 1 image can be selected");
+//             return;
+//         }
+//         else {
+//             for (const file of e.dataTransfer.files) {
+
+//                 var objectURL = URL.createObjectURL(file);
+//                 post_images.value.push(objectURL);
+//                 form.text_image = file;
+//                 // post_images.value.push({fname:file.name, gsrc:objectURL,file:file})
+//             }
+//         }
+//     } catch (error) {
+//         toast.error(error);
+//     }
+
+// }
 </script>
 <template>
   <AppLayout title="Dashboard">
