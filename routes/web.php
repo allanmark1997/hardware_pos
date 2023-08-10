@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CashierController;
+use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\User;
 use Illuminate\Foundation\Application;
@@ -53,5 +55,13 @@ Route::middleware([
     Route::prefix('categories')->name('categories.')->group(function() {
         Route::post('/add_cat', [CategoryController::class, 'store'])->name('store');
         Route::put('/update_cat/{category}', [CategoryController::class, 'update'])->name('update');
+    });
+
+    Route::prefix('delivery')->name('deliveries.')->group(function() {
+        Route::get('/deliveries', [DeliveryController::class, 'index'])->name('index');
+    });
+
+    Route::prefix('cahier')->name('cashier.')->group(function() {
+        Route::get('/cashier', [CashierController::class, 'index'])->name('index');
     });
 });

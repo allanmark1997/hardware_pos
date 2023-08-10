@@ -89,7 +89,7 @@ const date_time = (data) => {
 </script>
 <template>
   <div>
-    <section class="text-gray-600 bg-white rounded-lg py-5 px-5 mb-5">
+    <section class="text-gray-600 bg-white rounded-lg py-5 px-3 mb-5">
       <div class="container mx-auto">
         <div class="flex flex-wrap -m-4">
           <div v-if="products.data.length <= 0" class="mx-auto">

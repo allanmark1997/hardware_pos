@@ -20,6 +20,8 @@ const update_modal_category = ref(false);
 const category_object = ref(false);
 
 const specification = ref({});
+const spec_name = ref('');
+const spec_details = ref('');
 const post_images = ref([]);
 
 const form = useForm({
@@ -116,8 +118,18 @@ const search_remove = () => {
 };
 
 const add_specification = () => {
-  form.description.specification.spec_details.push(specification.value);
-  specification.value = {};
+  if(specification.value.spec_name == null || specification.value.spec_name == "") {
+    spec_name.value = "The specification name is required"
+  }
+  else if(specification.value.spec_details == null || specification.value.spec_details == ""){
+    spec_details.value = "The specification details is required"
+  }
+  else{
+    spec_details.value = ''
+    spec_name.value = ''
+    form.description.specification.spec_details.push(specification.value);
+    specification.value = {};
+  }
 };
 
 const openFile = () => {
@@ -153,6 +165,10 @@ const dragFile = (e) => {
 const remove_image = (key) => {
   post_images.value.splice(key, 1);
   form.text_image = null;
+};
+
+const remove_spec = (key) => {
+  form.description.specification.spec_details.splice(key, 1);
 };
 
 // const openFile = () => {
@@ -379,29 +395,29 @@ const remove_image = (key) => {
               class="mt-2"
             /> -->
           </div>
-          <div class="col-span-3">
+          <div v-if="form.description.specification.spec_title != '' " class="col-span-3">
             <Input
               type="text"
               label="Specification name"
               v-model="specification.spec_name"
             />
-            <!-- <JetInputError
-              :message="form.errors.description.specification.spec_name"
+            <JetInputError
+              :message="spec_name"
               class="mt-2"
-            /> -->
+            />
           </div>
-          <div class="col-span-6">
+          <div v-if="form.description.specification.spec_title != '' " class="col-span-6">
             <Input
               type="text"
               label="Specification details"
               v-model="specification.spec_details"
             />
-            <!-- <JetInputError
-              :message="form.errors.description.specification.spec_details"
+            <JetInputError
+              :message="spec_details"
               class="mt-2"
-            /> -->
+            />
           </div>
-          <div class="col-span-3 mx-auto mt-3">
+          <div v-if="form.description.specification.spec_title != '' " class="col-span-3 mx-auto mt-3">
             <SecondaryButton
               @click="add_specification"
               class="bg-green-200 hover:bg-green-400"
@@ -409,16 +425,19 @@ const remove_image = (key) => {
               Add Specification
             </SecondaryButton>
           </div>
-          <div class="col-span-12">
+          <div v-if="form.description.specification.spec_details.length != 0 && form.description.specification.spec_title != '' " class="col-span-12">
             <div class="grid grid-cols-12 border p-2 gap-2">
               <template
                 v-for="(spec, key) in form.description.specification
                   .spec_details"
                 :key="key"
               >
-                <div class="col-span-12 border-b-2">
+                <div class="col-span-11 border-b-2">
                   <p>{{ spec.spec_details }}</p>
                   <span>{{ spec.spec_name }}</span>
+                </div>
+                <div class="col-span-1">
+                  <Button class="bg-red-400 hover:bg-red-500 hover:text-white" title="Remove spec" @click="remove_spec">x</Button>
                 </div>
               </template>
             </div>
