@@ -41,7 +41,7 @@ class User extends Controller
 
         $imageName = $request->input('image');
         if($request->hasfile('image')){
-            // Product::initStorage();
+            ModelsUser::initStorage();
             $photo = $request->file('image');
             $imageName = $photo->hashName();
             $photo->store('public/profile-photos'); 

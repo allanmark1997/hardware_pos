@@ -28,7 +28,7 @@ class Product extends Model
         return $this->hasOne(sale_discount::class, "product_id", "id")->latestOfMany();
     }
     public static function initStorage()
-    {
+    {   
         if (!Storage::exists('public/images/products')) {
             Storage::makeDirectory('public/images/products');
         }

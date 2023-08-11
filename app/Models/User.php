@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
@@ -72,4 +73,10 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
+    public static function initStorage()
+    {   
+        if (!Storage::exists('public/profile-photos')) {
+            Storage::makeDirectory('public/profile-photos');
+        }
+    }
 }
