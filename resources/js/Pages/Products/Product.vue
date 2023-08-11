@@ -20,8 +20,8 @@ const update_modal_category = ref(false);
 const category_object = ref(false);
 
 const specification = ref({});
-const spec_name = ref('');
-const spec_details = ref('');
+const spec_name = ref("");
+const spec_details = ref("");
 const post_images = ref([]);
 
 const form = useForm({
@@ -118,15 +118,19 @@ const search_remove = () => {
 };
 
 const add_specification = () => {
-  if(specification.value.spec_name == null || specification.value.spec_name == "") {
-    spec_name.value = "The specification name is required"
-  }
-  else if(specification.value.spec_details == null || specification.value.spec_details == ""){
-    spec_details.value = "The specification details is required"
-  }
-  else{
-    spec_details.value = ''
-    spec_name.value = ''
+  if (
+    specification.value.spec_name == null ||
+    specification.value.spec_name == ""
+  ) {
+    spec_name.value = "The specification name is required";
+  } else if (
+    specification.value.spec_details == null ||
+    specification.value.spec_details == ""
+  ) {
+    spec_details.value = "The specification details is required";
+  } else {
+    spec_details.value = "";
+    spec_name.value = "";
     form.description.specification.spec_details.push(specification.value);
     specification.value = {};
   }
@@ -154,7 +158,6 @@ const dragFile = (e) => {
         var objectURL = URL.createObjectURL(file);
         post_images.value.push(objectURL);
         form.text_image = file;
-        // post_images.value.push({fname:file.name, gsrc:objectURL,file:file})
       }
     }
   } catch (error) {
@@ -262,10 +265,10 @@ const remove_spec = (key) => {
             </button>
           </div>
 
-          <div class="grid grid-cols-3  gap-3">
+          <div class="grid grid-cols-3 gap-3">
             <button
               @click="open_modal_add"
-              class="bg-yellow-400  text-sm font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
+              class="bg-yellow-400 text-sm font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
             >
               <a class="my-auto gap-2 flex">
                 <svg
@@ -395,29 +398,32 @@ const remove_spec = (key) => {
               class="mt-2"
             /> -->
           </div>
-          <div v-if="form.description.specification.spec_title != '' " class="col-span-3">
+          <div
+            v-if="form.description.specification.spec_title != ''"
+            class="col-span-3"
+          >
             <Input
               type="text"
               label="Specification name"
               v-model="specification.spec_name"
             />
-            <JetInputError
-              :message="spec_name"
-              class="mt-2"
-            />
+            <JetInputError :message="spec_name" class="mt-2" />
           </div>
-          <div v-if="form.description.specification.spec_title != '' " class="col-span-6">
+          <div
+            v-if="form.description.specification.spec_title != ''"
+            class="col-span-6"
+          >
             <Input
               type="text"
               label="Specification details"
               v-model="specification.spec_details"
             />
-            <JetInputError
-              :message="spec_details"
-              class="mt-2"
-            />
+            <JetInputError :message="spec_details" class="mt-2" />
           </div>
-          <div v-if="form.description.specification.spec_title != '' " class="col-span-3 mx-auto mt-3">
+          <div
+            v-if="form.description.specification.spec_title != ''"
+            class="col-span-3 mx-auto mt-3"
+          >
             <SecondaryButton
               @click="add_specification"
               class="bg-green-200 hover:bg-green-400"
@@ -425,7 +431,13 @@ const remove_spec = (key) => {
               Add Specification
             </SecondaryButton>
           </div>
-          <div v-if="form.description.specification.spec_details.length != 0 && form.description.specification.spec_title != '' " class="col-span-12">
+          <div
+            v-if="
+              form.description.specification.spec_details.length != 0 &&
+              form.description.specification.spec_title != ''
+            "
+            class="col-span-12"
+          >
             <div class="grid grid-cols-12 border p-2 gap-2">
               <template
                 v-for="(spec, key) in form.description.specification
@@ -437,7 +449,12 @@ const remove_spec = (key) => {
                   <span>{{ spec.spec_name }}</span>
                 </div>
                 <div class="col-span-1">
-                  <Button class="bg-red-400 hover:bg-red-500 hover:text-white" title="Remove spec" @click="remove_spec">x</Button>
+                  <Button
+                    class="bg-red-400 hover:bg-red-500 hover:text-white"
+                    title="Remove spec"
+                    @click="remove_spec"
+                    >x</Button
+                  >
                 </div>
               </template>
             </div>

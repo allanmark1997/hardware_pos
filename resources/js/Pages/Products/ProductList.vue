@@ -15,6 +15,7 @@ import { router, useForm } from "@inertiajs/vue3";
 const props = defineProps(["products", "search", "category", "categories"]);
 const condfirmationModal = ref(false);
 const updateModal = ref(false);
+const post_images = ref([]);
 
 const form = useForm({
   product: false,
@@ -43,10 +44,10 @@ const function_open_modal_confirmation = (product) => {
 };
 
 const function_open_modal_update = (product) => {
+  post_images.value.push(product.product_image);
   form_update.product = product;
   form_update.name = product.name;
   form_update.description = product.description;
-  form_update.remarks = product.remarks;
   form_update.category = product.category_id;
   form_update.sale_discount = product.current_discount.discount;
   form_update.price = product.current_price.price;
@@ -92,6 +93,44 @@ const convert_money = (data) => {
 
 const date_time = (data) => {
   return moment(data).format("MM/DD/YYYY, h:mm:ss a");
+};
+
+const openFile = () => {
+  let hidden = document.getElementById("post_image");
+  hidden.click();
+  hidden.onchange = (e) => {
+    for (let index = 0; index < e.target.files.length; index++) {
+      post_images.value.push(window.URL.createObjectURL(e.target.files[index]));
+      form_update.text_image = e.target.files[index];
+    }
+  };
+};
+
+const dragFile = (e) => {
+  e.preventDefault();
+  try {
+    if (e.dataTransfer.files.length > 1) {
+      toast.error("Only 1 image can be selected");
+      return;
+    } else {
+      for (const file of e.dataTransfer.files) {
+        var objectURL = URL.createObjectURL(file);
+        post_images.value.push(objectURL);
+        form_update.text_image = file;
+      }
+    }
+  } catch (error) {
+    toast.error(error);
+  }
+};
+
+const remove_image = (key) => {
+  post_images.value.splice(key, 1);
+  form_update.text_image = null;
+};
+
+const remove_spec = (key) => {
+  form.description.specification.spec_details.splice(key, 1);
 };
 </script>
 <template>
@@ -399,16 +438,83 @@ const date_time = (data) => {
           </select>
           <JetInputError :message="form_update.errors.category" class="mt-2" />
         </div>
-        <div class="col-span-12">
-          <Input
-            type="text"
-            label="Image"
-            v-model="form_update.product_image"
-          />
-          <JetInputError
-            :message="form_update.errors.product_image"
-            class="mt-2"
-          />
+        <div
+          v-if="form.post_images == 0"
+          class="col-span-12 flex items-center justify-center w-full mt-4"
+          @dragover.prevent
+          @drop.prevent
+        >
+          <label
+            @drop="dragFile"
+            @click="openFile"
+            for="dropzone-file"
+            class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+          >
+            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+              <svg
+                aria-hidden="true"
+                class="w-10 h-10 mb-3 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                ></path>
+              </svg>
+              <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                <span class="font-semibold">Click to upload</span> or drag and
+                drop
+              </p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                PNG, JPG or GIF (MAX. 800x400px)
+              </p>
+            </div>
+            <input
+              id="post_image"
+              type="file"
+              accept="image/png, image/gif, image/jpeg"
+              class="hidden"
+            />
+          </label>
+        </div>
+        <div class="col-span-12 flex items-center justify-center mt-4">
+          <template v-for="(image, key) in post_images" :key="key">
+            <div class="w-auto mt-2 mx-auto lg:max-w-[20vmin] z-30">
+              <div class="shadow-lg bg-white p-3">
+                <img class="w-full max-h-[40vmin] object-cover" :src="image" />
+                <ul class="mt-3 flex justify-end flex-wrap">
+                  <li>
+                    <button
+                      @click="remove_image(key)"
+                      class="flex text-gray-400 hover:text-gray-600"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-6 h-6"
+                      >
+                        <path
+                          class="text-red-500"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                        />
+                      </svg>
+                      <span class="text-red-500">Remove</span>
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </template>
         </div>
       </div>
     </template>
