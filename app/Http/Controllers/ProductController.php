@@ -59,7 +59,7 @@ class ProductController extends Controller
 
         $imageName = $request->input('text_image');
         if($request->hasfile('text_image')){
-            // Product::initStorage();
+            Product::initStorage();
             $photo = $request->file('text_image');
             $imageName = $photo->hashName();
             $photo->store('public/images/products'); 
