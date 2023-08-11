@@ -23,11 +23,18 @@ const form = useForm({
 const form_update = useForm({
   product: false,
   name: "",
-  description: {},
+  description: {
+    details: "",
+    specification: {
+      spec_title: "",
+      spec_details: [],
+    },
+  },
   product_image: "",
   category: "",
   sale_discount: "",
   price: "",
+  text_image: null,
 });
 
 const function_open_modal_confirmation = (product) => {
@@ -345,21 +352,21 @@ const date_time = (data) => {
           <textarea
             class="w-full rounded-lg border-1 border-gray-300 h-[100px] focus:ring-yellow-500 focus:border-yellow-500"
             placeholder="Product description"
-            v-model="form_update.description"
+            v-model="form_update.description.details"
           >
           </textarea>
-          <JetInputError
+          <!-- <JetInputError
             :message="form_update.errors.description"
             class="mt-2"
-          />
+          /> -->
         </div>
         <div class="col-span-12">
           <Input
             type="text"
-            label="Product remarks"
-            v-model="form_update.remarks"
+            label="Product Specification title"
+            v-model="form_update.description.specification.spec_title"
           />
-          <JetInputError :message="form_update.errors.remarks" class="mt-2" />
+          <!-- <JetInputError :message="form_update.errors.remarks" class="mt-2" /> -->
         </div>
         <div class="col-span-6">
           <Input
