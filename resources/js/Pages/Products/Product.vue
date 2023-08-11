@@ -445,6 +445,7 @@ const remove_spec = (key) => {
                 :key="key"
               >
                 <div class="col-span-11 border-b-2">
+                  <p>{{ key }}</p>
                   <p>{{ spec.spec_details }}</p>
                   <span>{{ spec.spec_name }}</span>
                 </div>
