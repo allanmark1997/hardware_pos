@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
@@ -25,5 +26,11 @@ class Product extends Model
     }
     public function current_discount(){
         return $this->hasOne(sale_discount::class, "product_id", "id")->latestOfMany();
+    }
+    public static function initStorage()
+    {
+        if (!Storage::exists('public/images/products')) {
+            Storage::makeDirectory('public/images/products');
+        }
     }
 }
