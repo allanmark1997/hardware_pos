@@ -262,10 +262,10 @@ const remove_spec = (key) => {
             </button>
           </div>
 
-          <div class="flex gap-2">
+          <div class="grid grid-cols-3  gap-3">
             <button
               @click="open_modal_add"
-              class="bg-yellow-400 text-sm font-bold mb-2 mt-5 rounded-lg w-[20vmin] hover:bg-yellow-500 flex gap-2 item-center justify-center"
+              class="bg-yellow-400  text-sm font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
             >
               <a class="my-auto gap-2 flex">
                 <svg
@@ -288,7 +288,7 @@ const remove_spec = (key) => {
             </button>
             <button
               @click="open_modal_add_category"
-              class="bg-yellow-400 text-sm font-bold mb-2 mt-5 rounded-lg w-[20vmin] hover:bg-yellow-500 flex gap-2 item-center justify-center"
+              class="bg-yellow-400 text-sm font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
             >
               <a class="my-auto gap-2 flex">
                 <svg
@@ -316,7 +316,7 @@ const remove_spec = (key) => {
 
             <button
               @click="open_modal_update_category"
-              class="bg-yellow-400 text-sm font-bold mb-2 mt-5 rounded-lg w-[20vmin] hover:bg-yellow-500 flex gap-2 item-center justify-center"
+              class="bg-yellow-400 text-sm font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
             >
               <a class="my-auto gap-1 flex">
                 <svg
