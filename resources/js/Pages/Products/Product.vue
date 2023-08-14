@@ -422,11 +422,11 @@ const remove_spec = (key) => {
           </div>
           <div
             v-if="form.description.specification.spec_title != ''"
-            class="col-span-3 mx-auto mt-3"
+            class="col-span-3 flex flex-row  item-center"
           >
             <SecondaryButton
               @click="add_specification"
-              class="bg-green-200 hover:bg-green-400"
+              class="bg-green-200  mt-2 hover:bg-green-400"
             >
               Add Specification
             </SecondaryButton>
