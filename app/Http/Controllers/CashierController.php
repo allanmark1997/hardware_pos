@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Redirect;
+use App\Models\Category;
+use App\Models\product;
+
 
 class CashierController extends Controller
 {
@@ -13,8 +16,12 @@ class CashierController extends Controller
      */
     public function index()
     {
+        $products = product::get();
+        $categories = Category::get();
         return Inertia::render('Cashier/Cashier',[
-            'props_detail' => "Cashier page"
+            'props_detail' => "Cashier page",
+            "categories" => $categories,
+            "products" => $products
         ]);
     }
 

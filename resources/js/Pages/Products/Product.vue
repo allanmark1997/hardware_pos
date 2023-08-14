@@ -527,6 +527,7 @@ const remove_spec = (key) => {
               />
             </label>
           </div>
+
           <div class="col-span-12 flex items-center justify-center mt-4">
             <template v-for="(image, key) in post_images" :key="key">
               <div class="w-auto mt-2 mx-auto lg:max-w-[20vmin] z-30">
@@ -564,6 +565,8 @@ const remove_spec = (key) => {
               </div>
             </template>
           </div>
+            <JetInputError :message="form.errors.text_image" class="mt-2 col-span-12" />
+
           <!-- <div class="col-span-12">
             <Input type="text" label="Image" v-model="form.product_image" />
             <JetInputError :message="form.errors.product_image" class="mt-2" />

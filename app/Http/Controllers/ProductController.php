@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\sale_discount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ProductController extends Controller
@@ -109,35 +110,59 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        $product_current = Product::with("current_price")->where("id",$product->id)->first();
-        dd($product_current->current_price->price);
+        $product_current = Product::with("current_price")->with('current_discount')->where("id",$product->id)->first();
+        $extracted_path = explode("/", $product_current->product_image);
+
         $request->validate([
             'name'=>["required","max:30"],
-            'text_image'=>"required",
-            'price'=>["required", "regex:/^[0-9]+(\.[0-9][0-9]?)?$/"],
+            // 'text_image'=>"required",
+            'price'=>["required", "regex:/^[0-9]+(\.[0-9][0-9]?)?$/","min:0"],
             'category'=>"required",
-            'sale_discount'=>["required", "integer", "max:100"],
+            'sale_discount'=>["required", "integer", "min:0", "max:100"],
         ]);
 
+        if($request->hasfile('text_image')){
+            Product::initStorage();
+            $photo = $request->file('text_image');
+            $imageName = $photo->hashName();
+            // dd(Storage::exists('public/images/products/'.$extracted_path[6]));
+            if (Storage::exists('public/images/products/'.$extracted_path[6]) == true) {
+                Storage::delete('public/images/products/'.$extracted_path[6]);
+            }
+            $photo->store('public/images/products'); 
+            // $photo->storeAs('public/images/products', $extracted_path[6]); 
+        }
+        $new_image_name = null;
+        try {
+            $new_image_name = env('APP_URL').'/storage/images/products/'.$imageName;
+        } catch (\Throwable $th) {
+           $new_image_name = $product_current->product_image;
+        }
+        
         $product -> update([
             'name'=>$request->name,
             'description'=>$request->description,
             'category_id'=>$request->category,
+            'product_image'=>$new_image_name,
             'user_id'=> Auth::user()->id
         ]);
 
-        Price::create([
-            'price'=>$request->price,
-            'product_id' => $product->id,
-            'user_id'=> Auth::user()->id
-        ]);
+        if(floatVal($request->price) != $product_current->current_price->price){
+            Price::create([
+                'price'=>$request->price,
+                'product_id' => $product->id,
+                'user_id'=> Auth::user()->id
+            ]);
+        }
 
-        sale_discount::create([
-            'discount' => $request->sale_discount,
-            'type'=>1,
-            'product_id' => $product->id,
-            'user_id'=> Auth::user()->id
-        ]);
+        if($request->sale_discount != $product_current->current_discount->discount){
+            sale_discount::create([
+                'discount' => $request->sale_discount,
+                'type'=>1,
+                'product_id' => $product->id,
+                'user_id'=> Auth::user()->id
+            ]);
+        }
 
         return back();
     }

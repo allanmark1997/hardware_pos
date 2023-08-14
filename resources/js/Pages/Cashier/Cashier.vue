@@ -30,7 +30,7 @@ const nFormatter = (num) => {
   return num;
 }
 
-const props = defineProps(["props_detail"]);
+const props = defineProps(["props_detail", "categories", "products"]);
 </script>
 <template>
   <AppLayout title="Dashboard">
