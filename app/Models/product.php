@@ -17,6 +17,10 @@ class Product extends Model
         'description' => 'json',
     ];
 
+    protected $appends = [
+        'product_price'=>"sda"
+    ];
+
     public function user(){
         return $this->belongsTo(User::class);
     }

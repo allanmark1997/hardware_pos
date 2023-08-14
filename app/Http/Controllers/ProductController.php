@@ -109,9 +109,11 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
+        $product_current = Product::with("current_price")->where("id",$product->id)->first();
+        dd($product_current->current_price->price);
         $request->validate([
             'name'=>["required","max:30"],
-            // 'description'=>"required",
+            'text_image'=>"required",
             'price'=>["required", "regex:/^[0-9]+(\.[0-9][0-9]?)?$/"],
             'category'=>"required",
             'sale_discount'=>["required", "integer", "max:100"],
