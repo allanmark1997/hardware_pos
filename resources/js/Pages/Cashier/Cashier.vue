@@ -1,6 +1,34 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Icon from "@/Components/Icon.vue";
+import { ref } from "vue";
+
+
+const totalCart = ref(2)
+const sampleData = ref(0)
+const samplePurchaseData = ref(2)
+
+const firstDigit = (num) => {
+  // 1: get first digit using regex pattern
+  const matches = String(num).match(/\d/);
+  // 2: convert matched item to integer
+  const digit = Number(matches[0]);
+  // 3: add sign back as needed
+  return (num < 0) ? -digit : digit;
+}
+
+const nFormatter = (num) => {
+  if (num >= 1000000000) {
+    return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'G';
+  }
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+  }
+  return num;
+}
 
 const props = defineProps(["props_detail"]);
 </script>
@@ -11,13 +39,10 @@ const props = defineProps(["props_detail"]);
         Cashier
       </h2>
     </template>
-    <div class="py-">
-      <div class="max-w-7xl mx-auto  bg-white rounded mt-5 px-1">
+    <div class="py-5">
+      <div class="max-w-7xl mx-auto bg-white rounded mt-5 px-1">
         <div class="grid grid-cols-12 gap-2">
-          <div class="col-span-2 bg-red-200">
-            Tabs
-          </div>
-          <div class="col-span-6 bg-blue-200">
+          <div class="col-span-8 p-5">
 
             <form class="flex items-center">
               <label for="Search products" class="sr-only">Search</label>
@@ -26,20 +51,19 @@ const props = defineProps(["props_detail"]);
                   <Icon class="mr-1" icon="shopping_bag" size="xs" />
                 </div>
                 <input type="text" id="Search products"
-                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  "
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full pl-10 p-2.5  "
                   placeholder="Search products">
               </div>
               <button type="submit"
-                class="inline-flex items-center py-2.5 px-3 ml-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 ">
+                class="inline-flex items-center py-2.5 px-3 ml-2 text-sm font-medium text-white bg-yellow-700 rounded-lg border border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 ">
                 <Icon class="mr-5" icon="search_icon" size="xs" />
               </button>
             </form>
 
-            <div class="product_list">
-
+            <div class="product_list bg-gray-50 p-1 rounded-lg mt-3 min-h-[60vmin] overflow-auto">
               <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                  <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <table v-if="sampleData != 0" class="w-full text-sm text-left text-gray-500">
+                  <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                     <tr>
                       <th scope="col" class="px-6 py-3">
                         <span class="sr-only">Image</span>
@@ -53,66 +77,91 @@ const props = defineProps(["props_detail"]);
                       <th scope="col" class="px-6 py-3">
                         Price
                       </th>
-                      <th scope="col" class="px-6 py-3">
-                        Action
-                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr
-                      class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    <tr v-for="data in sampleData" class="bg-white border-b ">
                       <td class="w-32 p-4">
                         <img src="/docs/images/products/iphone-12.png" alt="Iphone 12">
                       </td>
-                      <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                      <td class="px-6 py-4 font-semibold text-gray-900 ">
                         Iphone 12
                       </td>
                       <td class="px-6 py-4">
                         <div class="flex items-center space-x-3">
-                          <button
-                            class="inline-flex items-center justify-center p-1 text-sm font-medium h-6 w-6 text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-                            type="button">
-                            <span class="sr-only">Quantity button</span>
-                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                              viewBox="0 0 18 2">
-                              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M1 1h16" />
-                            </svg>
-                          </button>
                           <div>
                             <input type="number" id="first_product"
-                              class="bg-gray-50 w-14 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-2.5 py-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                              placeholder="1" required>
+                              class="bg-gray-50 w-14 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block px-2.5 py-1 "
+                              placeholder="1" disabled>
                           </div>
-                        <button
-                          class="inline-flex items-center justify-center h-6 w-6 p-1 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-                          type="button">
-                          <span class="sr-only">Quantity button</span>
-                          <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 18 18">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M9 1v16M1 9h16" />
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
-                      $999
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                        $999
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+              </div>
+              <div class="mt-24 flex justify-center">
+                <div class="bg-white px-10 py-5 shadow-lg rounded xl">
+                  <div class="flex justify-center mb-2">
+                    <Icon icon="shopping_bag" size="md" />
+                  </div>
+                  Scan a product
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-span-4  bg-gray-50">
+            <div class="bg-white rounded-b-xl shadow-md p-5 flex justify-between">
+              <div class="flex">
+                <Icon icon="shopping_cart" size="sm"></Icon>
+                <span class="font-bold">Cart</span>
+              </div>
+              <div>
+                <span class="font-bold "> count: </span>
+                <span class="bg-red-500 ml-1 px-2 text-white rounded-xl  w-10   text-center">
+
+                  <small v-if="totalCart >= 1000">{{ nFormatter(totalCart) }}</small>
+                  <small v-else-if="totalCart >= 100">{{ nFormatter(totalCart) }}</small>
+                  <small v-else>{{ totalCart }}</small>
+
+                </span>
+              </div>
+            </div>
+            <div class="relative mt-5 px-2 overflow-x-auto  shadow-md">
+              <table class="w-full text-sm text-left text-gray-500">
+                <tbody>
+                  <tr v-for="data in totalCart" class="bg-white border-b ">
+                    <td class="px-6 py-4 font-semibold text-gray-900 ">
+                      Wrench
                     </td>
                     <td class="px-6 py-4">
-                      <a href="#" class="font-medium text-red-600 dark:text-red-500 hover:underline">Remove</a>
+                      <div class="flex items-center space-x-3">
+                        <div>
+                          <input type="number" id="first_product"
+                            class="bg-gray-50 w-10 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block px-2.5 py-1 "
+                            placeholder="1" disabled>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 font-semibold text-gray-900 ">
+                      $999
+                    </td>
+                    <td class="px-6 py-4 font-semibold text-gray-900 ">
+                      <button>
+                      <Icon icon="close_icon" size="sm" class="text-red" />
+                    </button>
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
-
           </div>
-
-
         </div>
-        <div class="col-span-4 bg-yellow-200"></div>
       </div>
     </div>
-  </div>
-</AppLayout></template>
+  </AppLayout>
+</template>
