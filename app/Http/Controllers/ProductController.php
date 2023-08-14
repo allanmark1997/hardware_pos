@@ -51,10 +51,10 @@ class ProductController extends Controller
             'name'=>["required","max:30"],
             // 'title'=>["required","max:20"],
             // 'description'=>["required"],
-            'price'=>["required", "integer"],
+            'price'=>["required", "regex:/^[0-9]+(\.[0-9][0-9]?)?$/"],
             'category'=>"required",
             'text_image'=>"required",
-            'sale_discount'=>["required", "integer"],
+            'sale_discount'=>["required", "integer", "max:100"],
         ]);
 
         $imageName = $request->input('text_image');
@@ -112,9 +112,9 @@ class ProductController extends Controller
         $request->validate([
             'name'=>["required","max:30"],
             // 'description'=>"required",
-            'price'=>["required", "integer"],
+            'price'=>["required", "regex:/^[0-9]+(\.[0-9][0-9]?)?$/"],
             'category'=>"required",
-            'sale_discount'=>["required", "integer", "max:2"],
+            'sale_discount'=>["required", "integer", "max:100"],
         ]);
 
         $product -> update([

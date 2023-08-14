@@ -151,7 +151,7 @@ const dragFile = (e) => {
   e.preventDefault();
   try {
     if (e.dataTransfer.files.length > 1) {
-      toast.error("Only 1 image can be selected");
+      // toast.error("Only 1 image can be selected");
       return;
     } else {
       for (const file of e.dataTransfer.files) {
@@ -161,7 +161,7 @@ const dragFile = (e) => {
       }
     }
   } catch (error) {
-    toast.error(error);
+    // toast.error(error);
   }
 };
 
@@ -422,11 +422,11 @@ const remove_spec = (key) => {
           </div>
           <div
             v-if="form.description.specification.spec_title != ''"
-            class="col-span-3 flex flex-row  item-center"
+            class="col-span-3 flex flex-row item-center"
           >
             <SecondaryButton
               @click="add_specification"
-              class="bg-green-200  mt-2 hover:bg-green-400"
+              class="bg-green-200 mt-2 hover:bg-green-400"
             >
               Add Specification
             </SecondaryButton>
@@ -445,7 +445,6 @@ const remove_spec = (key) => {
                 :key="key"
               >
                 <div class="col-span-11 border-b-2">
-                  <p>{{ key }}</p>
                   <p>{{ spec.spec_details }}</p>
                   <span>{{ spec.spec_name }}</span>
                 </div>
@@ -453,7 +452,7 @@ const remove_spec = (key) => {
                   <Button
                     class="bg-red-400 hover:bg-red-500 hover:text-white"
                     title="Remove spec"
-                    @click="remove_spec"
+                    @click="remove_spec(key)"
                     >x</Button
                   >
                 </div>
