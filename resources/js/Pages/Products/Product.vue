@@ -26,6 +26,8 @@ const post_images = ref([]);
 
 const form = useForm({
   name: "",
+  barcode: "",
+  tax: 0,
   description: {
     details: "",
     specification: {
@@ -362,19 +364,15 @@ const remove_spec = (key) => {
             <Input type="text" label="Enter product name" v-model="form.name" />
             <JetInputError :message="form.errors.name" class="mt-2" />
           </div>
-          <!-- <div class="col-span-12">
-            <textarea
-              class="w-full rounded-lg border-1 border-gray-300 h-[100px] focus:ring-yellow-500 focus:border-yellow-500"
-              placeholder="Product description"
-              v-model="form.description"
-            >
-            </textarea>
-            <JetInputError :message="form.errors.description" class="mt-2" />
-          </div> -->
-          <!-- <div class="col-span-12">
-            <Input type="text" label="Product remarks" v-model="form.remarks" />
-            <JetInputError :message="form.errors.remarks" class="mt-2" />
-          </div> -->
+          <div class="col-span-12">
+            <Input
+              type="text"
+              label="Enter product barcode"
+              v-model="form.barcode"
+            />
+            <JetInputError :message="form.errors.barcode" class="mt-2" />
+          </div>
+
           <div class="col-span-12">
             <textarea
               class="w-full rounded-lg border-1 border-gray-300 h-[100px] focus:ring-yellow-500 focus:border-yellow-500"
@@ -459,11 +457,15 @@ const remove_spec = (key) => {
               </template>
             </div>
           </div>
-          <div class="col-span-6">
+          <div class="col-span-4">
+            <Input type="text" label="Enter product tax" v-model="form.tax" />
+            <JetInputError :message="form.errors.tax" class="mt-2" />
+          </div>
+          <div class="col-span-4">
             <Input type="number" label="Product price" v-model="form.price" />
             <JetInputError :message="form.errors.price" class="mt-2" />
           </div>
-          <div class="col-span-6">
+          <div class="col-span-4">
             <Input
               type="number"
               label="Product discount"
@@ -565,7 +567,10 @@ const remove_spec = (key) => {
               </div>
             </template>
           </div>
-            <JetInputError :message="form.errors.text_image" class="mt-2 col-span-12" />
+          <JetInputError
+            :message="form.errors.text_image"
+            class="mt-2 col-span-12"
+          />
 
           <!-- <div class="col-span-12">
             <Input type="text" label="Image" v-model="form.product_image" />

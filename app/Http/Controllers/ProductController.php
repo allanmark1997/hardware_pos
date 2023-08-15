@@ -50,7 +50,8 @@ class ProductController extends Controller
     {
         $request->validate([
             'name'=>["required","max:30"],
-            // 'title'=>["required","max:20"],
+            'barcode'=>["required"],
+            'tax'=>["required"],
             // 'description'=>["required"],
             'price'=>["required", "regex:/^[0-9]+(\.[0-9][0-9]?)?$/"],
             'category'=>"required",
@@ -68,6 +69,8 @@ class ProductController extends Controller
 
         $product = Product::create([
             'name'=>$request->name,
+            'barcode'=>$request->barcode,
+            'tax'=>$request->tax,
             'description'=>$request->description,
             'category_id'=>$request->category,
             'product_image'=>env('APP_URL').'/storage/images/products/'.$imageName,
@@ -115,6 +118,8 @@ class ProductController extends Controller
 
         $request->validate([
             'name'=>["required","max:30"],
+            'barcode'=>["required"],
+            'tax'=>["required"],
             // 'text_image'=>"required",
             'price'=>["required", "regex:/^[0-9]+(\.[0-9][0-9]?)?$/","min:0"],
             'category'=>"required",
@@ -141,6 +146,8 @@ class ProductController extends Controller
         
         $product -> update([
             'name'=>$request->name,
+            'barcode'=>$request->barcode,
+            'tax'=>$request->tax,
             'description'=>$request->description,
             'category_id'=>$request->category,
             'product_image'=>$new_image_name,

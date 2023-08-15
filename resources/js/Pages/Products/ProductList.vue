@@ -20,9 +20,7 @@ const specification = ref({});
 const spec_name = ref("");
 const spec_details = ref("");
 
-onMounted(()=>{
-  
-})
+onMounted(() => {});
 
 const form = useForm({
   product: false,
@@ -31,6 +29,8 @@ const form = useForm({
 const form_update = useForm({
   product: false,
   name: "",
+  barcode: "",
+  tax: 0,
   description: {
     details: "",
     specification: {
@@ -55,6 +55,8 @@ const function_open_modal_update = (product) => {
   post_images.value.push(product.product_image);
   form_update.product = product;
   form_update.name = product.name;
+  form_update.barcode = product.barcode;
+  form_update.tax = product.tax;
   form_update.description = product.description;
   form_update.category = product.category_id;
   form_update.sale_discount = product.current_discount.discount;
@@ -161,6 +163,22 @@ const remove_image = (key) => {
 
 const remove_spec = (key) => {
   form_update.description.specification.spec_details.splice(key, 1);
+};
+
+const key_spec = ref(null);
+const open_close_input_spec_update = ref(false);
+const update_spec = (name, description, key) => {
+  key_spec.value = key;
+  specification.value.spec_name = name;
+  specification.value.spec_details = description;
+  open_close_input_spec_update.value = !open_close_input_spec_update.value;
+};
+
+const update_specification = () => {
+  form_update.description.specification.spec_details[key_spec.value] =
+    specification.value;
+  specification.value = {};
+  open_close_input_spec_update.value = !open_close_input_spec_update.value;
 };
 </script>
 <template>
@@ -418,6 +436,14 @@ const remove_spec = (key) => {
           <JetInputError :message="form_update.errors.name" class="mt-2" />
         </div>
         <div class="col-span-12">
+          <Input
+            type="text"
+            label="Enter product barcode"
+            v-model="form_update.barcode"
+          />
+          <JetInputError :message="form_update.errors.barcode" class="mt-2" />
+        </div>
+        <div class="col-span-12">
           <textarea
             class="w-full rounded-lg border-1 border-gray-300 h-[100px] focus:ring-yellow-500 focus:border-yellow-500"
             placeholder="Product description"
@@ -438,7 +464,10 @@ const remove_spec = (key) => {
           <!-- <JetInputError :message="form_update.errors.remarks" class="mt-2" /> -->
         </div>
         <div
-          v-if="form_update.description.specification.spec_title != ''"
+          v-if="
+            form_update.description.specification.spec_title != '' &&
+            open_close_input_spec_update == false
+          "
           class="col-span-3"
         >
           <Input
@@ -449,7 +478,10 @@ const remove_spec = (key) => {
           <JetInputError :message="spec_name" class="mt-2" />
         </div>
         <div
-          v-if="form_update.description.specification.spec_title != ''"
+          v-if="
+            form_update.description.specification.spec_title != '' &&
+            open_close_input_spec_update == false
+          "
           class="col-span-6"
         >
           <Input
@@ -460,7 +492,10 @@ const remove_spec = (key) => {
           <JetInputError :message="spec_details" class="mt-2" />
         </div>
         <div
-          v-if="form_update.description.specification.spec_title != ''"
+          v-if="
+            form_update.description.specification.spec_title != '' &&
+            open_close_input_spec_update == false
+          "
           class="col-span-3 mx-auto mt-3"
         >
           <SecondaryButton
@@ -472,8 +507,50 @@ const remove_spec = (key) => {
         </div>
         <div
           v-if="
-            form_update.description.specification.spec_details.length != 0 &&
-            form_update.description.specification.spec_title != ''
+            form_update.description.specification.spec_title != '' &&
+            open_close_input_spec_update == true
+          "
+          class="col-span-3"
+        >
+          <Input
+            type="text"
+            label="Specification name"
+            v-model="specification.spec_name"
+          />
+          <JetInputError :message="spec_name" class="mt-2" />
+        </div>
+        <div
+          v-if="
+            form_update.description.specification.spec_title != '' &&
+            open_close_input_spec_update == true
+          "
+          class="col-span-6"
+        >
+          <Input
+            type="text"
+            label="Specification details"
+            v-model="specification.spec_details"
+          />
+          <JetInputError :message="spec_details" class="mt-2" />
+        </div>
+        <div
+          v-if="
+            form_update.description.specification.spec_title != '' &&
+            open_close_input_spec_update == true
+          "
+          class="col-span-3 mx-auto mt-3"
+        >
+          <SecondaryButton
+            @click="update_specification"
+            class="bg-green-200 hover:bg-green-400"
+          >
+            Update Specification
+          </SecondaryButton>
+        </div>
+        <div
+          v-if="
+            form_update.description.specification.spec_details?.length != 0 &&
+            form_update.description.specification?.spec_title != ''
           "
           class="col-span-12"
         >
@@ -491,21 +568,10 @@ const remove_spec = (key) => {
                 <Button
                   class="bg-orange-400 hover:bg-orange-500 hover:text-white"
                   title="Update spec"
-                  ><svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-5 h-5 text-white"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-                      />
-                    </svg></Button
+                  @click="update_spec(spec.spec_name, spec.spec_details, key)"
                 >
+                  <Icon icon="pencil" size="sm" />
+                </Button>
               </div>
               <div class="col-span-1">
                 <Button
@@ -518,7 +584,11 @@ const remove_spec = (key) => {
             </template>
           </div>
         </div>
-        <div class="col-span-6">
+        <div class="col-span-4">
+          <Input type="number" label="Product tax" v-model="form_update.tax" />
+          <JetInputError :message="form_update.errors.tax" class="mt-2" />
+        </div>
+        <div class="col-span-4">
           <Input
             type="number"
             label="Product price"
@@ -526,7 +596,7 @@ const remove_spec = (key) => {
           />
           <JetInputError :message="form_update.errors.price" class="mt-2" />
         </div>
-        <div class="col-span-6">
+        <div class="col-span-4">
           <Input
             type="number"
             label="Product discount"
@@ -627,8 +697,10 @@ const remove_spec = (key) => {
             </div>
           </template>
         </div>
-        <JetInputError :message="form_update.errors.text_image" class="mt-2 col-span-12" />
-
+        <JetInputError
+          :message="form_update.errors.text_image"
+          class="mt-2 col-span-12"
+        />
       </div>
     </template>
     <template #footer>
