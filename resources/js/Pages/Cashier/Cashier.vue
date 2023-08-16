@@ -8,8 +8,8 @@ const props = defineProps(["product"]);
 const totalCart = ref(2);
 const sampleData = ref(5);
 const samplePurchaseData = ref(2);
-const search = ref("");
-const scannedCode = '226652446'
+const search = ref("323423465756");
+const scannedCode = "323423465756";
 
 const firstDigit = (num) => {
   // 1: get first digit using regex pattern
@@ -33,13 +33,13 @@ const nFormatter = (num) => {
   return num;
 };
 
-const search_ = (value) => {
-  router.get(route("cashier.index", { search: value }));
+const search_ = () => {
+  router.get(route("cashier.index", { search: search.value }));
 };
 
-const scan = () =>{
-  search_(scannedCode.value)
-}
+// const scan = () =>{
+//   search_(scannedCode.value)
+// }
 </script>
 <template>
   <AppLayout title="Dashboard">
@@ -47,7 +47,8 @@ const scan = () =>{
       <h2 class="font-semibold text-lg text-gray-800 leading-tight">Cashier</h2>
     </template>
     <div class="py-5">
-      <button @click="scan()" class="bg-red-200">scan</button>
+      <input type="text" v-model="search" />
+      <button @click="search_()" class="bg-red-200">scan</button>
       <div class="max-w-7xl mx-auto bg-white rounded mt-5 px-1">
         <div class="grid grid-cols-12 gap-2">
           <div class="col-span-7 p-5">
@@ -77,7 +78,6 @@ const scan = () =>{
             <div
               class="product_list bg-gray-50 p-1 rounded-lg mt-3 min-h-[60vmin] overflow-auto"
             >
-
               <div class="mt-24 flex justify-center" v-if="sampleData == 0">
                 <div class="bg-white px-10 py-5 shadow-lg rounded xl">
                   <div class="flex justify-center mb-2">

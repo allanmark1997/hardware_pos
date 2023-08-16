@@ -69,7 +69,7 @@ Route::middleware([
         Route::get('/deliveries', [DeliveryController::class, 'index'])->name('index');
     });
 
-    Route::prefix('cahier')->name('cashier.')->group(function() {
+    Route::prefix('cashier')->name('cashier.')->group(function() {
         Route::get('/cashier', [CashierController::class, 'index'])->name('index');
     });
 

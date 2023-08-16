@@ -215,9 +215,6 @@ const remove_spec = (key) => {
 //     }
 
 // }
-onMounted(() => {
-  JsBarcode(".barcode").init();
-});
 </script>
 <template>
   <AppLayout title="Dashboard">
