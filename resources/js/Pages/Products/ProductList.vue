@@ -27,8 +27,6 @@ const detailModalData = ref({
   ProdIMG: "",
 });
 
-onMounted(() => {});
-
 const form = useForm({
   product: false,
 });
@@ -194,6 +192,9 @@ const update_specification = () => {
   specification.value = {};
   open_close_input_spec_update.value = !open_close_input_spec_update.value;
 };
+onMounted(() => {
+  JsBarcode(".barcode").init();
+});
 </script>
 <template>
   <div>
@@ -313,31 +314,13 @@ const update_specification = () => {
                 >
                   {{ convert_money(product.current_price.price) }}
                 </h2>
-
-                <!-- <p class="leading-relaxed mb-1 text-xs break-words">
-                  <span class="font-bold text-sm">Description: </span>
-                  {{ product.description.details }}
-                </p>
-                <p class="leading-relaxed mb-1 text-xs break-words">
-                  <span class="font-bold text-sm ">
-                    {{ product.description.specification.spec_title }}
-                  </span>
-                </p>
-                <div class="grid grid-cols-12 gap-1 mb-2">
-                  <template v-for="(specification, key) in product.description.specification.spec_details" :key="key">
-                  <div class="col-span-6 text-xs">
-                    <p class="break-words">{{ specification.spec_details }}</p>
-                    <p class="font-bold break-words italic">{{ specification.spec_name }}</p>
-                  </div>
-                  </template>
-                </div> -->
-
-                <!-- <p class="leading-relaxed mb-3"><span class="font-bold text-sm">Current Price: </span> {{
-                  convert_money(product.current_price.price) }}</p>
-                <p class="leading-relaxed mb-3"><span class="font-bold text-sm">Sale Discount: </span> {{
-                  product.current_discount.discount }}%</p>
-                <p class="leading-relaxed mb-3"><span class="font-bold text-sm">Quantity: </span> {{ product.quantity }}
-                </p> -->
+                <svg
+                  class="barcode w-[20vmin] h-[10vmin] mx-auto"
+                  jsbarcode-format="CODE128"
+                  :jsbarcode-value="product.barcode"
+                  jsbarcode-textmargin="0"
+                  jsbarcode-fontoptions="bold"
+                ></svg>
                 <p class="leading-relaxed text-xs flex gap-2 mb-2">
                   <img
                     class="w-6 h-6 rounded-full"

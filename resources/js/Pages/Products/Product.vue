@@ -7,7 +7,7 @@ import Input2 from "@/Components/InputCustom.vue";
 import JetInputError from "@/Components/InputError.vue";
 import Input from "@/Components/Input.vue";
 import JetDialogModal from "@/Components/DialogModal.vue";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { router, useForm } from "@inertiajs/vue3";
 
 const props = defineProps(["products", "search", "categories", "category"]);
@@ -215,6 +215,9 @@ const remove_spec = (key) => {
 //     }
 
 // }
+onMounted(() => {
+  JsBarcode(".barcode").init();
+});
 </script>
 <template>
   <AppLayout title="Dashboard">
