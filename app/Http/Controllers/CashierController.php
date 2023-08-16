@@ -17,9 +17,15 @@ class CashierController extends Controller
     public function index(Request $request)
     {
         $search = $request->search ?? '';
-        $products = product::with('current_price')->with('current_discount')->when($search != null || $search != "", function($query) use($search){
-            $query->where("name", $search);
-        })->first();
+        if ($request->search != '') {
+            $products = product::with('current_price')->with('current_discount')->when($search != null || $search != "", function($query) use($search){
+                $query->where("name", $search);
+            })->first();
+        }
+        else{
+            $products = ""
+        }
+        
         $categories = Category::get();
         return Inertia::render('Cashier/Cashier',[
             "categories" => $categories,
