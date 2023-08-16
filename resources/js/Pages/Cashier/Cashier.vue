@@ -2,12 +2,14 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Icon from "@/Components/Icon.vue";
 import { ref } from "vue";
-const props = defineProps(["categories", "products"]);
+import { router } from "@inertiajs/vue3";
+const props = defineProps(["product"]);
 
 const totalCart = ref(2);
 const sampleData = ref(5);
 const samplePurchaseData = ref(2);
 const search = ref("");
+const scannedCode = '226652446'
 
 const firstDigit = (num) => {
   // 1: get first digit using regex pattern
@@ -31,9 +33,13 @@ const nFormatter = (num) => {
   return num;
 };
 
-const search_ = () => {
-  router.get(route("cashier.scan", { search: search.value }));
+const search_ = (value) => {
+  router.get(route("cashier.index", { search: value }));
 };
+
+const scan = () =>{
+  search_(scannedCode.value)
+}
 </script>
 <template>
   <AppLayout title="Dashboard">
@@ -41,6 +47,7 @@ const search_ = () => {
       <h2 class="font-semibold text-lg text-gray-800 leading-tight">Cashier</h2>
     </template>
     <div class="py-5">
+      <button @click="scan()" class="bg-red-200">scan</button>
       <div class="max-w-7xl mx-auto bg-white rounded mt-5 px-1">
         <div class="grid grid-cols-12 gap-2">
           <div class="col-span-7 p-5">
@@ -70,54 +77,7 @@ const search_ = () => {
             <div
               class="product_list bg-gray-50 p-1 rounded-lg mt-3 min-h-[60vmin] overflow-auto"
             >
-              <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-                <table
-                  v-if="sampleData != 0"
-                  class="w-full text-sm text-left text-gray-500"
-                >
-                  <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                    <tr>
-                      <th scope="col" class="px-6 py-3">
-                        <span class="sr-only">Image</span>
-                      </th>
-                      <th scope="col" class="px-6 py-3">Product</th>
-                      <th scope="col" class="px-6 py-3">Qty</th>
-                      <th scope="col" class="px-6 py-3">Price</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="data in sampleData" class="bg-white border-b">
-                      <td class="w-32 p-4">
-                        <img
-                          src="/docs/images/products/iphone-12.png"
-                          alt="Iphone 12"
-                        />
-                      </td>
-                      <td class="px-6 py-4 font-semibold text-gray-900">
-                        Iphone 12
-                      </td>
-                      <td class="px-6 py-4">
-                        <div class="flex items-center space-x-3">
-                          <div>
-                            <input
-                              type="number"
-                              id="first_product"
-                              class="bg-gray-50 w-14 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block px-2.5 py-1"
-                              placeholder="1"
-                              disabled
-                            />
-                          </div>
-                        </div>
-                      </td>
-                      <td
-                        class="px-6 py-4 font-semibold text-gray-900 dark:text-white"
-                      >
-                        $999
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+
               <div class="mt-24 flex justify-center" v-if="sampleData == 0">
                 <div class="bg-white px-10 py-5 shadow-lg rounded xl">
                   <div class="flex justify-center mb-2">
