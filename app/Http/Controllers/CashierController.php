@@ -14,12 +14,14 @@ class CashierController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = product::get();
+        $search = $request->search ?? '';
+        $products = product::with('current_price')->with('current_discount')->when($search != null || $search != "", function($query) use($search){
+            $query->where("name", $search);
+        })->first();
         $categories = Category::get();
         return Inertia::render('Cashier/Cashier',[
-            'props_detail' => "Cashier page",
             "categories" => $categories,
             "products" => $products
         ]);
