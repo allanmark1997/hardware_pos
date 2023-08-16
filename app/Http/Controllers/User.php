@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User as ModelsUser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
@@ -11,15 +12,19 @@ use Inertia\Inertia;
 class User extends Controller
 {
     public function index(Request $request){
-        // dd($request->search);
-        $search = $request->search ?? "";
-        $users = ModelsUser::when($search != null || $search != "", function($query) use($search){
-            $query->where("name", "LIKE", "%{$search}%");
-        })->paginate(10);
-        return Inertia::render('UserManagement/Users',[
-            'users'=>$users,
-            'search'=>$search
-        ]);
+        if(Auth::user()->type != 0 && Auth::user()->type != 1){
+            return Redirect::route('dashboard');
+        }else{
+            $search = $request->search ?? "";
+            $users = ModelsUser::when($search != null || $search != "", function($query) use($search){
+                $query->where("name", "LIKE", "%{$search}%");
+            })->paginate(12);
+            return Inertia::render('UserManagement/Users',[
+                'users'=>$users,
+                'search'=>$search
+            ]);
+        }
+        
     }
 
     public function add_user(Request $request){

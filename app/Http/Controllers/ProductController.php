@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Price;
-use App\Models\Product;
+use App\Models\product;
 use App\Models\sale_discount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -18,21 +19,27 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        // dd($request->search);
-        $search = $request->search ?? '';
-        $category = $request->category ?? '';
-        $products = Product::with('user')->with('current_price')->with('current_discount')->when($search != null || $search != "", function($query) use($search){
-            $query->where("name", "LIKE", "%{$search}%");
-        })->when($category != null || $category != "", function($query) use($category){
-            $query->where("category_id", "LIKE", "%{$category}%");
-        })->orderBy('created_at', 'desc')->paginate(12);
-        $categories = Category::orderBy('name','asc')->get();
-        return Inertia::render('Products/Product',[
-            "products" => $products,
-            "search" => $search,
-            "categories" => $categories,
-            "category" => $category
-        ]);
+        
+        if(Auth::user()->type != 0 && Auth::user()->type != 1){
+            return Redirect::route('dashboard');
+        }
+        else{
+            $search = $request->search ?? '';
+             $category = $request->category ?? '';
+            $products = product::with('user')->with('current_price')->with('current_discount')->when($search != null || $search != "", function($query) use($search){
+                $query->where("name", "LIKE", "%{$search}%");
+            })->when($category != null || $category != "", function($query) use($category){
+                $query->where("category_id", "LIKE", "%{$category}%");
+            })->orderBy('created_at', 'desc')->paginate(12);
+            $categories = Category::orderBy('name','asc')->get();
+            return Inertia::render('Products/Product',[
+                "products" => $products,
+                "search" => $search,
+                "categories" => $categories,
+                "category" => $category
+            ]); 
+        }
+        
     }
 
     /**

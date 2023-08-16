@@ -37,7 +37,7 @@ const form = useForm({
   },
   product_image: "",
   category: "",
-  sale_discount: "",
+  sale_discount: 0,
   price: "",
   text_image: null,
 });

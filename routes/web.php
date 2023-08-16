@@ -4,8 +4,10 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\User;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -37,12 +39,18 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
-
+    
     Route::prefix('usermanagement')->name('users.')->group(function() {
         Route::get('/users', [User::class, 'index'])->name('index');
         Route::post('/users/add', [User::class, 'add_user'])->name('add_user');
         Route::put('/users/update/{user}', [User::class, 'update_user'])->name('update_user');
         Route::put('/users/update_position', [User::class, 'update_user_position'])->name('update_user_position');
+    });
+
+    Route::prefix('suppliermanagement')->name('suppliers.')->group(function() {
+        Route::get('/suppliers', [SupplierController::class, 'index'])->name('index');
+        // Route::post('/users/add', [User::class, 'add_user'])->name('add_user');
+        // Route::put('/users/update/{user}', [User::class, 'update_user'])->name('update_user');
     });
 
     Route::prefix('products')->name('products.')->group(function() {
