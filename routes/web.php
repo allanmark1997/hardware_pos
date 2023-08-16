@@ -72,4 +72,6 @@ Route::middleware([
     Route::prefix('cahier')->name('cashier.')->group(function() {
         Route::get('/cashier', [CashierController::class, 'index'])->name('index');
     });
+
+    // Route::get('/barcode', [Barcode_QR::class])->name('barcode');
 });
