@@ -28,7 +28,7 @@ class CashierController extends Controller
         
         $categories = Category::get();
         return Inertia::render('Cashier/Cashier',[
-            "products" => $product
+            "product" => $product
         ]);
     }
 
