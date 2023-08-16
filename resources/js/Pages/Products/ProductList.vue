@@ -40,7 +40,7 @@ const openDetails = (detail, title, specs, img) => {
   detailModalData.value.ProdTitle = title
   detailModalData.value.ProdDetail = detail
   detailModalData.value.ProdSpec = specs
-  detailModalData.value.ProdIMG =   img
+  detailModalData.value.ProdIMG = img
 }
 
 const form_update = useForm({
@@ -216,9 +216,10 @@ const update_specification = () => {
                   class="lg:h-36 md:h-36 w-full object-scale-down object-center bg-gray-100"
                   src="https://dummyimage.com/720x400" :alt="product.name" />
                 <div class="absolute hidden group-hover:block top-0 right-0 text-white p-2 rounded">
-                  <button @click="openDetails(product.description.details, product.name, product.description.specification, product.product_image)"
+                  <button
+                    @click="openDetails(product.description.details, product.name, product.description.specification, product.product_image)"
                     class="p-2 bg-gray-400 rounded-lg hover:bg-gray-600 mr-2 w-auto">
-                    <Icon  icon="docs" />
+                    <Icon icon="docs" />
                   </button>
                   <button @click="function_open_modal_update(product)"
                     class="p-2 bg-yellow-400 rounded-lg hover:bg-yellow-600 mr-2 w-auto">
@@ -339,11 +340,14 @@ const update_specification = () => {
   </ConfirmDialogModal>
 
   <JetDialogModal :show="detailModal" @close="detailModal = false" maxWidth="2xl">
-    <template #title >{{ detailModalData.ProdTitle }}</template>
+    <template #title>{{ detailModalData.ProdTitle }}</template>
     <template #content>
       <div class="grid grid-cols-5">
         <div id="imageContent" class="border-r border-yellow-500  col-span-2 p-2 ">
-          <img class="rounded-lg max-w-sx" :src="detailModalData.ProdIMG" />
+
+          <div class="bg-gray-50 rounded-lg shadow">
+            <img :src="detailModalData.ProdIMG" class="object-contain h-48 w-96 ...">
+          </div>
           <p class="text-gray-900 font-bold uppercase text-yellow-700 mt-5 mb-1">
             {{ detailModalData.ProdSpec.spec_title }}:
           </p>
@@ -353,7 +357,7 @@ const update_specification = () => {
         </div>
         <div id="textContent" class="col-span-3 p-2">
           <span class="font-bold mb-5 uppercase text-yellow-700 "> Details:<br> </span>
-          <p class="text-gray-900  overflow-auto max-h-80">
+          <p class="text-gray-900  overflow-auto max-h-[40vmin]">
             {{ detailModalData.ProdDetail }}
           </p>
         </div>
