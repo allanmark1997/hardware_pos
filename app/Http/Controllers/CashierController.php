@@ -23,7 +23,7 @@ class CashierController extends Controller
             })->first();
         }
         else{
-            $products = ""
+            $products = "";
         }
         
         $categories = Category::get();
