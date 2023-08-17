@@ -17,9 +17,12 @@ class CashierController extends Controller
      */
     public function index(Request $request)
     {
+        $searches = array_push($request->search);
         $product = $product = product::where("barcode", $request->search)->with('current_price')->with('current_discount')->first();
+
         return Inertia::render('Cashier/Cashier',[
-            "product" => $product
+            "product" => $product,
+            "searches" => $searches
         ]);
     }
 
