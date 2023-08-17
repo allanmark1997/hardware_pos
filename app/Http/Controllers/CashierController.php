@@ -8,7 +8,9 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Redirect;
 use App\Models\Category;
 use App\Models\product;
-
+use App\Models\transaction;
+use App\Models\TransactionDetail;
+use Illuminate\Support\Facades\Auth;
 
 class CashierController extends Controller
 {
@@ -17,12 +19,9 @@ class CashierController extends Controller
      */
     public function index(Request $request)
     {
-
-        $product = $product = product::where("barcode", $request->search)->with('current_price')->with('current_discount')->first();
-        $searches = array_push($product);
+        
+       
         return Inertia::render('Cashier/Cashier',[
-            "product" => $product,
-            "searches" => $searches
         ]);
     }
 
@@ -37,9 +36,36 @@ class CashierController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    public function create_transaction(Request $request)
+    {
+        $transaction = transaction::create([
+            "processed_by" => Auth::user()->id,
+            "status" => false,
+            "payment_method" => 0,
+            "customer_type" => 0
+        ]);
+        return Inertia::render('Cashier/Cashier',[
+            "transaction" => $transaction
+        ]);
+    }
     public function store(Request $request)
     {
-        //
+        $product = product::where("barcode", $request->search)->with('current_price')->with('current_discount')->first();
+        if($product != null){
+        dd($product->current_discount->id);
+
+            TransactionDetail::create([
+                "product_id"=>$product->id,
+                "transaction_id"=>$request->transaction["id"],
+                "sale_discounts_id"=>$product->current_discount->id,
+                "price_id"=>$product->current_price->id
+            ]);
+        }
+
+        $products = TransactionDetail::where('transaction_id')->get();
+        return Inertia::render('Cashier/Cashier',[
+            "product_listed" => $products
+        ]);
     }
 
     /**

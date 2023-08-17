@@ -71,7 +71,8 @@ Route::middleware([
 
     Route::prefix('cashier')->name('cashier.')->group(function() {
         Route::get('/cashier', [CashierController::class, 'index'])->name('index');
+        Route::post('/create_transaction', [CashierController::class, 'create_transaction'])->name('create_transaction');
+        Route::get('/cashier_sale', [CashierController::class, 'store'])->name('store');
     });
 
-    // Route::get('/barcode', [Barcode_QR::class])->name('barcode');
 });

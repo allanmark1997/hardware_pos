@@ -97,6 +97,7 @@ class ProductController extends Controller
             'product_id' => $product->id,
             'user_id'=> Auth::user()->id
         ]);
+        return back();
     }
 
     /**

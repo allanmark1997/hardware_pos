@@ -1,15 +1,15 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Icon from "@/Components/Icon.vue";
-import { ref } from "vue";
-import { router } from "@inertiajs/vue3";
-const props = defineProps(["product"]);
+import { onMounted, ref } from "vue";
+import { router, useForm } from "@inertiajs/vue3";
+const props = defineProps(["product", "transaction", "product_listed"]);
 
 const totalCart = ref(2);
 const sampleData = ref(5);
 const samplePurchaseData = ref(2);
-const search = ref("323423465756");
-const scannedCode = "323423465756";
+const search = ref("");
+// const scannedCode = "323423465756";
 
 const firstDigit = (num) => {
   // 1: get first digit using regex pattern
@@ -33,10 +33,37 @@ const nFormatter = (num) => {
   return num;
 };
 
+const form = useForm({
+  searchsadasd: "",
+});
+
 const search_ = () => {
-  router.get(route("cashier.index", { search: search.value }));
+  form.get(
+    route("cashier.store", {
+      search: search.value,
+      transaction: props.transaction,
+    }),
+    {
+      preserveScroll: true,
+      onSuccess: () => {
+        alert("ok");
+      },
+    }
+  );
+};
+const create_transaction = () => {
+  if (props.transaction == null) {
+    router.post(route("cashier.create_transaction"));
+  } else {
+    alert("Not null");
+  }
 };
 
+document.addEventListener("keydown", (e) => {
+  if (e.keyCode == 49) {
+    create_transaction();
+  }
+});
 // const scan = () =>{
 //   search_(scannedCode.value)
 // }

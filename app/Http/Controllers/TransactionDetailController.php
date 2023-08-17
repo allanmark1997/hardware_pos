@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
+use App\Models\TransactionDetail;
 use Illuminate\Http\Request;
 
-class CategoryController extends Controller
+class TransactionDetailController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -28,19 +28,13 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            "name" => "required"
-        ]);
-        Category::create([
-            "name" => $request->name
-        ]);
-        return back();
+        //
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Category $category)
+    public function show(TransactionDetail $transactionDetail)
     {
         //
     }
@@ -48,29 +42,23 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Category $category)
+    public function edit(TransactionDetail $transactionDetail)
     {
-        
+        //
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request, TransactionDetail $transactionDetail)
     {
-        $request->validate([
-            "name" => "required"
-        ]);
-        $category->update([
-            "name" => $request->name
-        ]);
-        return back();
+        //
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Category $category)
+    public function destroy(TransactionDetail $transactionDetail)
     {
         //
     }
