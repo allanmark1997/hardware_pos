@@ -52,7 +52,7 @@ class CashierController extends Controller
     {
         $product = product::where("barcode", $request->search)->with('current_price')->with('current_discount')->first();
         if($product != null){
-        dd($product->current_discount->id);
+        // dd($product->current_discount->id);
 
             TransactionDetail::create([
                 "product_id"=>$product->id,
