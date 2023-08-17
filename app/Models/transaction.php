@@ -16,5 +16,7 @@ class transaction extends Model
     //     'products' => 'json'
     // ];
 
-    
+    public function transaction_details(){
+        return $this->hasMany(TransactionDetail::class, "transaction_id", "id")->latestOfMany();
+    }
 }   

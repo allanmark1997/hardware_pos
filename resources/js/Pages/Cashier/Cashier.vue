@@ -3,12 +3,11 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import Icon from "@/Components/Icon.vue";
 import { onMounted, ref } from "vue";
 import { router, useForm } from "@inertiajs/vue3";
-const props = defineProps(["product", "transaction", "product_listed"]);
+const props = defineProps(["product"]);
 
 const totalCart = ref(2);
 const sampleData = ref(5);
 const samplePurchaseData = ref(2);
-const search = ref("");
 // const scannedCode = "323423465756";
 
 const firstDigit = (num) => {
@@ -34,15 +33,13 @@ const nFormatter = (num) => {
 };
 
 const form = useForm({
-  searchsadasd: "",
+  search: "",
 });
+
 
 const search_ = () => {
   form.get(
-    route("cashier.store", {
-      search: search.value,
-      transaction: props.transaction,
-    }),
+    route("cashier.index"),
     {
       preserveScroll: true,
       onSuccess: () => {
@@ -52,11 +49,12 @@ const search_ = () => {
   );
 };
 const create_transaction = () => {
-  if (props.transaction == null) {
-    router.post(route("cashier.create_transaction"));
-  } else {
+  // if (props.transaction == null) {
+  //   router.post(route("cashier.create_transaction"));
+  // } else {
     alert("Not null");
-  }
+  // }
+
 };
 
 document.addEventListener("keydown", (e) => {
@@ -74,7 +72,7 @@ document.addEventListener("keydown", (e) => {
       <h2 class="font-semibold text-lg text-gray-800 leading-tight">Cashier</h2>
     </template>
     <div class="py-5">
-      <input type="text" v-model="search" />
+      <input type="text" v-model="form.search" />
       <button @click="search_()" class="bg-red-200">scan</button>
       <div class="max-w-7xl mx-auto bg-white rounded mt-5 px-1">
         <div class="grid grid-cols-12 gap-2">

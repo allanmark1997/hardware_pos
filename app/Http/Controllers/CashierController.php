@@ -20,8 +20,10 @@ class CashierController extends Controller
     public function index(Request $request)
     {
         
+        $product = product::where("barcode", $request->search)->with('current_price')->with('current_discount')->first();
        
         return Inertia::render('Cashier/Cashier',[
+            "product" => $product,
         ]);
     }
 
@@ -44,9 +46,7 @@ class CashierController extends Controller
             "payment_method" => 0,
             "customer_type" => 0
         ]);
-        return Inertia::render('Cashier/Cashier',[
-            "transaction" => $transaction
-        ]);
+        return back();
     }
     public function store(Request $request)
     {
