@@ -42,7 +42,30 @@ class SupplierController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'supplier_name' => ['required', 'string', 'max:255', 'unique:suppliers'],
+            'address' => 'required',
+            'mobile_no' => ['required', 'string', 'max:13'],
+            'status' => 'required',
+            'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:1024'],
+
+        ]);
+
+        $imageName = $request->input('image');
+        if($request->hasfile('image')){
+            Supplier::initStorage();
+            $photo = $request->file('image');
+            $imageName = $photo->hashName();
+            $photo->store('public/supplier-photos');
+        }
+        Supplier::create([
+            'supplier_name' => $request->supplier_name,
+            'address' => $request->address,
+            'mobile_no' => $request->mobile_no,
+            'status' => $request->status,
+            'image' => env('APP_URL').'/storage/supplier-photos/'.$imageName
+        ]);
+        return Redirect::back();
     }
 
     /**
@@ -66,7 +89,10 @@ class SupplierController extends Controller
      */
     public function update(Request $request, Supplier $supplier)
     {
-        //
+        $supplier -> update([
+            'status' => $request->status
+        ]);
+        return Redirect::back();
     }
 
     /**

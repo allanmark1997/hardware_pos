@@ -49,7 +49,8 @@ Route::middleware([
 
     Route::prefix('suppliermanagement')->name('suppliers.')->group(function() {
         Route::get('/suppliers', [SupplierController::class, 'index'])->name('index');
-        // Route::post('/users/add', [User::class, 'add_user'])->name('add_user');
+        Route::post('/supplier/add', [SupplierController::class, 'store'])->name('add_supplier');
+        Route::put('/update_supplier/{supplier}', [SupplierController::class, 'update'])->name('update_supplier');
         // Route::put('/users/update/{user}', [User::class, 'update_user'])->name('update_user');
     });
 

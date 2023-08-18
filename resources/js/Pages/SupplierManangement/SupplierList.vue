@@ -13,16 +13,16 @@ import { ref } from "vue";
 import { useForm } from "@inertiajs/vue3";
 const props = defineProps(["suppliers", "search"]);
 const condfirmationModal = ref(false);
-const selected_user = ref("");
+const selected_supplier = ref("");
 
 const form = useForm({
   status: null,
   type: true,
 });
 
-const function_open_modal_confirmation = (data, user) => {
+const function_open_modal_confirmation = (data, supplier) => {
   form.status = data;
-  selected_user.value = user;
+  selected_supplier.value = supplier;
   condfirmationModal.value = !condfirmationModal.value;
 };
 
@@ -31,18 +31,21 @@ const function_extract_date_time = (date) => {
 };
 
 const function_update = () => {
-  form.put(route("users.update_user", { user: selected_user.value }), {
-    preserveScroll: true,
-    onSuccess: () => {
-      alert("success");
-      condfirmationModal.value = !condfirmationModal.value;
-      form.reset();
-      selected_user.value.reset();
-    },
-    onError: (error) => {
-      console.log(error);
-    },
-  });
+  form.put(
+    route("suppliers.update_supplier", { supplier: selected_supplier.value }),
+    {
+      preserveScroll: true,
+      onSuccess: () => {
+        alert("success");
+        condfirmationModal.value = !condfirmationModal.value;
+        form.reset();
+        selected_supplier.value.reset();
+      },
+      onError: (error) => {
+        console.log(error);
+      },
+    }
+  );
 };
 </script>
 <template>
@@ -51,19 +54,9 @@ const function_update = () => {
       <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <section class="text-gray-600 p-10">
           <div class="container px-5 mx-auto">
-            <!-- <div class="flex flex-wrap w-full mb-5">
-              <div class="lg:w-1/2 w-full lg:mb-0">
-                <h1
-                  class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900"
-                >
-                  Users
-                </h1>
-                <div class="h-1 w-20 bg-yellow-500 rounded"></div>
-              </div>
-            </div> -->
             <div class="flex flex-wrap -m-4">
               <div
-                v-for="(user, index) in props.suppliers.data"
+                v-for="(supplier, index) in props.suppliers.data"
                 :key="index"
                 class="xl:w-1/3 md:w-1/2 p-4"
               >
@@ -72,74 +65,46 @@ const function_update = () => {
                 >
                   <img
                     class="h-40 rounded max-w- object-fit object-center mb-6 mx-auto"
-                    :src="user.profile_photo_url"
-                    :alt="user.name"
+                    :src="supplier.image"
+                    :alt="supplier.name"
                     alt="content"
                   />
-                  <h3
-                    class="tracking-widest text-indigo-500 text-xs font-medium title-font"
-                  >
-                    {{ user.email }}
-                  </h3>
                   <h2 class="text-lg text-gray-900 font-medium title-font mb-4">
-                    {{ user.name }}
+                    {{ supplier.supplier_name }}
                   </h2>
-                  <div class="flex mt-4 gap-1">
-                    <Icon icon="sex" size="sm" />
-                    <p class="text-sm font-medium">
-                      {{ user.sex == 0 ? "Female" : "Male" }}
-                    </p>
-                  </div>
-                  <div class="flex mt-4 gap-1 mb-1">
-                    <Icon icon="birthday" size="sm" />
-                    <h4 class="text-gray-700">
-                      {{ function_extract_date_time(user.bday) }}
-                    </h4>
-                  </div>
                   <div class="flex mt-4 gap-2">
                     <Icon icon="mobile" size="sm" />
                     <p class="text-sm">
-                      {{ user.contact_no }}
+                      {{ supplier.mobile_no }}
                     </p>
                   </div>
                   <div class="flex mt-4 gap-2">
                     <Icon icon="location" size="sm" />
                     <p class="text-sm">
-                      {{ user.address }}
+                      {{ supplier.address }}
                     </p>
                   </div>
-                  <p
-                    v-if="user.type != 0"
-                    class="leading-relaxed font-bold mt-5 mb-2 text-base"
-                  >
-                    Controls
-                  </p>
-                  <div v-if="user.type != 0" class="text-sm whitespace-nowrap">
-                    <Dropdown :status="user.type" :id="user.id" />
-                  </div>
-                  <div v-else class="text-sm mt-3 whitespace-nowrap">
-                    <div class="flex my-auto gap-1">
-                      <Icon icon="administrator" size="sm" />
-                      <p class="text-sm text-gray-700 text-center font-bold">
-                        Root admin
-                      </p>
-                    </div>
+                  <div class="flex mt-4 gap-2">
+                    <Icon icon="calendar" size="sm" />
+                    <p class="text-sm">
+                      {{ function_extract_date_time(supplier.created_at) }}
+                    </p>
                   </div>
                   <div
-                    v-if="user.type != 0"
+                    v-if="supplier.type != 0"
                     class="text-sm mt-2 flex justify-center w-100 whitespace-nowrap"
                   >
                     <button
-                      @click="function_open_modal_confirmation(true, user)"
+                      @click="function_open_modal_confirmation(true, supplier)"
                       class="p-2 bg-green-400 rounded-lg hover:bg-green-600"
-                      v-if="user.status == 0 && user.type != 0"
+                      v-if="supplier.status == 0 && supplier.type != 0"
                     >
                       Activate
                     </button>
                     <button
-                      @click="function_open_modal_confirmation(false, user)"
+                      @click="function_open_modal_confirmation(false, supplier)"
                       class="p-2 bg-red-400 rounded-lg hover:bg-red-600"
-                      v-else-if="user.status == 1 && user.type != 0"
+                      v-else-if="supplier.status == 1 && supplier.type != 0"
                     >
                       Deactivate
                     </button>

@@ -16,17 +16,10 @@ const status_label = ref("Select Status");
 const post_image = ref([]);
 const search = ref(props.search);
 const form = useForm({
-  fname: "",
-  mname: "",
-  lname: "",
-  sex: null,
-  birthday: null,
+  supplier_name: "",
   address: "",
-  contact_no: "",
-  status: null,
-  type: null,
-  email: "",
-  password: "password",
+  mobile_no: "",
+  status: 1,
   image: [],
 });
 
@@ -66,8 +59,8 @@ const select_status = (data) => {
   status_.value = !status_.value;
 };
 
-const add_user = () => {
-  form.post(route("users.add_user"), {
+const add_supplier = () => {
+  form.post(route("suppliers.add_supplier"), {
     preserveScroll: true,
     onSuccess: () => {
       alert("success");
@@ -83,11 +76,11 @@ const add_user = () => {
   });
 };
 const search_ = () => {
-  router.get(route("users.index", { search: search.value }));
+  router.get(route("suppliers.index", { search: search.value }));
 };
 const search_remove = () => {
   search.value = "";
-  router.get(route("users.index", { search: search.value }));
+  router.get(route("suppliers.index", { search: search.value }));
 };
 
 const openFile = () => {
@@ -159,7 +152,7 @@ const remove_image = (key) => {
             @click="open_modal_add"
             class="bg-yellow-400 p-2 mb-2 mt-5 rounded-lg w-[15vmin] hover:bg-yellow-500"
           >
-            Add user
+            Add Supplier
           </button>
         </div>
 
@@ -169,7 +162,7 @@ const remove_image = (key) => {
       </div>
     </div>
     <JetDialogModal :show="addModal" @close="addModal = false" maxWidth="2xl">
-      <template #title> Add User </template>
+      <template #title> Add Supplier </template>
       <template #content>
         <div class="flex-shrink-0">
           <img
@@ -215,42 +208,6 @@ const remove_image = (key) => {
               </div>
             </template>
           </div>
-          <!-- <div v-if="post_image.length != 1" class="col-span-12">
-            <label
-              @click="openFile"
-              class="flex flex-col items-center justify-center w-full h-20 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
-            >
-              <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                <svg
-                  aria-hidden="true"
-                  class="w-7 h-7 mb-1 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                  ></path>
-                </svg>
-                <p class="mb-1 text-xs text-gray-500">
-                  <span class="font-semibold">Click to upload</span>
-                </p>
-                <p class="text-xs text-gray-500">
-                  PNG, JPG or JPEG (MAX.1024kb)
-                </p>
-              </div>
-              <input
-                id="profile_photo"
-                type="file"
-                accept="image/png, image/jpeg, image/jpg"
-                class="hidden"
-              />
-            </label>
-          </div> -->
           <div
             v-if="post_image.length != 1"
             class="col-span-12"
@@ -295,236 +252,35 @@ const remove_image = (key) => {
               />
             </label>
           </div>
-          <div class="col-span-4">
+          <div class="col-span-12">
             <Input
-              label="First name"
+              label="Supplier's name"
               type="text"
               class="mt-1 block w-full"
-              v-model="form.fname"
+              v-model="form.supplier_name"
               autofocus
             />
-            <JetInputError :message="form.errors.fname" class="mt-2" />
+            <JetInputError :message="form.errors.supplier_name" class="mt-2" />
           </div>
-          <div class="col-span-4">
-            <Input
-              label="Middle Name"
-              type="text"
-              class="block w-full"
-              v-model="form.mname"
-              autofocus
-            />
-            <JetInputError :message="form.errors.mname" class="mt-2" />
-          </div>
-          <div class="col-span-4">
-            <Input
-              label="Last Name"
-              type="text"
-              class="block w-full"
-              v-model="form.lname"
-              autofocus
-            />
-            <JetInputError :message="form.errors.lname" class="mt-2" />
-          </div>
-          <div class="col-span-4">
-            <!-- <select name="" id="" v-model="form.sex">
-              <option value="0">Female</option>
-              <option value="1">Male</option>
-            </select> -->
-            <button
-              @click="open_selection_sex"
-              class="text-gray-500 bg-white focus:ring-1 focus:outline-none focus:ring-yellow-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center border border-gray-300 mt-5 w-full"
-              type="button"
-            >
-              {{ sex_label }}
-              <svg
-                class="w-2.5 h-2.5 ml-2.5"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 10 6"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="m1 1 4 4 4-4"
-                />
-              </svg>
-            </button>
-            <!-- Dropdown menu -->
-            <div
-              v-if="sex_"
-              id="dropdown"
-              class="z-20 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 absolute"
-            >
-              <ul class="py-2 text-sm text-gray-700">
-                <li>
-                  <a
-                    @click="select_sex(false)"
-                    class="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    >Female
-                  </a>
-                  <a
-                    @click="select_sex(true)"
-                    class="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    >Male
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <JetInputError :message="form.errors.sex" class="mt-2" />
-          </div>
-          <div class="col-span-4">
-            <Input
-              label="Birthday"
-              type="date"
-              class="block w-full"
-              v-model="form.birthday"
-              autofocus
-            />
-            <JetInputError :message="form.errors.birthday" class="mt-2" />
-          </div>
-          <div class="col-span-4">
+          <div class="col-span-12">
             <Input
               label="Contact No"
               type="text"
               class="block w-full"
-              v-model="form.contact_no"
+              v-model="form.mobile_no"
               autofocus
             />
-            <JetInputError :message="form.errors.contact_no" class="mt-2" />
+            <JetInputError :message="form.errors.mobile_no" class="mt-2" />
           </div>
           <div class="col-span-12">
             <Input
-              label="Permanent Address"
+              label="Supplier's Address"
               type="text"
               class="block w-full"
               v-model="form.address"
               autofocus
             />
             <JetInputError :message="form.errors.address" class="mt-2" />
-          </div>
-          <div class="col-span-6">
-            <!-- <select name="" id="" v-model="form.status">
-              <option value="0">Activate</option>
-              <option value="1">Deactivate</option>
-            </select> -->
-            <button
-              @click="open_selection_status"
-              class="text-gray-500 bg-white focus:ring-1 focus:outline-none focus:ring-yellow-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center border border-gray-300 mt-5 w-full"
-              type="button"
-            >
-              {{ status_label }}
-              <svg
-                class="w-2.5 h-2.5 ml-2.5"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 10 6"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="m1 1 4 4 4-4"
-                />
-              </svg>
-            </button>
-            <!-- Dropdown menu -->
-            <div
-              v-if="status_"
-              id="dropdown"
-              class="z-20 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 absolute"
-            >
-              <ul class="py-2 text-sm text-gray-700">
-                <li>
-                  <a
-                    @click="select_status(true)"
-                    class="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    >Active
-                  </a>
-                  <a
-                    @click="select_status(false)"
-                    class="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    >Inactive
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <JetInputError :message="form.errors.status" class="mt-2" />
-          </div>
-          <div class="col-span-6">
-            <!-- <select name="" id="" v-model="form.type">
-              <option value="0">Administrator</option>
-              <option value="1">Cashier</option>
-            </select> -->
-            <button
-              @click="open_selection_type"
-              class="text-gray-500 bg-white focus:ring-1 focus:outline-none focus:ring-yellow-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center border border-gray-300 mt-5 w-full"
-              type="button"
-            >
-              {{ type_label }}
-              <svg
-                class="w-2.5 h-2.5 ml-2.5"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 10 6"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="m1 1 4 4 4-4"
-                />
-              </svg>
-            </button>
-            <!-- Dropdown menu -->
-            <div
-              v-if="type_"
-              id="dropdown"
-              class="z-20 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 absolute"
-            >
-              <ul class="py-2 text-sm text-gray-700">
-                <li>
-                  <a
-                    @click="select_type(1)"
-                    class="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    >Administrator
-                  </a>
-                  <a
-                    @click="select_type(3)"
-                    class="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    >Cashier
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <JetInputError :message="form.errors.type" class="mt-2" />
-          </div>
-          <div class="col-span-6">
-            <Input
-              label="Email"
-              type="text"
-              class="block w-full"
-              v-model="form.email"
-              autofocus
-              placeholder="Ex:Johndoe@gmail.com"
-            />
-            <JetInputError :message="form.errors.email" class="mt-2" />
-          </div>
-          <div class="col-span-6">
-            <Input
-              label="Password"
-              type="password"
-              class="block w-full"
-              v-model="form.password"
-              autofocus
-            />
-            <JetInputError :message="form.errors.password" class="mt-2" />
           </div>
         </div>
       </template>
@@ -535,7 +291,7 @@ const remove_image = (key) => {
         <Button
           :class="{ 'opacity-25': form.processing }"
           :disabled="form.processing"
-          @click="add_user"
+          @click="add_supplier"
           class="bg-yellow-200 hover:bg-yellow-400"
         >
           <svg
