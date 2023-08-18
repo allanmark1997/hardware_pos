@@ -51,6 +51,7 @@ Route::middleware([
         Route::get('/suppliers', [SupplierController::class, 'index'])->name('index');
         Route::post('/supplier/add', [SupplierController::class, 'store'])->name('add_supplier');
         Route::put('/update_supplier/{supplier}', [SupplierController::class, 'update'])->name('update_supplier');
+        Route::post('/update_supplier_details/{supplier}', [SupplierController::class, 'update_details'])->name('update_supplier_details');
         // Route::put('/users/update/{user}', [User::class, 'update_user'])->name('update_user');
     });
 
