@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 import ApplicationMark from "@/Components/ApplicationMark.vue";
 import Banner from "@/Components/Banner.vue";
@@ -12,6 +12,9 @@ defineProps({
   title: String,
 });
 
+onMounted(()=>{
+  localStorage.setItem("qrScanner", "");
+})
 const showingNavigationDropdown = ref(false);
 
 const switchToTeam = (team) => {
