@@ -48,7 +48,7 @@ class SupplierController extends Controller
             'address' => 'required',
             'mobile_no' => ['required', 'string', 'max:13'],
             'status' => 'required',
-            'photo' => ['required', 'mimes:jpg,jpeg,png', 'max:1024'],
+            // 'image' => ['mimes:jpg,jpeg,png', 'max:1024'],
 
         ]);
 
@@ -104,7 +104,7 @@ class SupplierController extends Controller
             'supplier_name' => ['required', 'string', 'max:255', 'unique:suppliers'],
             'address' => 'required',
             'mobile_no' => ['required', 'string', 'max:13'],
-            'image' => ['required', 'mimes:jpg,jpeg,png', 'max:1024'],
+            // 'image' => ['mimes:jpg,jpeg,png', 'max:1024'],
         ]);
         if($request->hasfile('image')){
             Supplier::initStorage();

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\SpecialDiscount;
 use App\Models\Price;
+use App\Models\Tax;
 use App\Models\product;
 use App\Models\sale_discount;
 use Illuminate\Http\Request;
@@ -32,11 +34,15 @@ class ProductController extends Controller
                 $query->where("category_id", "LIKE", "%{$category}%");
             })->orderBy('created_at', 'desc')->paginate(12);
             $categories = Category::orderBy('name','asc')->get();
+            $tax = Tax::orderBy('created_at','desc')->first();
+            $special_discount = SpecialDiscount::orderBy('created_at','desc')->first();
             return Inertia::render('Products/Product',[
                 "products" => $products,
                 "search" => $search,
                 "categories" => $categories,
-                "category" => $category
+                "category" => $category,
+                "tax" => $tax,
+                "special_discount"=>$special_discount
             ]); 
         }
         
@@ -58,8 +64,6 @@ class ProductController extends Controller
         $request->validate([
             'name'=>["required","max:30"],
             'barcode'=>["required"],
-            'tax'=>["required"],
-            // 'description'=>["required"],
             'price'=>["required", "regex:/^[0-9]+(\.[0-9][0-9]?)?$/"],
             'category'=>"required",
             'text_image'=>"required",
@@ -77,7 +81,6 @@ class ProductController extends Controller
         $product = Product::create([
             'name'=>$request->name,
             'barcode'=>$request->barcode,
-            'tax'=>$request->tax,
             'description'=>$request->description,
             'category_id'=>$request->category,
             'product_image'=>env('APP_URL').'/storage/images/products/'.$imageName,
@@ -127,8 +130,6 @@ class ProductController extends Controller
         $request->validate([
             'name'=>["required","max:30"],
             'barcode'=>["required"],
-            'tax'=>["required"],
-            // 'text_image'=>"required",
             'price'=>["required", "regex:/^[0-9]+(\.[0-9][0-9]?)?$/","min:0"],
             'category'=>"required",
             'sale_discount'=>["required", "integer", "min:0", "max:100"],
@@ -155,7 +156,6 @@ class ProductController extends Controller
         $product -> update([
             'name'=>$request->name,
             'barcode'=>$request->barcode,
-            'tax'=>$request->tax,
             'description'=>$request->description,
             'category_id'=>$request->category,
             'product_image'=>$new_image_name,

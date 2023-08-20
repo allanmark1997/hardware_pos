@@ -92,21 +92,21 @@ const function_update = () => {
                       {{ user.sex == 0 ? "Female" : "Male" }}
                     </p>
                   </div>
-                  <div class="flex mt-4 gap-1 mb-1">
+                  <div class="flex mt-1 gap-1 mb-1">
                     <Icon icon="birthday" size="sm" />
-                    <h4 class="text-gray-700">
+                    <h4 class="text-gray-700 text-sm">
                       {{ function_extract_date_time(user.bday) }}
                     </h4>
                   </div>
-                  <div class="flex mt-4 gap-2">
+                  <div class="flex mt-1 gap-2">
                     <Icon icon="mobile" size="sm" />
                     <p class="text-sm">
                       {{ user.contact_no }}
                     </p>
                   </div>
-                  <div class="flex mt-4 gap-2">
+                  <div class="flex mt-1 gap-2">
                     <Icon icon="location" size="sm" />
-                    <p class="text-sm">
+                    <p class="text-xs">
                       {{ user.address }}
                     </p>
                   </div>
@@ -172,10 +172,10 @@ const function_update = () => {
     @close="condfirmationModal = false"
     maxWidth="2xl"
   >
-    <template #title> Are you sure you want to update this user?</template>
+    <template #title> Are you sure you want to update this user's status?</template>
     <template #content>
       <p class="text-red-500">
-        Clicking can update the system and this is not reversible!
+        Clicking can update the system and may cause possible error!
       </p>
     </template>
     <template #footer>

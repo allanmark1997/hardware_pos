@@ -52,6 +52,10 @@ const function_extract_date_time = (date) => {
   return moment(date).format("MMMM Do YYYY");
 };
 
+const function_extract_time = (date) => {
+  return moment(date).fromNow();
+};
+
 const function_update = () => {
   form.put(
     route("suppliers.update_supplier", { supplier: selected_supplier.value }),
@@ -152,16 +156,22 @@ const remove_image = (key) => {
                       {{ supplier.mobile_no }}
                     </p>
                   </div>
-                  <div class="flex mt-4 gap-2">
+                  <div class="flex mt-1 gap-2">
                     <Icon icon="location" size="sm" />
                     <p class="text-sm">
                       {{ supplier.address }}
                     </p>
                   </div>
-                  <div class="flex mt-4 gap-2">
+                  <div class="flex mt-1 gap-2">
                     <Icon icon="calendar" size="sm" />
                     <p class="text-sm">
                       {{ function_extract_date_time(supplier.created_at) }}
+                    </p>
+                  </div>
+                  <div class="flex mt-1 gap-2">
+                    <Icon icon="clock" size="sm" />
+                    <p class="text-sm">
+                      {{ function_extract_time(supplier.updated_at) }}
                     </p>
                   </div>
                   <div
@@ -209,10 +219,10 @@ const remove_image = (key) => {
     @close="condfirmationModal = false"
     maxWidth="2xl"
   >
-    <template #title> Are you sure you want to update this user?</template>
+    <template #title> Are you sure you want to update this supplier status?</template>
     <template #content>
       <p class="text-red-500">
-        Clicking can update the system and this is not reversible!
+        Clicking can update the system and it may cause a possible error!
       </p>
     </template>
     <template #footer>

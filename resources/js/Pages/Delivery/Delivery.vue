@@ -1,10 +1,11 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-
-    const props = defineProps(["props_detail"]);
+import DeliveryList from "./DeliveryList.vue";
+import { inject, provide, ref } from "vue";
+provide("deliveries", 'sample')
 </script>
 <template>
-    <AppLayout title="Dashboard">
+  <AppLayout title="Dashboard">
     <template #header>
       <h2 class="font-semibold text-lg text-gray-800 leading-tight">
         Delivery Management
@@ -12,7 +13,8 @@ import AppLayout from "@/Layouts/AppLayout.vue";
     </template>
     <div class="py-">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-    This is Delivery page {{ props.props_detail }}
-</div></div>
-    </AppLayout>
+        <DeliveryList  />
+      </div>
+    </div>
+  </AppLayout>
 </template>

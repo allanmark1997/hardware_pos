@@ -5,6 +5,8 @@ use App\Http\Controllers\CashierController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\SpecialDiscountController;
+use App\Http\Controllers\TaxController;
 use App\Http\Controllers\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
@@ -60,6 +62,16 @@ Route::middleware([
         Route::post('/add_products', [ProductController::class, 'store'])->name('store');
         Route::post('/update_products/{product}', [ProductController::class, 'update'])->name('update');
         Route::put('/remove_products/{product}', [ProductController::class, 'destroy'])->name('remove');
+    });
+
+    Route::prefix('taxes')->name('taxes.')->group(function() {
+        Route::post('/add_tax', [TaxController::class, 'store'])->name('store');
+        Route::post('/update_tax/{tax}', [TaxController::class, 'update'])->name('update');
+    });
+
+    Route::prefix('specials')->name('specials.')->group(function() {
+        Route::post('/add_special', [SpecialDiscountController::class, 'store'])->name('store');
+        Route::post('/update_special/{special}', [SpecialDiscountController::class, 'update'])->name('update');
     });
 
     Route::prefix('categories')->name('categories.')->group(function() {

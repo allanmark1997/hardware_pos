@@ -27,38 +27,6 @@ const open_modal_add = () => {
   addModal.value = !addModal.value;
 };
 
-const open_selection_sex = () => {
-  sex_.value = !sex_.value;
-};
-
-const open_selection_status = () => {
-  status_.value = !status_.value;
-};
-
-const open_selection_type = () => {
-  type_.value = !type_.value;
-};
-
-const select_sex = (data) => {
-  form.sex = data;
-  if (data == false) {
-    sex_label.value = "Female";
-  } else {
-    sex_label.value = "Male";
-  }
-  sex_.value = !sex_.value;
-};
-
-const select_status = (data) => {
-  form.status = data;
-  if (data == false) {
-    status_label.value = "Inactive";
-  } else {
-    status_label.value = "Active";
-  }
-  status_.value = !status_.value;
-};
-
 const add_supplier = () => {
   form.post(route("suppliers.add_supplier"), {
     preserveScroll: true,
@@ -150,7 +118,7 @@ const remove_image = (key) => {
 
           <button
             @click="open_modal_add"
-            class="bg-yellow-400 p-2 mb-2 mt-5 rounded-lg w-[15vmin] hover:bg-yellow-500"
+            class="bg-yellow-400 p-2 mb-2 mt-5 rounded-lg w-[20vmin] hover:bg-yellow-500"
           >
             Add Supplier
           </button>

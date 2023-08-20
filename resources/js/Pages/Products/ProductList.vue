@@ -12,14 +12,15 @@ import Icon from "@/Components/Icon.vue";
 import { ref, onMounted } from "vue";
 import { router, useForm } from "@inertiajs/vue3";
 
-const props = defineProps(["products", "search", "category", "categories"]);
+const props = defineProps(["products", "search", "category", "categories", "tax", "special_discount"]);
 const condfirmationModal = ref(false);
-const updateModal = ref(false);
 const post_images = ref([]);
 const specification = ref({});
 const spec_name = ref("");
 const spec_details = ref("");
 const detailModal = ref(false);
+const updateModal = ref(false);
+
 const detailModalData = ref({
   ProdTitle: "",
   ProdSpec: "",
@@ -42,7 +43,6 @@ const form_update = useForm({
   product: false,
   name: "",
   barcode: "",
-  tax: 0,
   description: {
     details: "",
     specification: {
@@ -68,7 +68,6 @@ const function_open_modal_update = (product) => {
   form_update.product = product;
   form_update.name = product.name;
   form_update.barcode = product.barcode;
-  form_update.tax = product.tax;
   form_update.description = product.description;
   form_update.category = product.category_id;
   form_update.sale_discount = product.current_discount.discount;
@@ -116,6 +115,9 @@ const convert_money = (data) => {
 
 const date_time = (data) => {
   return moment(data).format("MM/DD/YYYY, h:mm:ss a");
+};
+const date_time_now = (data) => {
+  return moment(data).fromNow();
 };
 
 const add_specification = () => {
@@ -308,9 +310,14 @@ onMounted(() => {
                     >- (Out of stocks)</span
                   >
                 </h1>
-
                 <h2
-                  class="tracking-widest text-lg title-font font-bold text-gray-500 mb-2"
+                  class="tracking-widest text-lg title-font font-bold text-gray-500"
+                >
+                  {{ convert_money(product.current_price.price - (product.current_price.price * (product.current_discount.discount / 100))) }}<span v-if="product.current_price.price - (product.current_price.price - (product.current_price.price * (product.current_discount.discount / 100))) != 0" class="text-xs text-red-400">({{ convert_money(product.current_price.price - (product.current_price.price - (product.current_price.price * (product.current_discount.discount / 100)))) }} less)</span>
+                </h2>
+                <h2
+                v-if="(product.current_price.price - (product.current_price.price * (product.current_discount.discount / 100))) != product.current_price.price"
+                  class="tracking-widest text-sm title-font font-bold text-gray-500 mb-2 -mt-2 line-through decoration-red-700 decoration-double"
                 >
                   {{ convert_money(product.current_price.price) }}
                 </h2>
@@ -329,19 +336,19 @@ onMounted(() => {
                   />
                   {{ product.user.name }}
                 </p>
-                <div class="flex">
+                <div class="flex gap-1">
                   <p
                     class="flex leading-relaxed text-xs break-words"
-                    :title="date_time(product.updated_at)"
+                    :title="date_time_now(product.updated_at)"
                   >
                     <!--<span class="font-bold text-xs">Updated at: </span>-->
-                    <Icon class="mr-1" icon="calendar_minus" size="xs" />
+                    <Icon class="mr-1" icon="clock" size="sm" />
                     <time class="ml-1">{{
-                      date_time(product.updated_at)
+                      date_time_now(product.updated_at)
                     }}</time>
                   </p>
                   <p
-                    class="flex leading-relaxed mb-3 text-xs break-words"
+                    class="flex leading-relaxed mb-1 text-xs break-words"
                     :title="date_time(product.created_at)"
                   >
                     <!-- <span class="font-bold text-xs">Created at: </span> -->
@@ -612,11 +619,7 @@ onMounted(() => {
             </template>
           </div>
         </div>
-        <div class="col-span-4">
-          <Input type="number" label="Product tax" v-model="form_update.tax" />
-          <JetInputError :message="form_update.errors.tax" class="mt-2" />
-        </div>
-        <div class="col-span-4">
+        <div class="col-span-6">
           <Input
             type="number"
             label="Product price"
@@ -624,7 +627,7 @@ onMounted(() => {
           />
           <JetInputError :message="form_update.errors.price" class="mt-2" />
         </div>
-        <div class="col-span-4">
+        <div class="col-span-6">
           <Input
             type="number"
             label="Product discount"

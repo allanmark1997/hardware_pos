@@ -6,13 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class DeliveryDetail extends Model
+class Tax extends Model
 {
-    use HasFactory;
-    use SoftDeletes;
-
+    use HasFactory, SoftDeletes;
     protected $guarded = [];
-    protected $casts = [
-        'products' => 'json',
-    ];
+
 }

@@ -10,7 +10,7 @@ import JetDialogModal from "@/Components/DialogModal.vue";
 import { onMounted, ref } from "vue";
 import { router, useForm } from "@inertiajs/vue3";
 
-const props = defineProps(["products", "search", "categories", "category"]);
+const props = defineProps(["products", "search", "categories", "category", "tax", "special_discount"]);
 const search = ref(props.search);
 const category = ref(props.category);
 const add_modal = ref(false);
@@ -23,11 +23,14 @@ const specification = ref({});
 const spec_name = ref("");
 const spec_details = ref("");
 const post_images = ref([]);
+const addTaxModal = ref(false);
+const updateTaxEditModal = ref(false);
+const addSpecialModal = ref(false);
+const updateSpecialModal = ref(false);
 
 const form = useForm({
   name: "",
   barcode: "",
-  tax: 0,
   description: {
     details: "",
     specification: {
@@ -48,6 +51,22 @@ const form_cat = useForm({
 
 const form_update_cat = useForm({
   name: null,
+});
+
+const form_tax = useForm({
+  tax:""
+});
+
+const form_tax_update = useForm({
+  tax:""
+});
+
+const form_special = useForm({
+  discount:""
+});
+
+const form_special_update = useForm({
+  discount:""
 });
 
 const add_product = () => {
@@ -94,9 +113,6 @@ const update_selected_category = (category) => {
   form_update_cat.name = category.name;
 };
 const save_selected_category = () => {
-  // temp_data_categories.value[temp_data_selected_category_id.value - 1]["name"] =
-  //   temp_data_selected_category.value;
-
   form_update_cat.put(route("categories.update", category_object.value), {
     preserveScroll: true,
     onSuccess: () => {
@@ -105,6 +121,64 @@ const save_selected_category = () => {
     },
   });
 };
+
+const open_modal_add_tax = () => {
+  addTaxModal.value = !addTaxModal.value;
+};
+const create_tax = () => {
+  form_tax.post(route("taxes.store"),{
+    preserveScroll:true,
+    onSuccess:(()=>{
+      alert("Success")
+      form_tax.reset()
+      open_modal_add_tax()
+    })
+  })
+}
+
+const open_modal_update_tax = () => {
+  form_tax_update.tax = props.tax.tax ?? 0
+  updateTaxEditModal.value = !updateTaxEditModal.value;
+};
+const update_tax = () => {
+  form_tax_update.post(route("taxes.update", { tax:props.tax }),{
+    preserveScroll:true,
+    onSuccess:(()=>{
+      alert("Success")
+      form_tax_update.reset()
+      open_modal_update_tax()
+    })
+  })
+}
+
+const open_modal_add_special = () => {
+  addSpecialModal.value = !addSpecialModal.value;
+};
+const create_special = () => {
+  form_special.post(route("specials.store"),{
+    preserveScroll:true,
+    onSuccess:(()=>{
+      alert("Success")
+      form_special.reset()
+      open_modal_add_special()
+    })
+  })
+}
+
+const open_modal_update_special = () => {
+  form_special_update.discount = props.special_discount?.discount ?? 0
+  updateSpecialModal.value = !updateSpecialModal.value;
+};
+const update_special = () => {
+  form_special_update.post(route("specials.update", { special:props.special }),{
+    preserveScroll:true,
+    onSuccess:(()=>{
+      alert("Success")
+      form_special_update.reset()
+      open_modal_update_special()
+    })
+  })
+}
 
 const search_ = () => {
   router.get(
@@ -175,58 +249,28 @@ const remove_image = (key) => {
 const remove_spec = (key) => {
   form.description.specification.spec_details.splice(key, 1);
 };
-
-// const openFile = () => {
-//     let hidden = document.getElementById("post_image");
-//     hidden.click();
-//     hidden.onchange = (e) => {
-//         if (post_images.value.length + e.target.files.length > 1) {
-//             toast.error("Only 1 image can be selected");
-//             return;
-//         } else {
-//             for (let index = 0; index < e.target.files.length; index++) {
-//                 post_images.value.push(
-//                     window.URL.createObjectURL(e.target.files[index])
-//                 );
-//                 form.text_image = e.target.files[index];
-//             }
-//         }
-//     };
-// };
-
-// const dragFile = (e) => {
-//     e.preventDefault();
-//     try {
-//         if (e.dataTransfer.files.length > 1) {
-//             toast.error("Only 1 image can be selected");
-//             return;
-//         }
-//         else {
-//             for (const file of e.dataTransfer.files) {
-
-//                 var objectURL = URL.createObjectURL(file);
-//                 post_images.value.push(objectURL);
-//                 form.text_image = file;
-//                 // post_images.value.push({fname:file.name, gsrc:objectURL,file:file})
-//             }
-//         }
-//     } catch (error) {
-//         toast.error(error);
-//     }
-
-// }
 </script>
 <template>
   <AppLayout title="Dashboard">
     <template #header>
+      <div class="flex justify-between">
       <h2 class="font-semibold text-lg text-gray-800 leading-tight">
-        Products
+        Products management
       </h2>
+      <div class="-mt-4">
+        <small class="font-semibold text-xs text-white border p-1 rounded-lg bg-green-400">
+          VAT: {{ props.tax?.tax }}%
+        </small>
+      <h2 class="font-semibold text-xs text-white border p-1 rounded-lg mt-1 bg-red-400 -mb-5">
+        SD: {{ props.special_discount?.discount }}%
+      </h2>
+      </div>
+    </div>
     </template>
     <div class="py-">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="flex justify-between">
-          <div class="flex gap-2">
+          <div class="flex gap-2 ">
             <Input
               v-model="search"
               class="rounded-lg mb-2 w-[30vmin]"
@@ -267,10 +311,10 @@ const remove_spec = (key) => {
             </button>
           </div>
 
-          <div class="grid grid-cols-3 gap-3">
+          <div class="grid grid-cols-5 gap-2 ">
             <button
               @click="open_modal_add"
-              class="bg-yellow-400 text-sm font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
+              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
             >
               <a class="my-auto gap-2 flex">
                 <svg
@@ -293,7 +337,7 @@ const remove_spec = (key) => {
             </button>
             <button
               @click="open_modal_add_category"
-              class="bg-yellow-400 text-sm font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
+              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
             >
               <a class="my-auto gap-2 flex">
                 <svg
@@ -321,7 +365,7 @@ const remove_spec = (key) => {
 
             <button
               @click="open_modal_update_category"
-              class="bg-yellow-400 text-sm font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
+              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
             >
               <a class="my-auto gap-1 flex">
                 <svg
@@ -342,6 +386,102 @@ const remove_spec = (key) => {
                 <span>Edit category</span>
               </a>
             </button>
+            <button
+            v-if="props.tax?.tax == undefined || props.tax?.tax == null"
+              @click="open_modal_add_tax"
+              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
+            >
+              <a class="my-auto gap-1 flex">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-5 h-5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
+                  />
+                </svg>
+
+                <span>Add Tax</span>
+              </a>
+            </button>
+            <button
+            v-if="props.tax?.tax != undefined || props.tax?.tax != null"
+              @click="open_modal_update_tax"
+              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
+            >
+              <a class="my-auto gap-1 flex">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-5 h-5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
+                  />
+                </svg>
+
+                <span>Edit Tax</span>
+              </a>
+            </button>
+            <button
+            v-if="props.special_discount?.discount == undefined || props.special_discount?.discount == null"
+              @click="open_modal_add_special"
+              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
+            >
+              <a class="my-auto gap-1 flex">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-5 h-5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
+                  />
+                </svg>
+
+                <span>Add Special Discount</span>
+              </a>
+            </button>
+            <button
+            v-if="props.special_discount?.discount != undefined || props.special_discount?.discount != null"
+              @click="open_modal_update_special"
+              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
+            >
+              <a class="my-auto gap-1 flex">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-5 h-5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
+                  />
+                </svg>
+
+                <span>Edit Special Discount</span>
+              </a>
+            </button>
           </div>
         </div>
 
@@ -351,6 +491,8 @@ const remove_spec = (key) => {
             :search="search"
             :category="category"
             :categories="categories"
+            :tax="tax"
+            :special_discount="special_discount"
           />
         </div>
       </div>
@@ -457,15 +599,11 @@ const remove_spec = (key) => {
               </template>
             </div>
           </div>
-          <div class="col-span-4">
-            <Input type="text" label="Enter product tax" v-model="form.tax" />
-            <JetInputError :message="form.errors.tax" class="mt-2" />
-          </div>
-          <div class="col-span-4">
+          <div class="col-span-6">
             <Input type="number" label="Product price" v-model="form.price" />
             <JetInputError :message="form.errors.price" class="mt-2" />
           </div>
-          <div class="col-span-4">
+          <div class="col-span-6">
             <Input
               type="number"
               label="Product discount"
@@ -571,11 +709,6 @@ const remove_spec = (key) => {
             :message="form.errors.text_image"
             class="mt-2 col-span-12"
           />
-
-          <!-- <div class="col-span-12">
-            <Input type="text" label="Image" v-model="form.product_image" />
-            <JetInputError :message="form.errors.product_image" class="mt-2" />
-          </div> -->
         </div>
       </template>
       <template #footer>
@@ -727,5 +860,197 @@ const remove_spec = (key) => {
         </SecondaryButton>
       </template>
     </JetDialogModal>
+    <JetDialogModal
+    :show="addTaxModal"
+    @close="addTaxModal = false"
+    maxWidth="2xl"
+  >
+    <template #title> Add new tax</template>
+    <template #content>
+      <div class="grid grid-cols-12 gap-1">
+        <div class="col-span-12">
+          <Input
+            type="number"
+            label="Value added tax"
+            v-model="form_tax.tax"
+          />
+          <JetInputError
+            :message="form_tax.errors.tax"
+            class="mt-2"
+          />
+        </div>
+      </div>
+    </template>
+    <template #footer>
+      <SecondaryButton @click="addTaxModal = false" class="mr-2">
+        nevermind
+      </SecondaryButton>
+      <Button
+        :class="{ 'opacity-25': form_tax.processing }"
+        :disabled="form_tax.processing"
+        class="bg-green-200 hover:bg-green-400"
+        @click="create_tax"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-auto"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+          /></svg
+        >&nbsp;Submit
+      </Button>
+    </template>
+  </JetDialogModal>
+  <JetDialogModal
+    :show="updateTaxEditModal"
+    @close="updateTaxEditModal = false"
+    maxWidth="2xl"
+  >
+    <template #title> Update tax</template>
+    <template #content>
+      <div class="grid grid-cols-12 gap-1">
+        <div class="col-span-12">
+          <Input
+            type="number"
+            label="Value added tax"
+            v-model="form_tax_update.tax"
+          />
+          <JetInputError
+            :message="form_tax_update.errors.tax"
+            class="mt-2"
+          />
+        </div>
+      </div>
+    </template>
+    <template #footer>
+      <SecondaryButton @click="updateTaxEditModal = false" class="mr-2">
+        nevermind
+      </SecondaryButton>
+      <Button
+        :class="{ 'opacity-25': form_tax.processing }"
+        :disabled="form_tax.processing"
+        class="bg-green-200 hover:bg-green-400"
+        @click="update_tax"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-auto"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+          /></svg
+        >&nbsp;Submit
+      </Button>
+    </template>
+  </JetDialogModal>
+  <JetDialogModal
+    :show="addSpecialModal"
+    @close="addSpecialModal = false"
+    maxWidth="2xl"
+  >
+    <template #title> Add new Special Discount</template>
+    <template #content>
+      <div class="grid grid-cols-12 gap-1">
+        <div class="col-span-12">
+          <Input
+            type="number"
+            label="Special discount"
+            v-model="form_special.discount"
+          />
+          <JetInputError
+            :message="form_special.errors.discount"
+            class="mt-2"
+          />
+        </div>
+      </div>
+    </template>
+    <template #footer>
+      <SecondaryButton @click="addSpecialModal = false" class="mr-2">
+        nevermind
+      </SecondaryButton>
+      <Button
+        :class="{ 'opacity-25': form_special.processing }"
+        :disabled="form_special.processing"
+        class="bg-green-200 hover:bg-green-400"
+        @click="create_special"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-auto"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+          /></svg
+        >&nbsp;Submit
+      </Button>
+    </template>
+  </JetDialogModal>
+  <JetDialogModal
+    :show="updateSpecialModal"
+    @close="updateSpecialModal = false"
+    maxWidth="2xl"
+  >
+    <template #title> Update Special Discount</template>
+    <template #content>
+      <div class="grid grid-cols-12 gap-1">
+        <div class="col-span-12">
+          <Input
+            type="number"
+            label="Special discount"
+            v-model="form_special_update.discount"
+          />
+          <JetInputError
+            :message="form_special_update.errors.discount"
+            class="mt-2"
+          />
+        </div>
+      </div>
+    </template>
+    <template #footer>
+      <SecondaryButton @click="updateSpecialModal = false" class="mr-2">
+        nevermind
+      </SecondaryButton>
+      <Button
+        :class="{ 'opacity-25': form_special_update.processing }"
+        :disabled="form_special_update.processing"
+        class="bg-green-200 hover:bg-green-400"
+        @click="update_selected_category"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-auto"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+          /></svg
+        >&nbsp;Submit
+      </Button>
+    </template>
+  </JetDialogModal>
   </AppLayout>
 </template>
