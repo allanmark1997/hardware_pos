@@ -10,6 +10,9 @@ import Button from "@/Components/Button.vue";
 import Input2 from "@/Components/InputCustom.vue";
 import JetInputError from "@/Components/InputError.vue";
 
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
+
 const props = defineProps(["suppliers", "search"]);
 const addModal = ref(false);
 const status_label = ref("Select Status");
@@ -31,7 +34,11 @@ const add_supplier = () => {
   form.post(route("suppliers.add_supplier"), {
     preserveScroll: true,
     onSuccess: () => {
-      alert("success");
+      toast.success("Supplier successfully added!", {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
       addModal.value = !addModal.value;
       form.reset();
       sex_label.value.reset();
@@ -39,7 +46,11 @@ const add_supplier = () => {
       type_label.value.reset();
     },
     onError: (error) => {
-      console.log(error);
+      toast.error("Something went wrong " + error, {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
     },
   });
 };
@@ -72,6 +83,11 @@ const dragFile = (e) => {
 const remove_image = (key) => {
   post_image.value.splice(key, 1);
   form.image = null;
+  toast.warn("Image remove", {
+    autoClose: 1000,
+    transition: toast.TRANSITIONS.FLIP,
+    position: toast.POSITION.TOP_RIGHT,
+  });
 };
 </script>
 

@@ -12,4 +12,16 @@ class Delivery extends Model
     use SoftDeletes;
 
     protected $guarded = [];
+
+    public function details(){
+        return $this->hasMany(DeliveryDetail::class);
+    }
+
+    public function supplier(){
+        return $this->belongsTo(Supplier::class);
+    } 
+
+    public function user_receiver(){
+        return $this->belongsTo(User::class, "received_by", "id");
+    } 
 }

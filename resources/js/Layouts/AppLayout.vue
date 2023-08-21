@@ -12,9 +12,9 @@ defineProps({
   title: String,
 });
 
-onMounted(()=>{
+onMounted(() => {
   localStorage.setItem("qrScanner", "");
-})
+});
 const showingNavigationDropdown = ref(false);
 
 const switchToTeam = (team) => {

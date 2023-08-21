@@ -2,7 +2,8 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import DeliveryList from "./DeliveryList.vue";
 import { inject, provide, ref } from "vue";
-provide("deliveries", 'sample')
+
+const props = defineProps(["deliveries"]);
 </script>
 <template>
   <AppLayout title="Dashboard">
@@ -13,7 +14,7 @@ provide("deliveries", 'sample')
     </template>
     <div class="py-">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <DeliveryList  />
+        <DeliveryList :deliveries="deliveries" />
       </div>
     </div>
   </AppLayout>

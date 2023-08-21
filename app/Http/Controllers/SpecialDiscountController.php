@@ -59,13 +59,13 @@ class SpecialDiscountController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, SpecialDiscount $specialDiscount)
+    public function update(Request $request, SpecialDiscount $special)
     {
         $request->validate([
             'discount'=>["required", "integer", "max:99"],
         ]);
-        $special_current = SpecialDiscount::where("id",$specialDiscount->id)->first();
-        if(floatVal($request->tax) != $special_current->discount){
+        $special_current = SpecialDiscount::where("id",$special->id)->first();
+        if(floatVal($request->discount) != $special_current->discount){
             SpecialDiscount::create([
                 'discount' => $request->discount,
                 'user_id'=> Auth::user()->id

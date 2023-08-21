@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Delivery;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Redirect;
@@ -13,8 +14,9 @@ class DeliveryController extends Controller
      */
     public function index()
     {
+        $deliveries = Delivery::with("details")->with("supplier")->with("user_receiver")->get();
         return Inertia::render('Delivery/Delivery',[
-            'props_detail' => "Delivery page"
+            "deliveries" => $deliveries
         ]);
     }
 

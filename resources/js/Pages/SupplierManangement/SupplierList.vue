@@ -14,6 +14,10 @@ import JetInputError from "@/Components/InputError.vue";
 import moment from "moment";
 import { ref } from "vue";
 import { useForm, usePage } from "@inertiajs/vue3";
+
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
+
 const props = defineProps(["suppliers", "search"]);
 const condfirmationModal = ref(false);
 const updateModal = ref(false);
@@ -62,13 +66,21 @@ const function_update = () => {
     {
       preserveScroll: true,
       onSuccess: () => {
-        alert("success");
+        toast.success("Supplier successfully updated!", {
+          autoClose: 1000,
+          transition: toast.TRANSITIONS.FLIP,
+          position: toast.POSITION.TOP_RIGHT,
+        });
         condfirmationModal.value = !condfirmationModal.value;
         form.reset();
         selected_supplier.value.reset();
       },
       onError: (error) => {
-        console.log(error);
+        toast.error("Something went wrong " + error, {
+          autoClose: 1000,
+          transition: toast.TRANSITIONS.FLIP,
+          position: toast.POSITION.TOP_RIGHT,
+        });
       },
     }
   );
@@ -82,13 +94,21 @@ const function_update_details = () => {
     {
       preserveScroll: true,
       onSuccess: () => {
-        alert("success");
+        toast.success("Supplier successfully updated!", {
+          autoClose: 1000,
+          transition: toast.TRANSITIONS.FLIP,
+          position: toast.POSITION.TOP_RIGHT,
+        });
         updateModal.value = !updateModal.value;
         form_update.reset();
         selected_supplier.value.reset();
       },
       onError: (error) => {
-        console.log(error);
+        toast.error("Something went wrong " + error, {
+          autoClose: 1000,
+          transition: toast.TRANSITIONS.FLIP,
+          position: toast.POSITION.TOP_RIGHT,
+        });
       },
     }
   );
@@ -219,7 +239,9 @@ const remove_image = (key) => {
     @close="condfirmationModal = false"
     maxWidth="2xl"
   >
-    <template #title> Are you sure you want to update this supplier status?</template>
+    <template #title>
+      Are you sure you want to update this supplier status?</template
+    >
     <template #content>
       <p class="text-red-500">
         Clicking can update the system and it may cause a possible error!

@@ -8,6 +8,9 @@ import Button from "@/Components/Button.vue";
 import Dropdown from "@/Components/CustomDropdownPosition.vue";
 import Icon from "@/Components/Icon.vue";
 
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
+
 import moment from "moment";
 import { ref } from "vue";
 import { useForm } from "@inertiajs/vue3";
@@ -34,13 +37,21 @@ const function_update = () => {
   form.put(route("users.update_user", { user: selected_user.value }), {
     preserveScroll: true,
     onSuccess: () => {
-      alert("success");
+      toast.success("User successfully updated!", {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
       condfirmationModal.value = !condfirmationModal.value;
       form.reset();
       selected_user.value.reset();
     },
     onError: (error) => {
-      console.log(error);
+      toast.error("Somthing went wrong " + error, {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
     },
   });
 };
@@ -76,7 +87,6 @@ const function_update = () => {
                     class="h-40 rounded max-w- object-fit object-center mb-6 mx-auto"
                     :src="user.profile_photo_url"
                     :alt="user.name"
-                    alt="content"
                   />
                   <h3
                     class="tracking-widest text-indigo-500 text-xs font-medium title-font"
@@ -172,7 +182,9 @@ const function_update = () => {
     @close="condfirmationModal = false"
     maxWidth="2xl"
   >
-    <template #title> Are you sure you want to update this user's status?</template>
+    <template #title>
+      Are you sure you want to update this user's status?</template
+    >
     <template #content>
       <p class="text-red-500">
         Clicking can update the system and may cause possible error!

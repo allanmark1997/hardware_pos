@@ -12,7 +12,17 @@ import Icon from "@/Components/Icon.vue";
 import { ref, onMounted } from "vue";
 import { router, useForm } from "@inertiajs/vue3";
 
-const props = defineProps(["products", "search", "category", "categories", "tax", "special_discount"]);
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
+
+const props = defineProps([
+  "products",
+  "search",
+  "category",
+  "categories",
+  "tax",
+  "special_discount",
+]);
 const condfirmationModal = ref(false);
 const post_images = ref([]);
 const specification = ref({});
@@ -79,12 +89,20 @@ const remove_product = () => {
   form.put(route("products.remove", form.product), {
     preserveScroll: true,
     onSuccess: () => {
-      alert("Product removed");
+      toast.success("Product successfully removed!", {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
       condfirmationModal.value = false;
       form.reset();
     },
     onError: (error) => {
-      alert("Something went wrong " + error);
+      toast.error("Something went wrong " + error, {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
     },
   });
 };
@@ -93,13 +111,21 @@ const update_product = () => {
   form_update.post(route("products.update", form_update.product), {
     preserveScroll: true,
     onSuccess: () => {
-      alert("Product update");
+      toast.success("Product successfully updated!", {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
       updateModal.value = false;
       form_update.reset();
       // location.reload();
     },
     onError: (error) => {
-      alert("Something went wrong " + error);
+      toast.error("Something went wrong!", {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
     },
   });
 };
@@ -173,10 +199,20 @@ const dragFile = (e) => {
 const remove_image = (key) => {
   post_images.value.splice(key, 1);
   form_update.text_image = null;
+  toast.success("Image removed.", {
+    autoClose: 1000,
+    transition: toast.TRANSITIONS.FLIP,
+    position: toast.POSITION.TOP_RIGHT,
+  });
 };
 
 const remove_spec = (key) => {
   form_update.description.specification.spec_details.splice(key, 1);
+  toast.success("Removed specification details.", {
+    autoClose: 1000,
+    transition: toast.TRANSITIONS.FLIP,
+    position: toast.POSITION.TOP_RIGHT,
+  });
 };
 
 const key_spec = ref(null);
@@ -248,39 +284,13 @@ onMounted(() => {
                     @click="function_open_modal_update(product)"
                     class="p-2 bg-yellow-400 rounded-lg hover:bg-yellow-600 mr-2 w-auto"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-5 h-5 text-white"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-                      />
-                    </svg>
+                    <Icon icon="pencil" size="sm" />
                   </button>
                   <button
                     @click="function_open_modal_confirmation(product)"
                     class="p-2 bg-red-400 rounded-lg hover:bg-red-600 w-auto mt-2"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-5 h-5 text-white"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                      />
-                    </svg>
+                    <Icon icon="trash" size="sm" />
                   </button>
                 </div>
               </div>
@@ -313,10 +323,39 @@ onMounted(() => {
                 <h2
                   class="tracking-widest text-lg title-font font-bold text-gray-500"
                 >
-                  {{ convert_money(product.current_price.price - (product.current_price.price * (product.current_discount.discount / 100))) }}<span v-if="product.current_price.price - (product.current_price.price - (product.current_price.price * (product.current_discount.discount / 100))) != 0" class="text-xs text-red-400">({{ convert_money(product.current_price.price - (product.current_price.price - (product.current_price.price * (product.current_discount.discount / 100)))) }} less)</span>
+                  {{
+                    convert_money(
+                      product.current_price.price -
+                        product.current_price.price *
+                          (product.current_discount.discount / 100)
+                    )
+                  }}<span
+                    v-if="
+                      product.current_price.price -
+                        (product.current_price.price -
+                          product.current_price.price *
+                            (product.current_discount.discount / 100)) !=
+                      0
+                    "
+                    class="text-xs text-red-400"
+                    >({{
+                      convert_money(
+                        product.current_price.price -
+                          (product.current_price.price -
+                            product.current_price.price *
+                              (product.current_discount.discount / 100))
+                      )
+                    }}
+                    less)</span
+                  >
                 </h2>
                 <h2
-                v-if="(product.current_price.price - (product.current_price.price * (product.current_discount.discount / 100))) != product.current_price.price"
+                  v-if="
+                    product.current_price.price -
+                      product.current_price.price *
+                        (product.current_discount.discount / 100) !=
+                    product.current_price.price
+                  "
                   class="tracking-widest text-sm title-font font-bold text-gray-500 mb-2 -mt-2 line-through decoration-red-700 decoration-double"
                 >
                   {{ convert_money(product.current_price.price) }}
