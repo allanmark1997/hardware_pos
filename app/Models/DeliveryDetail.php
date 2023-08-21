@@ -12,7 +12,11 @@ class DeliveryDetail extends Model
     use SoftDeletes;
 
     protected $guarded = [];
-    protected $casts = [
-        'products' => 'json',
-    ];
+    // protected $casts = [
+    //     'products' => 'json',
+    // ];
+
+    public function product(){
+        return $this->belongsTo(Product::class);
+    } 
 }

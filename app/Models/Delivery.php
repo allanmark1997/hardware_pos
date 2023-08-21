@@ -14,7 +14,7 @@ class Delivery extends Model
     protected $guarded = [];
 
     public function details(){
-        return $this->hasMany(DeliveryDetail::class);
+        return $this->hasMany(DeliveryDetail::class)->with("product");
     }
 
     public function supplier(){
