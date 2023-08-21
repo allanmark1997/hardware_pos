@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('delivery_details', function (Blueprint $table) {
-            //
+            $table -> double('price')->nullable();
+            $table -> integer('quantity')->nullable();
         });
     }
 

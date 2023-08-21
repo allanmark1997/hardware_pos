@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('delivery_details', function (Blueprint $table) {
-            $table->foreignId('product_id')->change();
+            $table->dropColumn('products');
+            $table->foreignId('product_id')->after("id");
         });
     }
 
