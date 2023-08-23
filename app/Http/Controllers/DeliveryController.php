@@ -31,19 +31,43 @@ class DeliveryController extends Controller
         $results = [];
         $results[] = ['DATE RANGES', 'From', 'To'];
         $results[] = ['', '--', '--'];
-        $results[] = ['SUPPLIER NAME', 'RECEIVED BY', 'STATUS', 'PRODUCTS', 'REMARKS','TOTAL','CREATED AT'];
+        $results[] = ['SUPPLIER NAME', 'RECEIVED BY', 'STATUS', 'PRODUCT NAME', 'QUANTITY', 'PRICE', "SUB-TOTAL", 'REMARKS','TOTAL','CREATED AT'];
+
+        // $results_temp=[];
         foreach ($deliveries as $key => $delivery) {
+            // dd($delivery->details[$key]['quantity']);
             $results[]=
-            [
-                $delivery->supplier->supplier_name??"--",
-                $delivery->user_receiver->name??'--',
-                $delivery->status == 1 ? 'Delivered' : "Unsucessful",
-                $this->products($delivery->details),
-                $delivery->remarks ?? '--',
-                $this->products_total($delivery->details),
-                $this->date_time_formatter($delivery->created_at)
-            ];
+                [
+                    $delivery->supplier->supplier_name??"--",
+                    $delivery->user_receiver->name??'--',
+                    $delivery->status == 1 ? 'Delivered' : "Unsucessful",
+                    $delivery->details[$key]["product"]["name"],
+                    $delivery->details[$key]['quantity'],
+                    "PHP ".number_format($delivery->details[$key]['price']),
+                    "PHP ".number_format($delivery->details[$key]['price']*$delivery->details[$key]['quantity']),
+                    // $this->products($delivery->details),
+                    $delivery->remarks ?? '--',
+                    $this->products_total($delivery->details),
+                    $this->date_time_formatter($delivery->created_at)
+                ];
+                    for ($i=1; $i < count($delivery->details) ; $i++) { 
+                        $results[]=
+                                [
+                                    "",
+                                    '',
+                                '',
+                                $delivery->details[$i]['product']['name'],
+                                $delivery->details[$i]['quantity'],
+                                "PHP ".number_format($delivery->details[$i]['price']),
+                                "PHP ".number_format($delivery->details[$i]['quantity']*$delivery->details[$i]['price']),
+                                    '',
+                                    '',
+                                    ''
+                                ];
+                    }
         }
+
+        // dd($results);
         return (new DeliveryExport([$results], ['Delivery']))->download("Deliveries.xlsx");
         // return Excel::download(new DeliveryExport, 'Delivery.xlsx');
     }
@@ -69,7 +93,7 @@ class DeliveryController extends Controller
             foreach ($data as $key => $value) {
                 $sum +=$value["price"]*$value["quantity"];
             }
-            return "PHP".number_format($sum,2);
+            return "PHP ".number_format($sum,2);
         }
         else{
             return "--";
