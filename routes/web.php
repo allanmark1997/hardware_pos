@@ -81,6 +81,7 @@ Route::middleware([
 
     Route::prefix('delivery')->name('deliveries.')->group(function() {
         Route::get('/deliveries', [DeliveryController::class, 'index'])->name('index');
+        Route::get('/deliveries/export', [DeliveryController::class, 'export'])->name('export');
     });
 
     Route::prefix('cashier')->name('cashier.')->group(function() {
