@@ -3,26 +3,32 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import Icon from "@/Components/Icon.vue";
 import { onMounted, ref } from "vue";
 import { router, useForm } from "@inertiajs/vue3";
+
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 const props = defineProps(["product"]);
 
 const totalCart = ref(2);
 const sampleData = ref(5);
 const samplePurchaseData = ref(2);
 const eventListenerStorage = ref();
+const status = ref();
 // const scannedCode = "323423465756";
 
 onMounted(() => {
-  if(localStorage.getItem("qrScanner") == ""){
-    localStorage.setItem("qrScanner", "active");
-  window.addEventListener("keydown", (e) => {
-    e.preventDefault()
-    if (e.keyCode == 49 && router.page.component == 'Cashier/Cashier') {
-      create_transaction();
-    }
-  });
-}
+    keydownHandler()
+   
 })
 
+const keydownHandler = (event) => {
+  if(!status.value){
+   document.addEventListener("keydown", (e) => {
+      if (e.keyCode == 49 && router.page.component == 'Cashier/Cashier'){
+        create_transaction();
+      }
+    });
+}
+}
 
 const domChecker = () => {
   let result = ""
@@ -75,14 +81,7 @@ const search_ = () => {
   );
 };
 const create_transaction = (active) => {
-  // if (props.transaction == null) {
-  //   router.post(route("cashier.create_transaction"));
-  // } else {
-
   console.log('active cashier')
-
-  // }
-
 };
 
 
