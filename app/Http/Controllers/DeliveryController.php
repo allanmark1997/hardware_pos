@@ -50,7 +50,7 @@ class DeliveryController extends Controller
                     $this->products_total($delivery->details),
                     $this->date_time_formatter($delivery->created_at)
                 ];
-                    for ($i=1; $i < count($delivery->details) ; $i++) { 
+                    for ($i=0; $i < count($delivery->details); $i++) { 
                         $results[]=
                                 [
                                     "",
@@ -67,7 +67,7 @@ class DeliveryController extends Controller
                     }
         }
 
-        // dd($results);
+        dd($results);
         return (new DeliveryExport([$results], ['Delivery']))->download("Deliveries.xlsx");
         // return Excel::download(new DeliveryExport, 'Delivery.xlsx');
     }
