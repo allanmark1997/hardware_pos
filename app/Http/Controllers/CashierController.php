@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CashierStatus;
 use Illuminate\Http\Request;
 
 use Inertia\Inertia;
@@ -21,9 +22,10 @@ class CashierController extends Controller
     {
         
         $product = product::where("barcode", $request->search)->with('current_price')->with('current_discount')->first();
-       
+       $cashier_stat = CashierStatus::where("user_id", Auth::user()->id)->first();
         return Inertia::render('Cashier/Cashier',[
             "product" => $product,
+            "cashier_status" => $cashier_stat->status == 0 ? "false":"true"
         ]);
     }
 

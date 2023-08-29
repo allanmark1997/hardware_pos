@@ -3,6 +3,7 @@
 namespace App\Exports\Sheets;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
 use Maatwebsite\Excel\Concerns\WithTitle;
 
@@ -29,4 +30,14 @@ class SurveyDataSheet implements FromCollection, WithTitle, WithStrictNullCompar
     {
         return $this->sheet_title;
     }
+
+    // Public function headings(): array
+    // {
+    //     return [
+    //         'SKU',
+    //         'remark',
+    //         'status',
+    //     ];
+    // }
+    
 }

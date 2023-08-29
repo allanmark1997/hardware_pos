@@ -29,5 +29,10 @@ class UserSeeder extends Seeder
             'email' => 'superadmin@gmail.com',
             'password' => Hash::make('password')
         ]);
+
+        DB::table('cashier_statuses')->insert([
+            'status' => false,
+            'user_id'=> 1
+        ]);
     }
 }

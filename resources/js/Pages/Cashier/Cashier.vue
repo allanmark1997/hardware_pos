@@ -6,7 +6,7 @@ import { router, useForm } from "@inertiajs/vue3";
 
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
-const props = defineProps(["product"]);
+const props = defineProps(["product", "cashier_status"]);
 
 const totalCart = ref(2);
 const sampleData = ref(5);
@@ -16,29 +16,28 @@ const status = ref();
 // const scannedCode = "323423465756";
 
 onMounted(() => {
-    keydownHandler()
-   
-})
+  keydownHandler();
+});
 
 const keydownHandler = (event) => {
-  if(!status.value){
-   document.addEventListener("keydown", (e) => {
-      if (e.keyCode == 49 && router.page.component == 'Cashier/Cashier'){
+  if (!status.value) {
+    document.addEventListener("keydown", (e) => {
+      if (e.keyCode == 49 && router.page.component == "Cashier/Cashier") {
         create_transaction();
       }
     });
-}
-}
+  }
+};
 
 const domChecker = () => {
-  let result = ""
-  if ('keydown' in window) {
-    result = true
+  let result = "";
+  if ("keydown" in window) {
+    result = true;
   } else {
-    result = false
+    result = false;
   }
-  return result
-}
+  return result;
+};
 
 const firstDigit = (num) => {
   // 1: get first digit using regex pattern
@@ -64,26 +63,18 @@ const nFormatter = (num) => {
 
 const form = useForm({
   search: "",
-  machine: false
+  machine: false,
 });
 
-
-
 const search_ = () => {
-  form.get(
-    route("cashier.index"),
-    {
-      preserveScroll: true,
-      onSuccess: () => {
-
-      },
-    }
-  );
+  form.get(route("cashier.index"), {
+    preserveScroll: true,
+    onSuccess: () => {},
+  });
 };
 const create_transaction = (active) => {
-  console.log('active cashier')
+  console.log("active cashier");
 };
-
 
 // const scan = () =>{
 //   search_(scannedCode.value)
@@ -103,20 +94,29 @@ const create_transaction = (active) => {
             <form class="flex items-center">
               <label for="Search products" class="sr-only">Search</label>
               <div class="relative w-full">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <div
+                  class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+                >
                   <Icon class="mr-1" icon="shopping_bag" size="xs" />
                 </div>
-                <input type="text" id="Search products"
+                <input
+                  type="text"
+                  id="Search products"
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full pl-10 p-2.5"
-                  placeholder="Search products" />
+                  placeholder="Search products"
+                />
               </div>
-              <button type="submit"
-                class="inline-flex items-center py-2.5 px-3 ml-2 text-sm font-medium text-white bg-yellow-700 rounded-lg border border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300">
+              <button
+                type="submit"
+                class="inline-flex items-center py-2.5 px-3 ml-2 text-sm font-medium text-white bg-yellow-700 rounded-lg border border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300"
+              >
                 <Icon class="mr-5" icon="search_icon" size="xs" />
               </button>
             </form>
 
-            <div class="product_list bg-gray-50 p-1 rounded-lg mt-3 min-h-[60vmin] overflow-auto">
+            <div
+              class="product_list bg-gray-50 p-1 rounded-lg mt-3 min-h-[60vmin] overflow-auto"
+            >
               <div class="mt-24 flex justify-center" v-if="sampleData == 0">
                 <div class="bg-white px-10 py-5 shadow-lg rounded xl">
                   <div class="flex justify-center mb-2">
@@ -128,14 +128,18 @@ const create_transaction = (active) => {
             </div>
           </div>
           <div class="col-span-5">
-            <div class="bg-white rounded-b-xl shadow-md p-5 flex justify-between max-h-[63vmin]">
+            <div
+              class="bg-white rounded-b-xl shadow-md p-5 flex justify-between max-h-[63vmin]"
+            >
               <div class="flex">
                 <Icon icon="shopping_cart" size="sm"></Icon>
                 <span class="font-bold">Cart</span>
               </div>
               <div>
                 <span class="font-bold"> count: </span>
-                <span class="bg-red-500 ml-1 px-2 text-white rounded-xl w-10 text-center">
+                <span
+                  class="bg-red-500 ml-1 px-2 text-white rounded-xl w-10 text-center"
+                >
                   <small v-if="totalCart >= 1000">{{
                     nFormatter(totalCart)
                   }}</small>
@@ -149,19 +153,28 @@ const create_transaction = (active) => {
             <form class="flex mt-5 mx-5 items-center">
               <label for="Search products" class="sr-only">Search</label>
               <div class="relative w-full">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <div
+                  class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+                >
                   <Icon class="mr-1" icon="shopping_bag" size="xs" />
                 </div>
-                <input type="text" id="Search products"
+                <input
+                  type="text"
+                  id="Search products"
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full pl-10 p-2.5"
-                  placeholder="Search products" />
+                  placeholder="Search products"
+                />
               </div>
-              <button type="submit"
-                class="inline-flex items-center py-2.5 px-3 ml-2 text-sm font-medium text-white bg-yellow-700 rounded-lg border border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300">
+              <button
+                type="submit"
+                class="inline-flex items-center py-2.5 px-3 ml-2 text-sm font-medium text-white bg-yellow-700 rounded-lg border border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300"
+              >
                 <Icon class="mr-5" icon="search_icon" size="xs" />
               </button>
             </form>
-            <div class="relative mt-5 px-2 overflow-x-auto min-h-[45vmin] shadow-md">
+            <div
+              class="relative mt-5 px-2 overflow-x-auto min-h-[45vmin] shadow-md"
+            >
               <table class="w-full text-sm text-left text-gray-500">
                 <tbody>
                   <tr v-for="data in totalCart" class="bg-white border-b">
@@ -174,27 +187,53 @@ const create_transaction = (active) => {
                           <div class="flex items-center space-x-3">
                             <button
                               class="inline-flex items-center justify-center p-1 text-sm font-medium h-6 w-6 text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200"
-                              type="button">
+                              type="button"
+                            >
                               <span class="sr-only">Quantity button</span>
-                              <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 18 2">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                  stroke-width="2" d="M1 1h16" />
+                              <svg
+                                class="w-3 h-3"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 18 2"
+                              >
+                                <path
+                                  stroke="currentColor"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M1 1h16"
+                                />
                               </svg>
                             </button>
                             <div>
-                              <input type="number" id="first_product"
+                              <input
+                                type="number"
+                                id="first_product"
                                 class="bg-gray-50 w-14 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-2.5 py-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="1" required />
+                                placeholder="1"
+                                required
+                              />
                             </div>
                             <button
                               class="inline-flex items-center justify-center h-6 w-6 p-1 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200"
-                              type="button">
+                              type="button"
+                            >
                               <span class="sr-only">Quantity button</span>
-                              <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 18 18">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                  stroke-width="2" d="M9 1v16M1 9h16" />
+                              <svg
+                                class="w-3 h-3"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 18 18"
+                              >
+                                <path
+                                  stroke="currentColor"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M9 1v16M1 9h16"
+                                />
                               </svg>
                             </button>
                           </div>
@@ -213,8 +252,10 @@ const create_transaction = (active) => {
             </div>
             <div class="bg-white flex justify-between item-center p-5">
               <p><span class="font-bold">Total:</span> 200</p>
-              <button type="button"
-                class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2">
+              <button
+                type="button"
+                class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
+              >
                 Charge
               </button>
             </div>

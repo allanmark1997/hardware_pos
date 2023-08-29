@@ -29,8 +29,8 @@ class DeliveryController extends Controller
         // return Excel::download(new DeliveryExport, 'deliveries.xlsx');
         $deliveries = Delivery::with("details")->with("supplier")->with("user_receiver")->get();
         $results = [];
-        $results[] = ['DATE RANGES', 'From', 'To'];
-        $results[] = ['', '--', '--'];
+        $results[] = ['DATE RANGES', 'From', 'To', 'Grand total'];
+        $results[] = ['', '--', '--', "PHP ".number_format($this->grand_total($deliveries),2)];
         $results[] = ['SUPPLIER NAME', 'RECEIVED BY', 'STATUS', 'PRODUCT NAME', 'QUANTITY', 'PRICE', "SUB-TOTAL", 'REMARKS','TOTAL','CREATED AT'];
 
         // $results_temp=[];
@@ -41,25 +41,29 @@ class DeliveryController extends Controller
                     $delivery->supplier->supplier_name??"--",
                     $delivery->user_receiver->name??'--',
                     $delivery->status == 1 ? 'Delivered' : "Unsucessful",
-                    $delivery->details[$key]["product"]["name"],
-                    $delivery->details[$key]['quantity'],
-                    "PHP ".number_format($delivery->details[$key]['price']),
-                    "PHP ".number_format($delivery->details[$key]['price']*$delivery->details[$key]['quantity']),
+                    "",
+                    "",
+                    "",
+                    "",
+                    // $delivery->details[$key]["product"]["name"],
+                    // $delivery->details[$key]['quantity'],
+                    // "PHP ".number_format($delivery->details[$key]['price']),
+                    // "PHP ".number_format($delivery->details[$key]['price']*$delivery->details[$key]['quantity']),
                     // $this->products($delivery->details),
                     $delivery->remarks ?? '--',
                     $this->products_total($delivery->details),
                     $this->date_time_formatter($delivery->created_at)
                 ];
                     for ($i=0; $i < count($delivery->details); $i++) { 
-                        $results[]=
+                        $results[][$i]=
                                 [
                                     "",
                                     '',
                                 '',
                                 $delivery->details[$i]['product']['name'],
                                 $delivery->details[$i]['quantity'],
-                                "PHP ".number_format($delivery->details[$i]['price']),
-                                "PHP ".number_format($delivery->details[$i]['quantity']*$delivery->details[$i]['price']),
+                                "PHP ".number_format($delivery->details[$i]['price'], 2),
+                                "PHP ".number_format($delivery->details[$i]['quantity']*$delivery->details[$i]['price'],2),
                                     '',
                                     '',
                                     ''
@@ -67,9 +71,23 @@ class DeliveryController extends Controller
                     }
         }
 
-        dd($results);
+        // dd($results);
         return (new DeliveryExport([$results], ['Delivery']))->download("Deliveries.xlsx");
         // return Excel::download(new DeliveryExport, 'Delivery.xlsx');
+    }
+
+    public function grand_total($data){
+        $grand_total = 0;
+        if (count($data)!= 0) {
+            foreach ($data as $key => $delivery) {
+                foreach ($delivery->details as $key => $value) {
+                    // dd();
+                    $grand_total += $value->price * $value->quantity;
+                }
+            }
+            // dd($grand_total);
+            return $grand_total;
+        }
     }
 
     public function products($data){
