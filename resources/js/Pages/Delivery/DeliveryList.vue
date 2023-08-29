@@ -56,7 +56,7 @@ const convert_money = (data) => {
     </div>
     <a
       :href="route('deliveries.export')"
-      class="bg-green-400 hover:bg-green-600 hover:text-white"
+      class="bg-green-400 hover:bg-green-600 hover:text-white rounded-lg my-auto p-2"
       >Download</a
     >
   </div>
@@ -97,7 +97,7 @@ const convert_money = (data) => {
                         <th scope="col" class="px-1 py-1">No.</th>
                         <th scope="col" class="px-1 py-1">Price</th>
                         <th scope="col" class="px-1 py-1">Status</th>
-                        <th scope="col" class="px-1 py-1">Created at</th>
+                        <!-- <th scope="col" class="px-1 py-1">Created at</th> -->
                       </tr>
                     </thead>
                     <tbody>
@@ -126,9 +126,9 @@ const convert_money = (data) => {
                               }}
                             </small>
                           </td>
-                          <td class="px-1 py-1">
+                          <!-- <td class="px-1 py-1">
                             {{ date_time(delivery_detail.created_at) }}
-                          </td>
+                          </td> -->
                         </tr>
                       </template>
                     </tbody>

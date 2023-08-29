@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ProductsExport;
 use App\Models\Category;
 use App\Models\SpecialDiscount;
 use App\Models\Price;
@@ -21,31 +22,29 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        
-        if(Auth::user()->type != 0 && Auth::user()->type != 1){
+
+        if (Auth::user()->type != 0 && Auth::user()->type != 1) {
             return Redirect::route('dashboard');
-        }
-        else{
+        } else {
             $search = $request->search ?? '';
-             $category = $request->category ?? '';
-            $products = product::with('user')->with('current_price')->with('current_discount')->when($search != null || $search != "", function($query) use($search){
+            $category = $request->category ?? '';
+            $products = product::with('user')->with('current_price')->with('current_discount')->when($search != null || $search != "", function ($query) use ($search) {
                 $query->where("name", "LIKE", "%{$search}%");
-            })->when($category != null || $category != "", function($query) use($category){
+            })->when($category != null || $category != "", function ($query) use ($category) {
                 $query->where("category_id", "LIKE", "%{$category}%");
             })->orderBy('created_at', 'desc')->paginate(12);
-            $categories = Category::orderBy('name','asc')->get();
-            $tax = Tax::orderBy('created_at','desc')->first();
-            $special_discount = SpecialDiscount::orderBy('created_at','desc')->first();
-            return Inertia::render('Products/Product',[
+            $categories = Category::orderBy('name', 'asc')->get();
+            $tax = Tax::orderBy('created_at', 'desc')->first();
+            $special_discount = SpecialDiscount::orderBy('created_at', 'desc')->first();
+            return Inertia::render('Products/Product', [
                 "products" => $products,
                 "search" => $search,
                 "categories" => $categories,
                 "category" => $category,
                 "tax" => $tax,
-                "special_discount"=>$special_discount
-            ]); 
+                "special_discount" => $special_discount
+            ]);
         }
-        
     }
 
     /**
@@ -62,43 +61,43 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'=>["required","max:30"],
-            'barcode'=>["required"],
-            'price'=>["required", "regex:/^[0-9]+(\.[0-9][0-9]?)?$/"],
-            'category'=>"required",
-            'text_image'=>"required",
-            'sale_discount'=>["required", "integer", "max:100"],
+            'name' => ["required", "max:30"],
+            'barcode' => ["required"],
+            'price' => ["required", "regex:/^[0-9]+(\.[0-9][0-9]?)?$/"],
+            'category' => "required",
+            'text_image' => "required",
+            'sale_discount' => ["required", "integer", "max:100"],
         ]);
 
         $imageName = $request->input('text_image');
-        if($request->hasfile('text_image')){
+        if ($request->hasfile('text_image')) {
             Product::initStorage();
             $photo = $request->file('text_image');
             $imageName = $photo->hashName();
-            $photo->store('public/images/products'); 
+            $photo->store('public/images/products');
         }
 
         $product = Product::create([
-            'name'=>$request->name,
-            'barcode'=>$request->barcode,
-            'description'=>$request->description,
-            'category_id'=>$request->category,
-            'product_image'=>env('APP_URL').'/storage/images/products/'.$imageName,
-            'quantity'=>0,
-            'user_id'=> Auth::user()->id
+            'name' => $request->name,
+            'barcode' => $request->barcode,
+            'description' => $request->description,
+            'category_id' => $request->category,
+            'product_image' => env('APP_URL') . '/storage/images/products/' . $imageName,
+            'quantity' => 0,
+            'user_id' => Auth::user()->id
         ]);
 
         Price::create([
-            'price'=>$request->price,
+            'price' => $request->price,
             'product_id' => $product->id,
-            'user_id'=> Auth::user()->id
+            'user_id' => Auth::user()->id
         ]);
 
         sale_discount::create([
             'discount' => $request->sale_discount,
-            'type'=>1,
+            'type' => 1,
             'product_id' => $product->id,
-            'user_id'=> Auth::user()->id
+            'user_id' => Auth::user()->id
         ]);
         return back();
     }
@@ -124,58 +123,58 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        $product_current = Product::with("current_price")->with('current_discount')->where("id",$product->id)->first();
+        $product_current = Product::with("current_price")->with('current_discount')->where("id", $product->id)->first();
         $extracted_path = explode("/", $product_current->product_image);
 
         $request->validate([
-            'name'=>["required","max:30"],
-            'barcode'=>["required"],
-            'price'=>["required", "regex:/^[0-9]+(\.[0-9][0-9]?)?$/","min:0"],
-            'category'=>"required",
-            'sale_discount'=>["required", "integer", "min:0", "max:100"],
+            'name' => ["required", "max:30"],
+            'barcode' => ["required"],
+            'price' => ["required", "regex:/^[0-9]+(\.[0-9][0-9]?)?$/", "min:0"],
+            'category' => "required",
+            'sale_discount' => ["required", "integer", "min:0", "max:100"],
         ]);
 
-        if($request->hasfile('text_image')){
+        if ($request->hasfile('text_image')) {
             Product::initStorage();
             $photo = $request->file('text_image');
             $imageName = $photo->hashName();
             // dd(Storage::exists('public/images/products/'.$extracted_path[6]));
-            if (Storage::exists('public/images/products/'.$extracted_path[6]) == true) {
-                Storage::delete('public/images/products/'.$extracted_path[6]);
+            if (Storage::exists('public/images/products/' . $extracted_path[6]) == true) {
+                Storage::delete('public/images/products/' . $extracted_path[6]);
             }
-            $photo->store('public/images/products'); 
+            $photo->store('public/images/products');
             // $photo->storeAs('public/images/products', $extracted_path[6]); 
         }
         $new_image_name = null;
         try {
-            $new_image_name = env('APP_URL').'/storage/images/products/'.$imageName;
+            $new_image_name = env('APP_URL') . '/storage/images/products/' . $imageName;
         } catch (\Throwable $th) {
-           $new_image_name = $product_current->product_image;
+            $new_image_name = $product_current->product_image;
         }
-        
-        $product -> update([
-            'name'=>$request->name,
-            'barcode'=>$request->barcode,
-            'description'=>$request->description,
-            'category_id'=>$request->category,
-            'product_image'=>$new_image_name,
-            'user_id'=> Auth::user()->id
+
+        $product->update([
+            'name' => $request->name,
+            'barcode' => $request->barcode,
+            'description' => $request->description,
+            'category_id' => $request->category,
+            'product_image' => $new_image_name,
+            'user_id' => Auth::user()->id
         ]);
 
-        if(floatVal($request->price) != $product_current->current_price->price){
+        if (floatVal($request->price) != $product_current->current_price->price) {
             Price::create([
-                'price'=>$request->price,
+                'price' => $request->price,
                 'product_id' => $product->id,
-                'user_id'=> Auth::user()->id
+                'user_id' => Auth::user()->id
             ]);
         }
 
-        if($request->sale_discount != $product_current->current_discount->discount){
+        if ($request->sale_discount != $product_current->current_discount->discount) {
             sale_discount::create([
                 'discount' => $request->sale_discount,
-                'type'=>1,
+                'type' => 1,
                 'product_id' => $product->id,
-                'user_id'=> Auth::user()->id
+                'user_id' => Auth::user()->id
             ]);
         }
 
@@ -187,7 +186,15 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        $product -> delete();
+        $product->delete();
         return back();
+    }
+
+    public function export()
+    {
+        $products = product::with('user')->with('current_price')->with('current_discount')->get();
+        $results = [];
+        $results[] = ['DATE RANGES', 'From', 'To', 'Success grand total', "Unsuccessful grand total"];
+        return (new ProductsExport([$results], ['Delivery']))->download("Deliveries.xlsx");
     }
 }
