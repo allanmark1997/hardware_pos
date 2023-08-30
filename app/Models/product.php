@@ -17,18 +17,26 @@ class Product extends Model
         'description' => 'json',
     ];
 
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function current_price(){
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function current_price()
+    {
         return $this->hasOne(Price::class, "product_id", "id")->latestOfMany();
     }
-    public function current_discount(){
+    public function current_discount()
+    {
         return $this->hasOne(sale_discount::class, "product_id", "id")->latestOfMany();
     }
     public static function initStorage()
-    {   
+    {
         if (!Storage::exists('public/images/products')) {
             Storage::makeDirectory('public/images/products');
         }

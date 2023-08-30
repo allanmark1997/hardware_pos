@@ -9,6 +9,7 @@ use App\Models\Price;
 use App\Models\Tax;
 use App\Models\product;
 use App\Models\sale_discount;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
@@ -192,9 +193,34 @@ class ProductController extends Controller
 
     public function export()
     {
-        $products = product::with('user')->with('current_price')->with('current_discount')->get();
+        $products = product::with('user')->with('current_price')->with('current_discount')->with('category')->orderBy('created_at', 'asc')->get();
         $results = [];
-        $results[] = ["", "Barcode"];
-        return (new ProductsExport([$results], ['Delivery']))->download("Deliveries.xlsx");
+        $results[] = ["", "BARCODE", "PRODUCT NAME", "DESCRIPTION DETAILS", "PRODUCT IMAGE", "PRODUCT QUANTITY", "CURRENT DISCOUNT", "CURRENT PRICE", "CATEGORY", "CREATED BY", "CREATED AT", "LAST UPDATED"];
+        $sample = "";
+        foreach ($products as $key => $product) {
+            // dd($product->description["specification"]["spec_details"])
+            $results[] =
+                [
+                    $key + 1,
+                    strval($product->barcode),
+                    $product->name,
+                    $product->description["details"],
+                    $product->product_image,
+                    $product->quantity,
+                    $product->current_discount->discount,
+                    "PHP " . number_format($product->current_price->price, 2),
+                    $product->category->name,
+                    $product->user->name,
+                    Carbon::parse($product->created_at)->format('d-m-Y'),
+                    Carbon::parse($product->updated_at)->format('d-m-Y'),
+                ];
+            $results[] = [
+                "",
+                $product->description["specification"]["spec_title"],
+                $product->description["specification"]
+            ];
+        }
+        // dd($results);
+        return (new ProductsExport([$results], ['Inventory']))->download("Inventories.xlsx");
     }
 }
