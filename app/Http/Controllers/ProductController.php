@@ -194,7 +194,7 @@ class ProductController extends Controller
     {
         $products = product::with('user')->with('current_price')->with('current_discount')->get();
         $results = [];
-        $results[] = ['DATE RANGES', 'From', 'To', 'Success grand total', "Unsuccessful grand total"];
+        $results[] = ["", "Barcode"];
         return (new ProductsExport([$results], ['Delivery']))->download("Deliveries.xlsx");
     }
 }

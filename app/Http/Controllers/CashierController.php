@@ -20,12 +20,13 @@ class CashierController extends Controller
      */
     public function index(Request $request)
     {
-        
+
         $product = product::where("barcode", $request->search)->with('current_price')->with('current_discount')->first();
-       $cashier_stat = CashierStatus::where("user_id", Auth::user()->id)->first();
-        return Inertia::render('Cashier/Cashier',[
+        $cashier_stat = CashierStatus::where("user_id", Auth::user()->id)->first();
+        return Inertia::render('Cashier/Cashier', [
             "product" => $product,
-            "cashier_status" => $cashier_stat->status == 0 ? "false":"true"
+            "cashier_status" => $cashier_stat->status == 0 ? "false" : "true",
+            "cashier_stat_id" => $cashier_stat->id
         ]);
     }
 
@@ -53,19 +54,19 @@ class CashierController extends Controller
     public function store(Request $request)
     {
         $product = product::where("barcode", $request->search)->with('current_price')->with('current_discount')->first();
-        if($product != null){
-        // dd($product->current_discount->id);
+        if ($product != null) {
+            // dd($product->current_discount->id);
 
             TransactionDetail::create([
-                "product_id"=>$product->id,
-                "transaction_id"=>$request->transaction["id"],
-                "sale_discounts_id"=>$product->current_discount->id,
-                "price_id"=>$product->current_price->id
+                "product_id" => $product->id,
+                "transaction_id" => $request->transaction["id"],
+                "sale_discounts_id" => $product->current_discount->id,
+                "price_id" => $product->current_price->id
             ]);
         }
 
         $products = TransactionDetail::where('transaction_id')->get();
-        return Inertia::render('Cashier/Cashier',[
+        return Inertia::render('Cashier/Cashier', [
             "product_listed" => $products
         ]);
     }

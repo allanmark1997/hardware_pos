@@ -6,7 +6,7 @@ import { router, useForm } from "@inertiajs/vue3";
 
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
-const props = defineProps(["product", "cashier_status"]);
+const props = defineProps(["product", "cashier_status", "cashier_stat_id"]);
 
 const totalCart = ref(2);
 const sampleData = ref(5);
@@ -79,6 +79,10 @@ const create_transaction = (active) => {
 // const scan = () =>{
 //   search_(scannedCode.value)
 // }
+
+const function_activate_status = () => {
+  router.put(route("cashier_stat.update_status", props.cashier_stat_id));
+};
 </script>
 <template>
   <AppLayout title="Dashboard">
@@ -107,6 +111,7 @@ const create_transaction = (active) => {
                 />
               </div>
               <button
+                @click="function_activate_status"
                 type="submit"
                 class="inline-flex items-center py-2.5 px-3 ml-2 text-sm font-medium text-white bg-yellow-700 rounded-lg border border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300"
               >

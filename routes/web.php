@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CashierController;
+use App\Http\Controllers\CashierStatusController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SupplierController;
@@ -88,6 +89,11 @@ Route::middleware([
     Route::prefix('cashier')->name('cashier.')->group(function () {
         Route::get('/cashier', [CashierController::class, 'index'])->name('index');
         Route::post('/create_transaction', [CashierController::class, 'create_transaction'])->name('create_transaction');
+        Route::put('/status/{cashierStatus}', [CashierController::class, 'update_status'])->name('update_status');
         // Route::get('/cashier_sale', [CashierController::class, 'store'])->name('store');
+    });
+
+    Route::prefix('cashier')->name('cashier_stat.')->group(function () {
+        Route::put('/status/{cashierStatus}', [CashierStatusController::class, 'update_status'])->name('update_status');
     });
 });

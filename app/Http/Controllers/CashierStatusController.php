@@ -52,7 +52,13 @@ class CashierStatusController extends Controller
      */
     public function update(Request $request, CashierStatus $cashierStatus)
     {
-        //
+    }
+
+    public function update_status(Request $request, CashierStatus $cashierStatus)
+    {
+        $cashierStatus->update([
+            "status" => true
+        ]);
     }
 
     /**
