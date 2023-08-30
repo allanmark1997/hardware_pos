@@ -53,6 +53,14 @@ class ProductMultipleSheet implements FromCollection, WithTitle, WithStrictNullC
         $drawing->setHeight(90);
         $drawing->setCoordinates('N' . '3');
 
-        return $drawing;
+        // dd($this->data);
+        $drawing2 = new Drawing();
+        // $drawing->setName('Logo');
+        // $drawing->setDescription('This is my logo');
+        $drawing2->setPath(public_path('/storage/images/products/AZFeHRojxyY1WikX2bkbvZPVIkO5S0FsFl4XMGTj.jpg'));
+        $drawing2->setHeight(90);
+        $drawing2->setCoordinates('N' . '10');
+
+        return [$drawing, $drawing2];
     }
 }
