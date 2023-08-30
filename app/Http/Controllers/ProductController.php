@@ -214,11 +214,26 @@ class ProductController extends Controller
                     Carbon::parse($product->created_at)->format('d-m-Y'),
                     Carbon::parse($product->updated_at)->format('d-m-Y'),
                 ];
-            $results[] = [
-                "",
-                $product->description["specification"]["spec_title"],
-                $product->description["specification"]
-            ];
+            if ($product->description["specification"]["spec_title"] != null) {
+                $results[] = [
+                    "",
+                    "Specification title",
+                    $product->description["specification"]["spec_title"],
+                    "Specification Name",
+                    "Specification Details",
+                ];
+            }
+            if ($product->description["specification"]["spec_title"] != null) {
+                foreach ($product->description["specification"]["spec_details"] as $key2 => $value) {
+                    $results[] = [
+                        "",
+                        "",
+                        "",
+                        $value["spec_name"],
+                        $value["spec_details"],
+                    ];
+                }
+            }
         }
         // dd($results);
         return (new ProductsExport([$results], ['Inventory']))->download("Inventories.xlsx");

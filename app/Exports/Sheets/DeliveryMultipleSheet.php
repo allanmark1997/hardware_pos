@@ -7,7 +7,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
 use Maatwebsite\Excel\Concerns\WithTitle;
 
-class SurveyDataSheet implements FromCollection, WithTitle, WithStrictNullComparison
+class DeliveryMultipleSheet implements FromCollection, WithTitle, WithStrictNullComparison
 {
     public array $data;
     public string $sheet_title;
@@ -21,7 +21,7 @@ class SurveyDataSheet implements FromCollection, WithTitle, WithStrictNullCompar
     public function collection()
     {
         return collect($this->data);
-    } 
+    }
 
     /**
      * @return string
@@ -39,5 +39,4 @@ class SurveyDataSheet implements FromCollection, WithTitle, WithStrictNullCompar
     //         'status',
     //     ];
     // }
-    
 }

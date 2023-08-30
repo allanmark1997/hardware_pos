@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Exports\Sheets\SurveyDataSheet;
+use App\Exports\Sheets\ProductMultipleSheet;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
@@ -22,16 +22,12 @@ class ProductsExport implements WithMultipleSheets
     /**
      * @return \Illuminate\Support\Collection
      */
-    /* public function collection()
-    {
-        return [collect($this->data), collect($this->data)];
-    } */
 
     public function sheets(): array
     {
         $sheets = [];
         for ($i = 0; $i < count($this->datas); $i++) {
-            $sheets[] = new SurveyDataSheet($this->datas[$i], $this->titles[$i]);
+            $sheets[] = new ProductMultipleSheet($this->datas[$i], $this->titles[$i]);
         }
         return $sheets;
     }

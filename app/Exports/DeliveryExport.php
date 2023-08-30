@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Exports\Sheets\SurveyDataSheet;
+use App\Exports\Sheets\DeliveryMultipleSheet;
 use App\Models\Delivery;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -17,7 +17,7 @@ use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 //     {
 //         return Delivery::all();
 //     }
-    
+
 // }
 class DeliveryExport implements WithMultipleSheets
 {
@@ -32,8 +32,8 @@ class DeliveryExport implements WithMultipleSheets
     }
 
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
     /* public function collection()
     {
         return [collect($this->data), collect($this->data)];
@@ -43,9 +43,8 @@ class DeliveryExport implements WithMultipleSheets
     {
         $sheets = [];
         for ($i = 0; $i < count($this->datas); $i++) {
-            $sheets[] = new SurveyDataSheet($this->datas[$i], $this->titles[$i]);
+            $sheets[] = new DeliveryMultipleSheet($this->datas[$i], $this->titles[$i]);
         }
         return $sheets;
     }
-    
 }

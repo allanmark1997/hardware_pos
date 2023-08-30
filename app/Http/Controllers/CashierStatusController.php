@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CashierDummy;
 use App\Models\CashierStatus;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CashierStatusController extends Controller
 {
@@ -28,7 +30,15 @@ class CashierStatusController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $cashier_dummy = CashierDummy::create([
+            "product_id" => $request->product_id,
+            "quantity" => $request->quantity,
+            "price_id" => $request->price_id,
+            "discount_id" => $request->discount_id,
+            "user_id" => Auth::user()->id
+        ]);
+
+        return back();
     }
 
     /**
