@@ -21,7 +21,7 @@ class DeliveryController extends Controller
         $date_to = $request->date_to ?? "";
         $deliveries = Delivery::with("details")->with("supplier")->with("user_receiver")->when($date_from !=  null || $date_from != "" && $date_to != null || $date_to != "", function ($query) use ($date_from, $date_to) {
             $query->whereBetween('created_at', [$date_from, $date_to]);
-        })->get();
+        })->paginate(20);
         return Inertia::render('Delivery/Delivery', [
             "deliveries" => $deliveries,
             "date_from" => $date_from,

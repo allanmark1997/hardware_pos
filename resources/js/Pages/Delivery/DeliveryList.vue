@@ -2,6 +2,7 @@
 import Button from "@/Components/Button.vue";
 import { router } from "@inertiajs/vue3";
 import Icon from "@/Components/Icon.vue";
+import Pagination2 from "@/Components/Pagination2.vue";
 
 import moment from "moment";
 import { inject, onMounted, provide, ref } from "vue";
@@ -115,7 +116,7 @@ const function_filter_remove = () => {
             </tr>
           </thead>
           <tbody>
-            <template v-for="(delivery, key) in deliveries" :key="key">
+            <template v-for="(delivery, key) in deliveries.data" :key="key">
               <tr class="bg-white border-">
                 <td class="px-6 py-4">{{ delivery.supplier.supplier_name }}</td>
                 <td class="px-6 py-4">{{ delivery.user_receiver?.name }}</td>
@@ -179,6 +180,16 @@ const function_filter_remove = () => {
             </template>
           </tbody>
         </table>
+      </div>
+      <div class="flex items-center justify-between">
+        <Pagination2
+          :links="props.deliveries.links"
+          :date_from="date_from"
+          :date_to="date_to"
+        />
+        <p class="mt-6 text-sm text-gray-500">
+          Showing {{ deliveries.data.length }} Deliveries
+        </p>
       </div>
     </div>
   </section>

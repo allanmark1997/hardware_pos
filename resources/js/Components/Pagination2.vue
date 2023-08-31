@@ -2,7 +2,13 @@
 import { Link, usePage } from "@inertiajs/vue3";
 import { computed, inject, onMounted, ref } from "vue";
 
-const props = defineProps(["links", "search", "category"]);
+const props = defineProps([
+  "links",
+  "search",
+  "category",
+  "date_from",
+  "date_to",
+]);
 const search_url = computed(() =>
   props.search != "" && props.search != undefined
     ? "&search=" + props.search
@@ -11,6 +17,15 @@ const search_url = computed(() =>
 const category_url = computed(() =>
   props.category != "" && props.category != undefined
     ? "&category=" + props.category
+    : ""
+);
+
+const delivery_url = computed(() =>
+  props.date_from != "" &&
+  props.date_from != undefined &&
+  props.date_to != "" &&
+  props.date_to != undefined
+    ? "&date_from=" + props.date_from + "&date_to=" + props.date_to
     : ""
 );
 
@@ -34,7 +49,7 @@ onMounted(() => {});
           'bg-white': link.active,
           'ml-auto': links.length === key + 1,
         }"
-        :href="link.url + search_url + category_url"
+        :href="link.url + search_url + category_url + delivery_url"
       >
         <span v-html="link.label"></span>
       </Link>
