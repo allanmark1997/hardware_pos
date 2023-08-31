@@ -5,7 +5,7 @@ import Button from "@/Components/Button.vue";
 
 import { inject, provide, ref } from "vue";
 
-const props = defineProps(["deliveries"]);
+const props = defineProps(["deliveries", "date_from", "date_to"]);
 </script>
 <template>
   <AppLayout title="Dashboard">
@@ -15,11 +15,14 @@ const props = defineProps(["deliveries"]);
           Delivery Management
         </h2>
       </div>
-      
     </template>
     <div class="py-">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <DeliveryList :deliveries="deliveries" />
+        <DeliveryList
+          :deliveries="deliveries"
+          :date_from="date_from"
+          :date_to="date_to"
+        />
       </div>
     </div>
   </AppLayout>

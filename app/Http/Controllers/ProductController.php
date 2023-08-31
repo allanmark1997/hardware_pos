@@ -195,17 +195,16 @@ class ProductController extends Controller
     {
         $products = product::with('user')->with('current_price')->with('current_discount')->with('category')->orderBy('created_at', 'asc')->get();
         $results = [];
-        $results[] = ["", "BARCODE", "PRODUCT NAME", "DESCRIPTION DETAILS", "PRODUCT IMAGE", "PRODUCT QUANTITY", "CURRENT DISCOUNT", "CURRENT PRICE", "CATEGORY", "CREATED BY", "CREATED AT", "LAST UPDATED"];
+        $results[] = ["", "PRODUCT NAME", "BARCODE", "DESCRIPTION DETAILS", "PRODUCT QUANTITY", "CURRENT DISCOUNT", "CURRENT PRICE", "CATEGORY", "CREATED BY", "CREATED AT", "LAST UPDATED"];
         $sample = "";
         foreach ($products as $key => $product) {
             // dd($product->description["specification"]["spec_details"])
             $results[] =
                 [
                     $key + 1,
-                    strval($product->barcode),
                     $product->name,
+                    strval($product->barcode),
                     $product->description["details"],
-                    $product->product_image,
                     $product->quantity,
                     $product->current_discount->discount,
                     "PHP " . number_format($product->current_price->price, 2),
@@ -217,6 +216,7 @@ class ProductController extends Controller
             if ($product->description["specification"]["spec_title"] != null) {
                 $results[] = [
                     "",
+                    "",
                     "Specification title",
                     $product->description["specification"]["spec_title"],
                     "Specification Name",
@@ -226,6 +226,7 @@ class ProductController extends Controller
             if ($product->description["specification"]["spec_title"] != null) {
                 foreach ($product->description["specification"]["spec_details"] as $key2 => $value) {
                     $results[] = [
+                        "",
                         "",
                         "",
                         "",

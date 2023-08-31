@@ -15,27 +15,34 @@ class DeliveryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $deliveries = Delivery::with("details")->with("supplier")->with("user_receiver")->get();
+        $date_from = $request->date_from ?? "";
+        $date_to = $request->date_to ?? "";
+        $deliveries = Delivery::with("details")->with("supplier")->with("user_receiver")->when($date_from !=  null || $date_from != "" && $date_to != null || $date_to != "", function ($query) use ($date_from, $date_to) {
+            $query->whereBetween('created_at', [$date_from, $date_to]);
+        })->get();
         return Inertia::render('Delivery/Delivery', [
-            "deliveries" => $deliveries
+            "deliveries" => $deliveries,
+            "date_from" => $date_from,
+            "date_to" => $date_to
         ]);
     }
 
-    public function export()
+    public function export(Request $request)
     {
-        // dd('ok');
+        $date_from = $request->date_from ?? "";
+        $date_to = $request->date_to ?? "";
         // return Excel::download(new DeliveryExport, 'deliveries.xlsx');
-        $deliveries = Delivery::with("details")->with("supplier")->with("user_receiver")->get();
+        $deliveries = Delivery::with("details")->with("supplier")->with("user_receiver")->when($date_from !=  null || $date_from != "" && $date_to != null || $date_to != "", function ($query) use ($date_from, $date_to) {
+            $query->whereBetween('created_at', [$date_from, $date_to]);
+        })->get();
         $results = [];
         $results[] = ['DATE RANGES', 'From', 'To', 'Success grand total', "Unsuccessful grand total"];
-        $results[] = ['', '--', '--', "PHP " . number_format($this->grand_total_success($deliveries), 2), "PHP " . number_format($this->grand_total_unsuccess($deliveries), 2)];
+        $results[] = ['', $request->date_from ?? "--", $request->date_to ?? '--', "PHP " . number_format($this->grand_total_success($deliveries), 2), "PHP " . number_format($this->grand_total_unsuccess($deliveries), 2)];
         $results[] = ['SUPPLIER NAME', 'RECEIVED BY', 'STATUS', 'PRODUCT NAME', 'QUANTITY', 'PRICE', "SUB-TOTAL", "STATUS", 'REMARKS', 'UNSUCCESSFULL TOTAL', 'SUCCESSFUL TOTAL', 'CREATED AT'];
 
-        // $results_temp=[];
         foreach ($deliveries as $key => $delivery) {
-            // dd($delivery->details[$key]['quantity']);
             $results[] =
                 [
                     $delivery->supplier->supplier_name ?? "--",
@@ -46,11 +53,7 @@ class DeliveryController extends Controller
                     "",
                     "",
                     "",
-                    // $delivery->details[$key]["product"]["name"],
-                    // $delivery->details[$key]['quantity'],
-                    // "PHP ".number_format($delivery->details[$key]['price']),
-                    // "PHP ".number_format($delivery->details[$key]['price']*$delivery->details[$key]['quantity']),
-                    // $this->products($delivery->details),
+
                     $delivery->remarks ?? '--',
                     $this->products_total_unsuccessful($delivery->details),
                     $this->products_total_success($delivery->details),
@@ -73,8 +76,6 @@ class DeliveryController extends Controller
                     ];
             }
         }
-
-        // dd($results);
         return (new DeliveryExport([$results], ['Delivery']))->download("Deliveries.xlsx");
         // return Excel::download(new DeliveryExport, 'Delivery.xlsx');
     }

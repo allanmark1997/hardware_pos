@@ -1,13 +1,17 @@
 <script setup>
 import Button from "@/Components/Button.vue";
 import { router } from "@inertiajs/vue3";
+import Icon from "@/Components/Icon.vue";
 
 import moment from "moment";
 import { inject, onMounted, provide, ref } from "vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
-const props = defineProps(["deliveries"]);
+const props = defineProps(["deliveries", "date_from", "date_to"]);
+
+const date_from = ref(props.date_from);
+const date_to = ref(props.date_to);
 
 const notify = () => {
   toast("Default Notification !");
@@ -39,6 +43,24 @@ const convert_money = (data) => {
   formatter.format(data);
   return formatter.format(data);
 };
+
+const function_filter_range = () => {
+  router.get(
+    route("deliveries.index", {
+      date_from: date_from.value,
+      date_to: date_to.value,
+    })
+  );
+};
+
+const function_filter_remove = () => {
+  router.get(
+    route("deliveries.index", {
+      date_from: null,
+      date_to: null,
+    })
+  );
+};
 </script>
 <template>
   <div class="flex justify-between mt-2">
@@ -46,16 +68,33 @@ const convert_money = (data) => {
       <div class="flex gap-2">
         <div class="flex">
           <span class="text-md mt-2 mr-2">From</span>
-          <input type="date" />
+          <input class="rounded-lg" type="date" v-model="date_from" />
         </div>
         <div class="flex">
           <span class="text-md mt-2 mr-2">To</span>
-          <input type="date" />
+          <input
+            @keyup.enter="function_filter_range"
+            class="rounded-lg"
+            type="date"
+            v-model="date_to"
+          />
         </div>
+        <button
+          v-if="date_from || date_to"
+          class="h-10 my-auto mt-5"
+          @click="function_filter_remove"
+        >
+          <Icon icon="close_icon" size="sm" />
+        </button>
       </div>
     </div>
     <a
-      :href="route('deliveries.export')"
+      :href="
+        route('deliveries.export', {
+          date_from: date_from,
+          date_to: date_to,
+        })
+      "
       class="bg-green-400 hover:bg-green-600 hover:text-white rounded-lg my-auto p-2"
       >Download</a
     >
