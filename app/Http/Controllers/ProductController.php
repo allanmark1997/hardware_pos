@@ -195,7 +195,7 @@ class ProductController extends Controller
     {
         $products = product::with('user')->with('current_price')->with('current_discount')->with('category')->orderBy('created_at', 'asc')->get();
         $results = [];
-        $results[] = ["", "PRODUCT NAME", "BARCODE", "DESCRIPTION DETAILS", "PRODUCT QUANTITY", "CURRENT DISCOUNT", "CURRENT PRICE", "CATEGORY", "CREATED BY", "CREATED AT", "LAST UPDATED"];
+        $results[] = ["", "PRODUCT NAME", "BARCODE", "DESCRIPTION DETAILS", "PRODUCT QUANTITY", "CURRENT DISCOUNT %", "CURRENT PRICE", "CATEGORY", "CREATED BY", "CREATED AT", "LAST UPDATED"];
         $sample = "";
         foreach ($products as $key => $product) {
             // dd($product->description["specification"]["spec_details"])

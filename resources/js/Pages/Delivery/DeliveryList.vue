@@ -97,7 +97,7 @@ const function_filter_remove = () => {
         })
       "
       class="bg-green-400 hover:bg-green-600 hover:text-white rounded-lg my-auto p-2"
-      >Download</a
+      >Export Delivery</a
     >
   </div>
 
