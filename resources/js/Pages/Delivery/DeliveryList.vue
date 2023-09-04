@@ -3,6 +3,8 @@ import Button from "@/Components/Button.vue";
 import { router } from "@inertiajs/vue3";
 import Icon from "@/Components/Icon.vue";
 import Pagination2 from "@/Components/Pagination2.vue";
+import TextInput from '@/Components/TextInput.vue';
+
 
 import moment from "moment";
 import { inject, onMounted, provide, ref } from "vue";
@@ -13,6 +15,10 @@ const props = defineProps(["deliveries", "date_from", "date_to"]);
 
 const date_from = ref(props.date_from);
 const date_to = ref(props.date_to);
+
+// onMounted(()=>{
+//   console.log(props.deliveries)
+// })
 
 const notify = () => {
   toast("Default Notification !");
@@ -62,6 +68,28 @@ const function_filter_remove = () => {
     })
   );
 };
+
+const count_total_success = (data) => {
+  let temp_data = 0;
+  data.forEach(element => {
+    if (element.status == 1) {
+    temp_data += element.quantity * element.price
+      
+    }
+  });
+  return temp_data
+}
+
+const count_total_unsuccess = (data) => {
+  let temp_data = 0;
+  data.forEach(element => {
+    if (element.status == 0) {
+    temp_data += element.quantity * element.price
+      
+    }
+  });
+  return temp_data
+}
 </script>
 <template>
   <div class="flex justify-between mt-2">
@@ -69,16 +97,24 @@ const function_filter_remove = () => {
       <div class="flex gap-2">
         <div class="flex">
           <span class="text-md mt-2 mr-2">From</span>
-          <input class="rounded-lg" type="date" v-model="date_from" />
+          <TextInput
+                    id="date_from"
+                    v-model="date_from"
+                    type="date"
+                    class="mt-1 block w-full"
+                />
         </div>
         <div class="flex">
           <span class="text-md mt-2 mr-2">To</span>
-          <input
+
+          <TextInput
+                    id="date_to"
+                    v-model="date_to"
+                    type="date"
+                    class="mt-1 block w-full"
             @keyup.enter="function_filter_range"
-            class="rounded-lg"
-            type="date"
-            v-model="date_to"
-          />
+
+                />
         </div>
         <button
           v-if="date_from || date_to"
@@ -105,12 +141,14 @@ const function_filter_remove = () => {
     <div class="container mx-auto">
       <div class="relative overflow-x-auto">
         <table class="w-full text-sm text-left text-gray-500">
-          <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+          <thead class="text-xs text-white uppercase bg-yellow-500">
             <tr>
               <th scope="col" class="px-6 py-3">Supplier name</th>
               <th scope="col" class="px-6 py-3">Receive by</th>
               <th scope="col" class="px-6 py-3">Status</th>
               <th scope="col" class="px-6 py-3">Products</th>
+              <th scope="col" class="px-6 py-3">Total Success</th>
+              <th scope="col" class="px-6 py-3">Total Unsuccess</th>
               <th scope="col" class="px-6 py-3">Remarks</th>
               <th scope="col" class="px-6 py-3">Created at</th>
             </tr>
@@ -119,7 +157,7 @@ const function_filter_remove = () => {
             <template v-for="(delivery, key) in deliveries.data" :key="key">
               <tr class="bg-white border-">
                 <td class="px-6 py-4">{{ delivery.supplier.supplier_name }}</td>
-                <td class="px-6 py-4">{{ delivery.user_receiver?.name }}</td>
+                <td class="px-6 py-4">{{ delivery.user_receiver?.name??'Pending' }}</td>
                 <td class="px-6 py-4">
                   <span class="bg-orange-400 rounded-md p-1 text-white">
                     {{ delivery.status == 1 ? "Success" : "Unsuccessful" }}
@@ -137,6 +175,7 @@ const function_filter_remove = () => {
                         <th scope="col" class="px-1 py-1">No.</th>
                         <th scope="col" class="px-1 py-1">Price</th>
                         <th scope="col" class="px-1 py-1">Status</th>
+                        <th scope="col" class="px-1 py-1">Sub-total</th>
                         <!-- <th scope="col" class="px-1 py-1">Created at</th> -->
                       </tr>
                     </thead>
@@ -160,20 +199,20 @@ const function_filter_remove = () => {
                               class="bg-orange-400 rounded-sm p-[1px] text-white"
                             >
                               {{
-                                delivery_detail.status == 1
-                                  ? "Success"
-                                  : "Unsuccessful"
+                                delivery_detail.status == 1 ? "Success":"Unsuccessful"
                               }}
                             </small>
                           </td>
-                          <!-- <td class="px-1 py-1">
-                            {{ date_time(delivery_detail.created_at) }}
-                          </td> -->
+                          <td class="px-1 py-1">
+                            <small>{{ convert_money(delivery_detail.quantity * delivery_detail.price) }}</small>
+                          </td>
                         </tr>
                       </template>
                     </tbody>
                   </table>
                 </td>
+                <td class="px-6 py-4">{{ convert_money(count_total_success(delivery.details)) }}</td>
+                <td class="px-6 py-4">{{ convert_money(count_total_unsuccess(delivery.details)) }}</td>
                 <td class="px-6 py-4">{{ delivery.remarks ?? "None" }}</td>
                 <td class="px-6 py-4">{{ date_time(delivery.created_at) }}</td>
               </tr>

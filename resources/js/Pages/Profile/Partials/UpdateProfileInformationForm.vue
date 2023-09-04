@@ -18,6 +18,13 @@ const form = useForm({
     name: props.user.name,
     email: props.user.email,
     photo: null,
+    fname: props.user.fname,
+    mname: props.user.mname,
+    lname: props.user.lname,
+    sex: props.user.sex,
+    bday: props.user.bday,
+    address: props.user.address,
+    contact_no: props.user.contact_no,
 });
 
 const verificationLinkSent = ref(null);
@@ -128,7 +135,7 @@ const clearPhotoFileInput = () => {
             </div>
 
             <!-- Name -->
-            <div class="col-span-6 sm:col-span-4">
+            <!-- <div class="col-span-6 sm:col-span-4">
                 <InputLabel for="name" value="Name" />
                 <TextInput
                     id="name"
@@ -138,7 +145,7 @@ const clearPhotoFileInput = () => {
                     autocomplete="name"
                 />
                 <InputError :message="form.errors.name" class="mt-2" />
-            </div>
+            </div> -->
 
             <!-- Email -->
             <div class="col-span-6 sm:col-span-4">
@@ -172,6 +179,81 @@ const clearPhotoFileInput = () => {
                     </div>
                 </div>
             </div>
+            <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="fname" value="First Name" />
+                <TextInput
+                    id="fname"
+                    v-model="form.fname"
+                    type="text"
+                    class="mt-1 block w-full"
+                    autocomplete="fname"
+                />
+                <InputError :message="form.errors.fname" class="mt-2" />
+            </div>
+            <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="mname" value="Middle Name" />
+                <TextInput
+                    id="mname"
+                    v-model="form.mname"
+                    type="text"
+                    class="mt-1 block w-full"
+                    autocomplete="mname"
+                />
+                <InputError :message="form.errors.mname" class="mt-2" />
+            </div>
+            <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="lname" value="Last Name" />
+                <TextInput
+                    id="lname"
+                    v-model="form.lname"
+                    type="text"
+                    class="mt-1 block w-full"
+                    autocomplete="lname"
+                />
+                <InputError :message="form.errors.lname" class="mt-2" />
+            </div>
+            <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="sex" value="Sex" />
+                <select class="border border-gray-300 focus-yellow-500 w-full rounded-lg focus:outline-none focus:ring-0 focus:border-yellow-500" v-model="form.sex">
+                    <option :value="1">Male</option>
+                    <option :value="0">Female</option>
+                </select>
+                <InputError :message="form.errors.sex" class="mt-2" />
+            </div>
+            <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="bday" value="Birthday" />
+                <TextInput
+                    id="bday"
+                    v-model="form.bday"
+                    type="date"
+                    class="mt-1 block w-full"
+                    autocomplete="bday"
+                />
+                <InputError :message="form.errors.bday" class="mt-2" />
+            </div>
+            <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="address" value="Address" />
+                <TextInput
+                    id="address"
+                    v-model="form.address"
+                    type="text"
+                    class="mt-1 block w-full"
+                    autocomplete="address"
+                />
+                <InputError :message="form.errors.address" class="mt-2" />
+            </div>
+            <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="contact_no" value="Contact Number" />
+                <TextInput
+                    id="contact_no"
+                    v-model="form.contact_no"
+                    type="text"
+                    class="mt-1 block w-full"
+                    autocomplete="contact_no"
+                />
+                <InputError :message="form.errors.contact_no" class="mt-2" />
+            </div>
+            
         </template>
 
         <template #actions>
