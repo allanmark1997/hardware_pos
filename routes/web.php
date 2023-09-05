@@ -8,6 +8,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SpecialDiscountController;
 use App\Http\Controllers\TaxController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
@@ -84,6 +85,11 @@ Route::middleware([
     Route::prefix('delivery')->name('deliveries.')->group(function () {
         Route::get('/deliveries', [DeliveryController::class, 'index'])->name('index');
         Route::get('/deliveries/export', [DeliveryController::class, 'export'])->name('export');
+    });
+
+    Route::prefix('transactions')->name('transactions.')->group(function () {
+        Route::get('/transactions', [TransactionController::class, 'index'])->name('index');
+        Route::get('/transactions/export', [TransactionController::class, 'export'])->name('export');
     });
 
     Route::prefix('cashier')->name('cashier.')->group(function () {

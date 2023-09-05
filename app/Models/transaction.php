@@ -6,17 +6,23 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class transaction extends Model
+class Transaction extends Model
 {
-    use HasFactory;
-    use SoftDeletes;
-
+    use HasFactory, SoftDeletes;
     protected $guarded = [];
-    // protected $casts = [
-    //     'products' => 'json'
-    // ];
 
-    public function transaction_details(){
-        return $this->hasMany(TransactionDetail::class, "transaction_id", "id")->latestOfMany();
+    public function processed_by()
+    {
+        return $this->belongsTo(User::class);
     }
-}   
+
+    public function tax()
+    {
+        return $this->belongsTo(Tax::class);
+    }
+
+    public function special_discount()
+    {
+        return $this->belongsTo(SpecialDiscount::class);
+    }
+}
