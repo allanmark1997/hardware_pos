@@ -129,7 +129,7 @@ const count_total_unsuccess = (data) => {
         })
       "
       class="bg-green-400 hover:bg-green-600 hover:text-white rounded-lg my-auto p-2"
-      >Export Delivery</a
+      >Export Transaction</a
     >
   </div>
 
@@ -223,13 +223,16 @@ const count_total_unsuccess = (data) => {
                           </td>
                           <td class="px-1 py-1">
                             <small
+                              v-if="transaction_detail.status == 1"
                               class="bg-orange-400 rounded-sm p-[1px] text-white"
                             >
-                              {{
-                                transaction_detail.status == 1
-                                  ? "Success"
-                                  : "Unsuccessful"
-                              }}
+                              Unsuccess
+                            </small>
+                            <small
+                              v-else
+                              class="bg-green-400 rounded-sm p-[1px] text-white"
+                            >
+                              Success
                             </small>
                           </td>
                           <td class="px-1 py-1">
