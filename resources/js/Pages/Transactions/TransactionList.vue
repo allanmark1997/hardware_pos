@@ -146,6 +146,7 @@ const count_total_unsuccess = (data) => {
               <th scope="col" class="px-6 py-3">Customer Type</th>
               <th scope="col" class="px-6 py-3">Tax</th>
               <th scope="col" class="px-6 py-3">Special Discount</th>
+              <th scope="col" class="px-6 py-3">Products</th>
               <th scope="col" class="px-6 py-3">Created at</th>
             </tr>
           </thead>
@@ -189,7 +190,7 @@ const count_total_unsuccess = (data) => {
                   {{ transaction.special_discount?.discount }}%
                 </td>
 
-                <!-- <td
+                <td
                   scope="row"
                   class="px-2 py-1 text-gray-900 whitespace-nowrap"
                 >
@@ -205,25 +206,27 @@ const count_total_unsuccess = (data) => {
                     </thead>
                     <tbody>
                       <template
-                        v-for="(delivery_detail, key2) in delivery.details"
+                        v-for="(
+                          transaction_detail, key2
+                        ) in transaction.transaction_details"
                         :key="key2"
                       >
                         <tr class="bg-white border-">
                           <td class="px-1 py-1">
-                            {{ delivery_detail.product?.name }}
+                            {{ transaction_detail.product?.name }}
                           </td>
                           <td class="px-1 py-1">
-                            {{ delivery_detail.quantity }}
+                            {{ transaction_detail.quantity }}
                           </td>
                           <td class="px-1 py-1">
-                            {{ convert_money(delivery_detail.price) }}
+                            {{ convert_money(transaction_detail.price.price) }}
                           </td>
                           <td class="px-1 py-1">
                             <small
                               class="bg-orange-400 rounded-sm p-[1px] text-white"
                             >
                               {{
-                                delivery_detail.status == 1
+                                transaction_detail.status == 1
                                   ? "Success"
                                   : "Unsuccessful"
                               }}
@@ -232,7 +235,8 @@ const count_total_unsuccess = (data) => {
                           <td class="px-1 py-1">
                             <small>{{
                               convert_money(
-                                delivery_detail.quantity * delivery_detail.price
+                                transaction_detail.quantity *
+                                  transaction_detail.price
                               )
                             }}</small>
                           </td>
@@ -240,13 +244,7 @@ const count_total_unsuccess = (data) => {
                       </template>
                     </tbody>
                   </table>
-                </td> -->
-                <!-- <td class="px-6 py-4">
-                  {{ convert_money(count_total_success(delivery.details)) }}
                 </td>
-                <td class="px-6 py-4">
-                  {{ convert_money(count_total_unsuccess(delivery.details)) }}
-                </td> -->
                 <td class="px-6 py-4">
                   {{ date_time(transaction.created_at) }}
                 </td>

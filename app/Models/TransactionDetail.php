@@ -12,4 +12,18 @@ class TransactionDetail extends Model
 
     protected $guarded = [];
 
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function sale_discount()
+    {
+        return $this->belongsTo(sale_discount::class, "sale_discounts_id", "id");
+    }
+
+    public function price()
+    {
+        return $this->belongsTo(Price::class);
+    }
 }
