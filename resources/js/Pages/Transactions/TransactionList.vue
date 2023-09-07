@@ -235,19 +235,24 @@ const calculate_grand_total_unsuccess = (data, discount, vat, type) => {
                   </div>
                 </td>
                 <td class="px-6 py-4">
-                  <div class="flex p-1">
-                    <div v-if="transaction.status == 1" class="flex gap-1">
-                      <Icon icon="wrong" size="xs" />
+                  <div class="flex p-1 w-[8vmin]">
+                    <div
+                      v-if="transaction.customer_type == 0"
+                      class="flex gap-1"
+                    >
+                      <Icon icon="user" size="md" />
 
-                      <small class="bg-green-400 rounded-md p-1 text-white">
-                        Success
+                      <small
+                        class="bg-green-400 rounded-md p-1 text-white w-full"
+                      >
+                        Walk-in
                       </small>
                     </div>
                     <div v-else class="flex gap-1">
-                      <Icon icon="wrong" size="xs" />
+                      <Icon icon="user" size="md" />
 
                       <small class="bg-orange-400 rounded-md p-1 text-white">
-                        Unsuccess
+                        Regular
                       </small>
                     </div>
                   </div>
@@ -285,7 +290,7 @@ const calculate_grand_total_unsuccess = (data, discount, vat, type) => {
                   <table class="w-full text-xs text-left text-gray-500">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-100">
                       <tr>
-                        <th scope="col" class="px-1 py-1">Product</th>
+                        <th scope="col" class="px-1 py-1 flex">Product</th>
                         <th scope="col" class="px-1 py-1">No.</th>
                         <th scope="col" class="px-1 py-1">Price</th>
                         <th scope="col" class="px-1 py-1">Discount %</th>
@@ -302,7 +307,8 @@ const calculate_grand_total_unsuccess = (data, discount, vat, type) => {
                         :key="key2"
                       >
                         <tr class="bg-white border-">
-                          <td class="px-1 py-1">
+                          <td class="px-1 py-1 flex">
+                            <Icon icon="shopping_cart" size="xs" />
                             {{ transaction_detail.product?.name }}
                           </td>
                           <td class="px-1 py-1">
@@ -349,7 +355,9 @@ const calculate_grand_total_unsuccess = (data, discount, vat, type) => {
                 </td>
                 <td class="px-6 py-4">
                   <div class="flex rounded-lg bg-red-400 p-[3px] text-white">
-                    <small>VAT: </small>
+                    <small class="flex"
+                      ><Icon icon="tax" size="sm" />VAT:
+                    </small>
                     <small>
                       {{
                         convert_money(
@@ -366,7 +374,9 @@ const calculate_grand_total_unsuccess = (data, discount, vat, type) => {
                   <div
                     class="flex rounded-lg bg-orange-400 p-[3px] text-white mt-1"
                   >
-                    <small>SD: </small>
+                    <small class="flex"
+                      ><Icon icon="wheelchair" size="sm" />SD:
+                    </small>
                     <small>{{
                       convert_money(
                         calculate_grand_total(
@@ -402,7 +412,8 @@ const calculate_grand_total_unsuccess = (data, discount, vat, type) => {
                     )
                   }}
                 </td>
-                <td class="px-6 py-4">
+                <td class="px-6 py-4 flex gap-2">
+                  <Icon icon="calendar" size="md" />
                   <small>
                     {{ date_time(transaction.created_at) }}
                   </small>
