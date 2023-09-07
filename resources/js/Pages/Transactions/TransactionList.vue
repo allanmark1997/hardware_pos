@@ -192,9 +192,10 @@ const calculate_grand_total_unsuccess = (data, discount, vat, type) => {
               <th scope="col" class="px-6 py-3">Transaction ID</th>
               <th scope="col" class="px-6 py-3">Processed by</th>
               <th scope="col" class="px-6 py-3">Status</th>
-              <th scope="col" class="px-6 py-3">Payment Method</th>
-              <th scope="col" class="px-6 py-3">Customer Type</th>
-              <th scope="col" class="px-6 py-3">Tax / Discount</th>
+              <th scope="col" class="px-6 py-3">
+                Payment Method & Customer Type
+              </th>
+              <th scope="col" class="px-6 py-3">Tax & Discount</th>
               <th scope="col" class="px-6 py-3">Products</th>
               <th scope="col" class="px-6 py-3">Total Discount & VAT</th>
               <th scope="col" class="px-6 py-3">Total Paid</th>
@@ -231,18 +232,25 @@ const calculate_grand_total_unsuccess = (data, discount, vat, type) => {
                   </span>
                 </td>
                 <td class="px-6 py-4">
-                  {{ transaction.payment_method == 0 ? "Cash" : "Other" }}
-                </td>
-                <td class="px-6 py-4">
-                  <span
-                    v-if="transaction.customer_type == 1"
-                    class="bg-green-400 rounded-md p-1 text-white"
-                  >
-                    Regular Customer
-                  </span>
-                  <span v-else class="bg-orange-400 rounded-md p-1 text-white">
-                    Walk-in
-                  </span>
+                  <div class="flex">
+                    <small
+                      v-if="transaction.status == 1"
+                      class="bg-green-400 rounded-md p-1 text-white"
+                    >
+                      Success
+                    </small>
+                    <small
+                      v-else
+                      class="bg-orange-400 rounded-md p-1 text-white"
+                    >
+                      Unsuccess
+                    </small>
+                  </div>
+                  <div class="flex">
+                    <small>
+                      {{ transaction.payment_method == 0 ? "Cash" : "Other" }}
+                    </small>
+                  </div>
                 </td>
                 <td class="px-6 py-4">
                   <div class="flex rounded-lg bg-red-400 p-[3px] text-white">

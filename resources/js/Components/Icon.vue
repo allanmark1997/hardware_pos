@@ -35,6 +35,9 @@ const icons = {
   administrator: "administrator",
   option: "option",
   report: "report",
+  cash: "cash",
+  check: "check",
+  wrong: "wrong",
 };
 
 const size = computed(() => {
@@ -1102,5 +1105,68 @@ const size = computed(() => {
   >
     <title>report</title>
     <path d="M6 11h4v17h-4v-17zM22 16v12h4v-12h-4zM14 28h4v-24h-4v24z"></path>
+  </svg>
+
+  <svg
+    v-if="icon_default === icons.cash"
+    :class="size"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <circle
+      opacity="0.5"
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="#1C274C"
+      stroke-width="1.5"
+    />
+    <path
+      d="M9 14H12"
+      stroke="#1C274C"
+      stroke-width="1.5"
+      stroke-linecap="round"
+    />
+    <path
+      d="M10 12V8.2C10 8.0142 10 7.9213 10.0123 7.84357C10.0801 7.41567 10.4157 7.08008 10.8436 7.01231C10.9213 7 11.0142 7 11.2 7H13.5C14.8807 7 16 8.11929 16 9.5C16 10.8807 14.8807 12 13.5 12H10ZM10 12V17M10 12H9"
+      stroke="#1C274C"
+      stroke-width="1.5"
+      stroke-linecap="round"
+    />
+  </svg>
+  <svg
+    v-if="icon_default === icons.check"
+    :class="size"
+    viewBox="0 0 512 512"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <g data-name="Layer 2" id="Layer_2">
+      <g
+        data-name="E408, Success, Media, media player, multimedia"
+        id="E408_Success_Media_media_player_multimedia"
+      >
+        <circle class="cls-1" cx="256" cy="256" r="246" />
+
+        <polyline
+          class="cls-1"
+          points="115.54 268.77 200.67 353.9 396.46 158.1"
+        />
+      </g>
+    </g>
+  </svg>
+
+  <svg
+    v-if="icon_default === icons.wrong"
+    :class="size"
+    viewBox="0 0 48 48"
+    data-name="Layer 1"
+    id="Layer_1"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <title />
+    <circle class="cls-1" cx="24" cy="24" r="23" />
+    <line class="cls-1" x1="12" x2="36" y1="12" y2="36" />
+    <line class="cls-1" x1="12" x2="36" y1="36" y2="12" />
   </svg>
 </template>
