@@ -68,24 +68,87 @@ const function_filter_remove = () => {
   );
 };
 
-const count_total_success = (data) => {
-  let temp_data = 0;
-  data.forEach((element) => {
-    if (element.status == 1) {
-      temp_data += element.quantity * element.price;
-    }
-  });
-  return temp_data;
+const calculate_item_discount = (data) => {
+  let temp_data_discounted = 0;
+  let convert_discount = data.sale_discount.discount / 100;
+
+  for (let index = 0; index < data.quantity; index++) {
+    temp_data_discounted = data.price.price * convert_discount;
+  }
+  return temp_data_discounted;
 };
 
-const count_total_unsuccess = (data) => {
-  let temp_data = 0;
+const calculate_sub_total = (data) => {
+  let temp_data_result = 0;
+  let temp_data_discounted = 0;
+  let convert_discount = data.sale_discount.discount / 100;
+
+  for (let index = 0; index < data.quantity; index++) {
+    temp_data_discounted = data.price.price * convert_discount;
+    temp_data_result += data.price.price - temp_data_discounted;
+  }
+  console.log(temp_data_discounted);
+  return temp_data_result;
+};
+
+const calculate_grand_total = (data, discount, vat, type) => {
+  let temp_data_total = 0;
+  let temp_data_sub_total = 0;
+  let temp_data_grand_total = 0;
+  let temp_discounted_total = 0;
+  let temp_vat_total = 0;
+  let temp_special_discounted = discount / 100;
+  let temp_vat = vat / 100;
   data.forEach((element) => {
-    if (element.status == 0) {
-      temp_data += element.quantity * element.price;
+    let temp_data_result = 0;
+    let temp_data_discounted = 0;
+    let convert_discount = element.sale_discount.discount / 100;
+    if (element.status == 1) {
+      for (let index = 0; index < element.quantity; index++) {
+        temp_data_discounted = element.price.price * convert_discount;
+        temp_data_result += element.price.price - temp_data_discounted;
+      }
     }
+    temp_data_total += temp_data_result;
   });
-  return temp_data;
+  temp_discounted_total = temp_data_total * temp_special_discounted;
+  temp_data_sub_total = temp_data_total - temp_discounted_total;
+  temp_vat_total = temp_data_sub_total * temp_vat;
+  temp_data_grand_total = temp_data_sub_total + temp_vat_total;
+  if (type == 0) {
+    return temp_data_grand_total;
+  } else if (type == 1) {
+    return temp_vat_total;
+  } else if (type == 2) {
+    return temp_discounted_total;
+  }
+};
+
+const calculate_grand_total_unsuccess = (data, discount, vat, type) => {
+  let temp_data_total = 0;
+  let temp_data_sub_total = 0;
+  let temp_data_grand_total = 0;
+  let temp_discounted_total = 0;
+  let temp_vat_total = 0;
+  let temp_special_discounted = discount / 100;
+  let temp_vat = vat / 100;
+  data.forEach((element) => {
+    let temp_data_result = 0;
+    let temp_data_discounted = 0;
+    let convert_discount = element.sale_discount.discount / 100;
+    if (element.status == 0) {
+      for (let index = 0; index < element.quantity; index++) {
+        temp_data_discounted = element.price.price * convert_discount;
+        temp_data_result += element.price.price - temp_data_discounted;
+      }
+    }
+    temp_data_total += temp_data_result;
+  });
+  temp_discounted_total = temp_data_total * temp_special_discounted;
+  temp_data_sub_total = temp_data_total - temp_discounted_total;
+  temp_vat_total = temp_data_sub_total * temp_vat;
+  temp_data_grand_total = temp_data_sub_total + temp_vat_total;
+  return temp_data_grand_total;
 };
 </script>
 <template>
@@ -144,9 +207,11 @@ const count_total_unsuccess = (data) => {
               <th scope="col" class="px-6 py-3">Status</th>
               <th scope="col" class="px-6 py-3">Payment Method</th>
               <th scope="col" class="px-6 py-3">Customer Type</th>
-              <th scope="col" class="px-6 py-3">Tax</th>
-              <th scope="col" class="px-6 py-3">Special Discount</th>
+              <th scope="col" class="px-6 py-3">Tax / Discount</th>
               <th scope="col" class="px-6 py-3">Products</th>
+              <th scope="col" class="px-6 py-3">Total Discount & VAT</th>
+              <th scope="col" class="px-6 py-3">Total Success</th>
+              <th scope="col" class="px-6 py-3">Total Unsuccess</th>
               <th scope="col" class="px-6 py-3">Created at</th>
             </tr>
           </thead>
@@ -185,11 +250,22 @@ const count_total_unsuccess = (data) => {
                     Walk-in
                   </span>
                 </td>
-                <td class="px-6 py-4">{{ transaction.tax?.tax }}%</td>
                 <td class="px-6 py-4">
-                  {{ transaction.special_discount?.discount }}%
+                  <div class="flex rounded-lg bg-red-400 p-[3px] text-white">
+                    <small>VAT: </small>
+                    <small> {{ transaction.tax?.tax }}% </small>
+                  </div>
+                  <div
+                    class="flex rounded-lg bg-orange-400 p-[3px] text-white mt-1"
+                  >
+                    <small>SD: </small>
+                    <small
+                      >{{
+                        transaction.special_discount?.discount ?? "0"
+                      }}%</small
+                    >
+                  </div>
                 </td>
-
                 <td
                   scope="row"
                   class="px-2 py-1 text-gray-900 whitespace-nowrap"
@@ -200,7 +276,9 @@ const count_total_unsuccess = (data) => {
                         <th scope="col" class="px-1 py-1">Product</th>
                         <th scope="col" class="px-1 py-1">No.</th>
                         <th scope="col" class="px-1 py-1">Price</th>
+                        <th scope="col" class="px-1 py-1">Discount %</th>
                         <th scope="col" class="px-1 py-1">Status</th>
+                        <th scope="col" class="px-1 py-1">Total Discount</th>
                         <th scope="col" class="px-1 py-1">Sub-total</th>
                       </tr>
                     </thead>
@@ -222,8 +300,11 @@ const count_total_unsuccess = (data) => {
                             {{ convert_money(transaction_detail.price.price) }}
                           </td>
                           <td class="px-1 py-1">
+                            {{ transaction_detail.sale_discount.discount }}%
+                          </td>
+                          <td class="px-1 py-1">
                             <small
-                              v-if="transaction_detail.status == 1"
+                              v-if="transaction_detail.status == 0"
                               class="bg-orange-400 rounded-sm p-[1px] text-white"
                             >
                               Unsuccess
@@ -238,8 +319,14 @@ const count_total_unsuccess = (data) => {
                           <td class="px-1 py-1">
                             <small>{{
                               convert_money(
-                                transaction_detail.quantity *
-                                  transaction_detail.price
+                                calculate_item_discount(transaction_detail)
+                              )
+                            }}</small>
+                          </td>
+                          <td class="px-1 py-1">
+                            <small>{{
+                              convert_money(
+                                calculate_sub_total(transaction_detail)
                               )
                             }}</small>
                           </td>
@@ -247,6 +334,61 @@ const count_total_unsuccess = (data) => {
                       </template>
                     </tbody>
                   </table>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex rounded-lg bg-red-400 p-[3px] text-white">
+                    <small>VAT: </small>
+                    <small>
+                      {{
+                        convert_money(
+                          calculate_grand_total(
+                            transaction.transaction_details,
+                            transaction.special_discount?.discount ?? 0,
+                            transaction.tax?.tax ?? 0,
+                            1
+                          )
+                        )
+                      }}
+                    </small>
+                  </div>
+                  <div
+                    class="flex rounded-lg bg-orange-400 p-[3px] text-white mt-1"
+                  >
+                    <small>SD: </small>
+                    <small>{{
+                      convert_money(
+                        calculate_grand_total(
+                          transaction.transaction_details,
+                          transaction.special_discount?.discount ?? 0,
+                          transaction.tax?.tax ?? 0,
+                          2
+                        )
+                      )
+                    }}</small>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  {{
+                    convert_money(
+                      calculate_grand_total(
+                        transaction.transaction_details,
+                        transaction.special_discount?.discount ?? 0,
+                        transaction.tax?.tax ?? 0,
+                        0
+                      )
+                    )
+                  }}
+                </td>
+                <td class="px-6 py-4">
+                  {{
+                    convert_money(
+                      calculate_grand_total_unsuccess(
+                        transaction.transaction_details,
+                        transaction.special_discount?.discount ?? 0,
+                        transaction.tax?.tax ?? 0
+                      )
+                    )
+                  }}
                 </td>
                 <td class="px-6 py-4">
                   {{ date_time(transaction.created_at) }}
