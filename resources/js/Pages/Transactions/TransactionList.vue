@@ -71,9 +71,10 @@ const function_filter_remove = () => {
 const calculate_item_discount = (data) => {
   let temp_data_discounted = 0;
   let convert_discount = data.sale_discount.discount / 100;
-
-  for (let index = 0; index < data.quantity; index++) {
-    temp_data_discounted = data.price.price * convert_discount;
+  if (data.status == 1) {
+    for (let index = 0; index < data.quantity; index++) {
+      temp_data_discounted = data.price.price * convert_discount;
+    }
   }
   return temp_data_discounted;
 };
@@ -82,12 +83,15 @@ const calculate_sub_total = (data) => {
   let temp_data_result = 0;
   let temp_data_discounted = 0;
   let convert_discount = data.sale_discount.discount / 100;
-
-  for (let index = 0; index < data.quantity; index++) {
-    temp_data_discounted = data.price.price * convert_discount;
-    temp_data_result += data.price.price - temp_data_discounted;
+  if (data.status == 1) {
+    for (let index = 0; index < data.quantity; index++) {
+      temp_data_discounted = data.price.price * convert_discount;
+      temp_data_result += data.price.price - temp_data_discounted;
+    }
+  } else {
+    temp_data_result += data.price.price * data.quantity;
   }
-  console.log(temp_data_discounted);
+
   return temp_data_result;
 };
 
@@ -126,29 +130,12 @@ const calculate_grand_total = (data, discount, vat, type) => {
 
 const calculate_grand_total_unsuccess = (data, discount, vat, type) => {
   let temp_data_total = 0;
-  let temp_data_sub_total = 0;
-  let temp_data_grand_total = 0;
-  let temp_discounted_total = 0;
-  let temp_vat_total = 0;
-  let temp_special_discounted = discount / 100;
-  let temp_vat = vat / 100;
   data.forEach((element) => {
-    let temp_data_result = 0;
-    let temp_data_discounted = 0;
-    let convert_discount = element.sale_discount.discount / 100;
     if (element.status == 0) {
-      for (let index = 0; index < element.quantity; index++) {
-        temp_data_discounted = element.price.price * convert_discount;
-        temp_data_result += element.price.price - temp_data_discounted;
-      }
+      temp_data_total = element.price.price * element.quantity;
     }
-    temp_data_total += temp_data_result;
   });
-  temp_discounted_total = temp_data_total * temp_special_discounted;
-  temp_data_sub_total = temp_data_total - temp_discounted_total;
-  temp_vat_total = temp_data_sub_total * temp_vat;
-  temp_data_grand_total = temp_data_sub_total + temp_vat_total;
-  return temp_data_grand_total;
+  return temp_data_total;
 };
 </script>
 <template>
@@ -210,7 +197,7 @@ const calculate_grand_total_unsuccess = (data, discount, vat, type) => {
               <th scope="col" class="px-6 py-3">Tax / Discount</th>
               <th scope="col" class="px-6 py-3">Products</th>
               <th scope="col" class="px-6 py-3">Total Discount & VAT</th>
-              <th scope="col" class="px-6 py-3">Total Success</th>
+              <th scope="col" class="px-6 py-3">Total Paid</th>
               <th scope="col" class="px-6 py-3">Total Unsuccess</th>
               <th scope="col" class="px-6 py-3">Created at</th>
             </tr>
@@ -223,7 +210,14 @@ const calculate_grand_total_unsuccess = (data, discount, vat, type) => {
               <tr class="bg-white border-">
                 <td class="px-6 py-4">{{ transaction.id }}</td>
                 <td class="px-6 py-4">
-                  {{ transaction.processed_by?.name ?? "Pending" }}
+                  <small class="flex gap-2">
+                    <img
+                      class="h-8 w-8 rounded-full object-cover"
+                      :src="transaction.processed_by.profile_photo_url"
+                      :alt="transaction.processed_by.name"
+                    />
+                    {{ transaction.processed_by?.name ?? "Pending" }}
+                  </small>
                 </td>
                 <td class="px-6 py-4">
                   <span
@@ -391,7 +385,9 @@ const calculate_grand_total_unsuccess = (data, discount, vat, type) => {
                   }}
                 </td>
                 <td class="px-6 py-4">
-                  {{ date_time(transaction.created_at) }}
+                  <small>
+                    {{ date_time(transaction.created_at) }}
+                  </small>
                 </td>
               </tr>
             </template>

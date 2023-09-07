@@ -13,7 +13,7 @@ class Transaction extends Model
 
     public function processed_by()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, "processed_by", "id");
     }
 
     public function tax()
