@@ -52,7 +52,7 @@ const convert_money = (data) => {
 
 const function_filter_range = () => {
   router.get(
-    route("deliveries.index", {
+    route("transactions.index", {
       date_from: date_from.value,
       date_to: date_to.value,
     })
@@ -61,7 +61,7 @@ const function_filter_range = () => {
 
 const function_filter_remove = () => {
   router.get(
-    route("deliveries.index", {
+    route("transactions.index", {
       date_from: null,
       date_to: null,
     })
