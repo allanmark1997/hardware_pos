@@ -221,45 +221,55 @@ const calculate_grand_total_unsuccess = (data, discount, vat, type) => {
                   </small>
                 </td>
                 <td class="px-6 py-4">
-                  <span
-                    v-if="transaction.status == 1"
-                    class="bg-green-400 rounded-md p-1 text-white"
-                  >
-                    Success
-                  </span>
-                  <span v-else class="bg-orange-400 rounded-md p-1 text-white">
-                    Unsuccess
-                  </span>
+                  <div v-if="transaction.status == 1" class="flex gap-1">
+                    <Icon icon="check" size="sm" />
+                    <span class="bg-green-400 rounded-md p-1 text-white">
+                      Success
+                    </span>
+                  </div>
+                  <div v-else class="flex gap-1">
+                    <Icon icon="wrong" size="xs" />
+                    <span class="bg-orange-400 rounded-md p-1 text-white">
+                      Unsuccess
+                    </span>
+                  </div>
                 </td>
                 <td class="px-6 py-4">
-                  <div class="flex">
-                    <small
-                      v-if="transaction.status == 1"
-                      class="bg-green-400 rounded-md p-1 text-white"
-                    >
-                      Success
-                    </small>
-                    <small
-                      v-else
-                      class="bg-orange-400 rounded-md p-1 text-white"
-                    >
-                      Unsuccess
-                    </small>
+                  <div class="flex p-1">
+                    <div v-if="transaction.status == 1" class="flex gap-1">
+                      <Icon icon="wrong" size="xs" />
+
+                      <small class="bg-green-400 rounded-md p-1 text-white">
+                        Success
+                      </small>
+                    </div>
+                    <div v-else class="flex gap-1">
+                      <Icon icon="wrong" size="xs" />
+
+                      <small class="bg-orange-400 rounded-md p-1 text-white">
+                        Unsuccess
+                      </small>
+                    </div>
                   </div>
                   <div class="flex">
-                    <small>
-                      {{ transaction.payment_method == 0 ? "Cash" : "Other" }}
+                    <small
+                      class="flex gap-1"
+                      v-if="transaction.payment_method == 0"
+                      ><Icon icon="cash" size="sm" /> Cash
                     </small>
+                    <small v-else>Other</small>
                   </div>
                 </td>
                 <td class="px-6 py-4">
                   <div class="flex rounded-lg bg-red-400 p-[3px] text-white">
+                    <Icon icon="tax" size="sm" />
                     <small>VAT: </small>
                     <small> {{ transaction.tax?.tax }}% </small>
                   </div>
                   <div
                     class="flex rounded-lg bg-orange-400 p-[3px] text-white mt-1"
                   >
+                    <Icon icon="wheelchair" size="sm" />
                     <small>SD: </small>
                     <small
                       >{{
