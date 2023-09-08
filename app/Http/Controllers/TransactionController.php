@@ -49,17 +49,18 @@ class TransactionController extends Controller
                 $transaction->customer_type == 0 ? "Walk-in" : "Regular",
                 $transaction->tax->tax / 100,
                 $transaction->special_discount->discount / 100,
-                "Product name",
-                "Quantity",
-                "Price",
-                "Discount in percent",
-                "Status",
-                "Total Discount",
-                "Sub-total",
-                "VAT Added",
-                "Total Special discount",
-                "Total price paid",
-                "Total back order",
+                count($transaction->transaction_details) != 0 ? "Product name" : "--",
+                count($transaction->transaction_details) != 0 ? "Quantity" : "--",
+                count($transaction->transaction_details) != 0 ? "Price" : "--",
+                count($transaction->transaction_details) != 0 ? "Discount in percent" : "--",
+                count($transaction->transaction_details) != 0 ? "Status" : "--",
+                count($transaction->transaction_details) != 0 ? "Total Discount" : "--",
+                count($transaction->transaction_details) != 0 ? "Sub-total" : "--",
+                "PHP " . number_format($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount->discount, 0, $transaction->status), 2),
+                "PHP " . number_format($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount->discount, 1, $transaction->status), 2),
+                "PHP " . number_format($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount->discount, 2, $transaction->status), 2),
+                "PHP " . number_format($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount->discount, 3, $transaction->status), 2),
+
                 Carbon::parse($transaction->created_at)->format('d-m-Y')
             ];
             foreach ($transaction->transaction_details as $key => $transaction_detail) {
@@ -73,11 +74,11 @@ class TransactionController extends Controller
                     "",
                     $transaction_detail->product->name,
                     $transaction_detail->quantity,
-                    $transaction_detail->price->price,
+                    "PHP " . number_format($transaction_detail->price->price),
                     $transaction_detail->sale_discount->discount / 100,
-                    $transaction_detail->status,
-                    "Total Discount",
-                    $transaction->quantity * $transaction_detail->price->price,
+                    $transaction_detail->status == 1 ? "Success" : "Unsuccess",
+                    "PHP " . number_format($this->calculate_sub_total_discounted_amount($transaction_detail->price->price, $transaction_detail->sale_discount->discount, $transaction_detail->quantity, $transaction_detail->status), 2),
+                    "PHP " . number_format($this->calculate_sub_total_discounted($transaction_detail->price->price, $transaction_detail->sale_discount->discount, $transaction_detail->quantity, $transaction_detail->status), 2),
                     "",
                     "",
                     "",
@@ -88,6 +89,86 @@ class TransactionController extends Controller
         }
 
         return (new TransactionsExport([$results], ['Transactions']))->download("Transactions.xlsx");
+    }
+
+    private function calculate_sub_total_discounted($price, $discount, $quantity, $status)
+    {
+        $temp_result = 0;
+        $temp_discount = $discount / 100;
+        $temp_ammount_discounted = $price * $temp_discount;
+        if ($status == 1) {
+            for ($i = 0; $i < $quantity; $i++) {
+                $temp_result += $price - $temp_ammount_discounted;
+            }
+        } else {
+            for ($i = 0; $i < $quantity; $i++) {
+                $temp_result += $price;
+            }
+        }
+
+        return $temp_result;
+    }
+
+    private function calculate_sub_total_discounted_amount($price, $discount, $quantity, $status)
+    {
+        $temp_result = 0;
+        $temp_discount = $discount / 100;
+        $temp_amount_discounted = $price * $temp_discount;
+        if ($status == 1) {
+            for ($i = 0; $i < $quantity; $i++) {
+                $temp_result += $temp_amount_discounted;
+            }
+        }
+
+        return $temp_result;
+    }
+
+    private function calculate_vat_special_discounted($details, $vat, $special_discount, $type, $status)
+    {
+        $temp_result = 0;
+        $temp_result_unsuccess = 0;
+        $temp_discount = 0;
+        $temp_amount_discounted = 0;
+
+        $converted_vat = $vat / 100;
+        $total_vat_amount = 0;
+
+        $converted_sd = $special_discount / 100;
+        $total_sd_amount = 0;
+
+        $price_discounted = 0;
+
+        $price_total = 0;
+
+        foreach ($details as $key => $detail) {
+            $temp_discount = $detail->sale_discount->discount / 100;
+
+            if ($detail->status == 1) {
+                for ($i = 0; $i < $detail->quantity; $i++) {
+                    $temp_amount_discounted = $detail->price->price * $temp_discount;
+                    $temp_result += $detail->price->price - $temp_amount_discounted;
+                }
+            }
+            if ($detail->status == 0) {
+                for ($i = 0; $i < $detail->quantity; $i++) {
+                    $temp_result_unsuccess += $detail->price->price;
+                }
+            }
+        }
+        $total_sd_amount = $temp_result * $converted_sd;
+        $price_discounted = $temp_result - $total_sd_amount;
+        $total_vat_amount = $price_discounted * $converted_vat;
+        $price_total = $price_discounted + $total_vat_amount;
+
+        if ($type == 0) {
+            return $total_vat_amount;
+        } else if ($type == 1) {
+            return $total_sd_amount;
+        } else if ($type == 2) {
+            return $price_total;
+        } else if ($type == 3) {
+            return $temp_result_unsuccess;
+        }
     }
 
     /**

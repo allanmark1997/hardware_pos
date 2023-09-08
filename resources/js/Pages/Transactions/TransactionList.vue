@@ -73,7 +73,7 @@ const calculate_item_discount = (data) => {
   let convert_discount = data.sale_discount.discount / 100;
   if (data.status == 1) {
     for (let index = 0; index < data.quantity; index++) {
-      temp_data_discounted = data.price.price * convert_discount;
+      temp_data_discounted += data.price.price * convert_discount;
     }
   }
   return temp_data_discounted;
