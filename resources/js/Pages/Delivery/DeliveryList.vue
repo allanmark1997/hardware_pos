@@ -3,8 +3,7 @@ import Button from "@/Components/Button.vue";
 import { router } from "@inertiajs/vue3";
 import Icon from "@/Components/Icon.vue";
 import Pagination2 from "@/Components/Pagination2.vue";
-import TextInput from '@/Components/TextInput.vue';
-
+import TextInput from "@/Components/TextInput.vue";
 
 import moment from "moment";
 import { inject, onMounted, provide, ref } from "vue";
@@ -71,25 +70,23 @@ const function_filter_remove = () => {
 
 const count_total_success = (data) => {
   let temp_data = 0;
-  data.forEach(element => {
+  data.forEach((element) => {
     if (element.status == 1) {
-    temp_data += element.quantity * element.price
-      
+      temp_data += element.quantity * element.price;
     }
   });
-  return temp_data
-}
+  return temp_data;
+};
 
 const count_total_unsuccess = (data) => {
   let temp_data = 0;
-  data.forEach(element => {
+  data.forEach((element) => {
     if (element.status == 0) {
-    temp_data += element.quantity * element.price
-      
+      temp_data += element.quantity * element.price;
     }
   });
-  return temp_data
-}
+  return temp_data;
+};
 </script>
 <template>
   <div class="flex justify-between mt-2">
@@ -98,23 +95,22 @@ const count_total_unsuccess = (data) => {
         <div class="flex">
           <span class="text-md mt-2 mr-2">From</span>
           <TextInput
-                    id="date_from"
-                    v-model="date_from"
-                    type="date"
-                    class="mt-1 block w-full"
-                />
+            id="date_from"
+            v-model="date_from"
+            type="date"
+            class="mt-1 block w-full"
+          />
         </div>
         <div class="flex">
           <span class="text-md mt-2 mr-2">To</span>
 
           <TextInput
-                    id="date_to"
-                    v-model="date_to"
-                    type="date"
-                    class="mt-1 block w-full"
+            id="date_to"
+            v-model="date_to"
+            type="date"
+            class="mt-1 block w-full"
             @keyup.enter="function_filter_range"
-
-                />
+          />
         </div>
         <button
           v-if="date_from || date_to"
@@ -156,11 +152,36 @@ const count_total_unsuccess = (data) => {
           <tbody>
             <template v-for="(delivery, key) in deliveries.data" :key="key">
               <tr class="bg-white border-">
-                <td class="px-6 py-4">{{ delivery.supplier.supplier_name }}</td>
-                <td class="px-6 py-4">{{ delivery.user_receiver?.name??'Pending' }}</td>
                 <td class="px-6 py-4">
-                  <span class="bg-orange-400 rounded-md p-1 text-white">
-                    {{ delivery.status == 1 ? "Success" : "Unsuccessful" }}
+                  <img
+                    class="h-8 w-8 rounded-full object-cover"
+                    :src="delivery.supplier.image"
+                    :alt="delivery.supplier.supplier_name"
+                  />
+                  {{ delivery.supplier.supplier_name }}
+                </td>
+                <td class="px-6 py-4">
+                  <img
+                    class="h-8 w-8 rounded-full object-cover"
+                    :src="delivery.user_receiver.profile_photo_url"
+                    :alt="delivery.user_receiver.supplier_name"
+                  />
+                  {{ delivery.user_receiver?.name ?? "Pending" }}
+                </td>
+                <td class="px-6 py-4">
+                  <span
+                    v-if="delivery.status == 1"
+                    class="bg-green-400 rounded-md p-1 text-white flex"
+                  >
+                    <Icon icon="check" size="sm" />
+                    Success
+                  </span>
+                  <span
+                    v-else
+                    class="bg-green-400 rounded-md p-1 text-white flex"
+                  >
+                    <Icon icon="wrong" size="sm" />
+                    Unuccess
                   </span>
                 </td>
 
@@ -176,7 +197,6 @@ const count_total_unsuccess = (data) => {
                         <th scope="col" class="px-1 py-1">Price</th>
                         <th scope="col" class="px-1 py-1">Status</th>
                         <th scope="col" class="px-1 py-1">Sub-total</th>
-                        <!-- <th scope="col" class="px-1 py-1">Created at</th> -->
                       </tr>
                     </thead>
                     <tbody>
@@ -185,7 +205,9 @@ const count_total_unsuccess = (data) => {
                         :key="key2"
                       >
                         <tr class="bg-white border-">
-                          <td class="px-1 py-1">
+                          <td class="px-1 py-1 flex">
+                            <Icon icon="shopping_cart" size="xs" />
+
                             {{ delivery_detail.product?.name }}
                           </td>
                           <td class="px-1 py-1">
@@ -196,25 +218,43 @@ const count_total_unsuccess = (data) => {
                           </td>
                           <td class="px-1 py-1">
                             <small
-                              class="bg-orange-400 rounded-sm p-[1px] text-white"
+                              v-if="delivery_detail.status == 1"
+                              class="bg-green-400 rounded-md p-1 text-white flex gap-1"
                             >
-                              {{
-                                delivery_detail.status == 1 ? "Success":"Unsuccessful"
-                              }}
+                              <Icon icon="check" size="sm" />
+                              Success
+                            </small>
+                            <small
+                              v-else
+                              class="bg-green-400 rounded-md p-1 text-white flex gap-1"
+                            >
+                              <Icon icon="wrong" size="xs" />
+                              Unuccess
                             </small>
                           </td>
                           <td class="px-1 py-1">
-                            <small>{{ convert_money(delivery_detail.quantity * delivery_detail.price) }}</small>
+                            <small>{{
+                              convert_money(
+                                delivery_detail.quantity * delivery_detail.price
+                              )
+                            }}</small>
                           </td>
                         </tr>
                       </template>
                     </tbody>
                   </table>
                 </td>
-                <td class="px-6 py-4">{{ convert_money(count_total_success(delivery.details)) }}</td>
-                <td class="px-6 py-4">{{ convert_money(count_total_unsuccess(delivery.details)) }}</td>
+                <td class="px-6 py-4">
+                  {{ convert_money(count_total_success(delivery.details)) }}
+                </td>
+                <td class="px-6 py-4">
+                  {{ convert_money(count_total_unsuccess(delivery.details)) }}
+                </td>
                 <td class="px-6 py-4">{{ delivery.remarks ?? "None" }}</td>
-                <td class="px-6 py-4">{{ date_time(delivery.created_at) }}</td>
+                <td class="px-6 py-4 flex gap-2">
+                  <Icon icon="calendar" size="md" />
+                  {{ date_time(delivery.created_at) }}
+                </td>
               </tr>
             </template>
           </tbody>
