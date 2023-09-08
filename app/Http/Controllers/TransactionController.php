@@ -36,7 +36,7 @@ class TransactionController extends Controller
         })->get();
         $results = [];
         $results[] = ['DATE RANGES', 'From', 'To', 'Paid grand total', "Unsuccessful grand total"];
-        // $results[] = ['', $request->date_from ?? "--", $request->date_to ?? '--', "PHP " . number_format($this->grand_total_success($transactions), 2), "PHP " . number_format($this->grand_total_unsuccess($transactions), 2)];
+        $results[] = ['', $request->date_from ?? "--", $request->date_to ?? '--', "PHP " . number_format($this->grand_total_success($transactions), 2), "PHP " . number_format($this->grand_total_unsuccess($transactions), 2)];
         $results[] = ['TRANSACTION ID', 'ACCOMMODATED BY', 'STATUS', 'PAYMENT METHOD', 'CUSTOMER TYPE', 'TAX IN PERCENT', 'SPECIAL DISCOUNT IN PERCENT', '', '', '', '', '', '', '', "TOTAL VAT ADDED", "TOTAL SPECIAL DISCOUNTED", "TOTAL PRICE PAID", "TOTAL BACK ORDER", 'CREATED AT'];
 
         foreach ($transactions as $key => $transaction) {
@@ -169,6 +169,24 @@ class TransactionController extends Controller
         } else if ($type == 3) {
             return $temp_result_unsuccess;
         }
+    }
+
+    private function grand_total_success($transactions)
+    {
+        $grand_total = 0;
+        foreach ($transactions as $key => $transaction) {
+            $grand_total += $this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount->discount, 2, $transaction->status);
+        }
+        return $grand_total;
+    }
+
+    private function grand_total_unsuccess($transactions)
+    {
+        $grand_total = 0;
+        foreach ($transactions as $key => $transaction) {
+            $grand_total += $this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount->discount, 3, $transaction->status);
+        }
+        return $grand_total;
     }
 
     /**
