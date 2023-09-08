@@ -128,7 +128,7 @@ const calculate_grand_total = (data, discount, vat, type) => {
   }
 };
 
-const calculate_grand_total_unsuccess = (data, discount, vat, type) => {
+const calculate_grand_total_unsuccess = (data) => {
   let temp_data_total = 0;
   data.forEach((element) => {
     if (element.status == 0) {
@@ -173,7 +173,7 @@ const calculate_grand_total_unsuccess = (data, discount, vat, type) => {
     </div>
     <a
       :href="
-        route('deliveries.export', {
+        route('transactions.export', {
           date_from: date_from,
           date_to: date_to,
         })
@@ -214,10 +214,10 @@ const calculate_grand_total_unsuccess = (data, discount, vat, type) => {
                   <small class="flex gap-2">
                     <img
                       class="h-8 w-8 rounded-full object-cover"
-                      :src="transaction.processed_by.profile_photo_url"
-                      :alt="transaction.processed_by.name"
+                      :src="transaction.accommodate_by.profile_photo_url"
+                      :alt="transaction.accommodate_by.name"
                     />
-                    {{ transaction.processed_by?.name ?? "Pending" }}
+                    {{ transaction.accommodate_by?.name ?? "Pending" }}
                   </small>
                 </td>
                 <td class="px-6 py-4">

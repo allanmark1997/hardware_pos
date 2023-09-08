@@ -11,7 +11,7 @@ class Transaction extends Model
     use HasFactory, SoftDeletes;
     protected $guarded = [];
 
-    public function processed_by()
+    public function accommodate_by()
     {
         return $this->belongsTo(User::class, "processed_by", "id");
     }
