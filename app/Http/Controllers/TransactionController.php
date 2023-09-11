@@ -35,8 +35,12 @@ class TransactionController extends Controller
             $query->whereBetween('created_at', [$date_from, $date_to]);
         })->get();
         $results = [];
-        $results[] = ['DATE RANGES', 'From', 'To', 'Paid grand total', "Unsuccessful grand total"];
-        $results[] = ['', $request->date_from ?? "--", $request->date_to ?? '--', "PHP " . number_format($this->grand_total_success($transactions), 2), "PHP " . number_format($this->grand_total_unsuccess($transactions), 2)];
+        $grand_unsuccess_total = [];
+        // $results[] = ['DATE RANGES', 'From', 'To', 'Paid grand total', "Unsuccessful grand total"];
+        // $results[] = ['', $request->date_from ?? "--", $request->date_to ?? '--', "PHP " . number_format($this->grand_total_success($transactions), 2), "PHP " . number_format($this->grand_total_unsuccess($transactions), 2)];
+        $grand_unsuccess_total[] = ['Paid grand total', "Unsuccessful grand total"];
+        $grand_unsuccess_total[] = ["PHP " . number_format($this->grand_total_success($transactions), 2), "PHP " . number_format($this->grand_total_unsuccess($transactions), 2)];
+
         $results[] = ['TRANSACTION ID', 'ACCOMMODATED BY', 'STATUS', 'PAYMENT METHOD', 'CUSTOMER TYPE', 'TAX IN PERCENT', 'SPECIAL DISCOUNT IN PERCENT', '', '', '', '', '', '', '', "TOTAL VAT ADDED", "TOTAL SPECIAL DISCOUNTED", "TOTAL PRICE PAID", "TOTAL BACK ORDER", 'CREATED AT'];
 
         foreach ($transactions as $key => $transaction) {
@@ -88,7 +92,7 @@ class TransactionController extends Controller
             }
         }
 
-        return (new TransactionsExport([$results], ['Transactions']))->download("Transactions.xlsx");
+        return (new TransactionsExport([$results, $grand_unsuccess_total], ['Transactions', 'Grand Totals']))->download($request->date_from . " to " . $request->date_to . "Transactions.xlsx");
     }
 
     private function calculate_sub_total_discounted($price, $discount, $quantity, $status)
