@@ -92,7 +92,7 @@ class TransactionController extends Controller
             }
         }
 
-        return (new TransactionsExport([$results, $grand_unsuccess_total], ['Transactions', 'Grand Totals']))->download($request->date_from . " to " . $request->date_to . "Transactions.xlsx");
+        return (new TransactionsExport([$results, $grand_unsuccess_total], ['Transactions', 'Grand Totals']))->download($request->date_from ?? "--" . " to " . $request->date_to ?? "--" . "Transactions.xlsx");
     }
 
     private function calculate_sub_total_discounted($price, $discount, $quantity, $status)

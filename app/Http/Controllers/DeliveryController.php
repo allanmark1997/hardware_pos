@@ -39,8 +39,11 @@ class DeliveryController extends Controller
             $query->whereBetween('created_at', [$date_from, $date_to]);
         })->get();
         $results = [];
+        $grand_unsuccess_total = [];
+
         $results[] = ['DATE RANGES', 'From', 'To', 'Success grand total', "Unsuccessful grand total"];
         $results[] = ['', $request->date_from ?? "--", $request->date_to ?? '--', "PHP " . number_format($this->grand_total_success($deliveries), 2), "PHP " . number_format($this->grand_total_unsuccess($deliveries), 2)];
+
         $results[] = ['SUPPLIER NAME', 'RECEIVED BY', 'STATUS', 'PRODUCT NAME', 'QUANTITY', 'PRICE', "SUB-TOTAL", "STATUS", 'REMARKS', 'UNSUCCESSFULL TOTAL', 'SUCCESSFUL TOTAL', 'CREATED AT'];
 
         foreach ($deliveries as $key => $delivery) {
@@ -77,7 +80,7 @@ class DeliveryController extends Controller
                     ];
             }
         }
-        return (new DeliveryExport([$results], ['Delivery']))->download("Deliveries.xlsx");
+        return (new DeliveryExport([$results], ['Delivery']))->download($request->date_from ?? "--" . " to " . $request->date_to ?? '--' . " Deliveries.xlsx");
         // return Excel::download(new DeliveryExport, 'Delivery.xlsx');
     }
 
