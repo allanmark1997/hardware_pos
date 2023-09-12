@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BackOrderController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\CashierStatusController;
@@ -85,6 +86,11 @@ Route::middleware([
     Route::prefix('delivery')->name('deliveries.')->group(function () {
         Route::get('/deliveries', [DeliveryController::class, 'index'])->name('index');
         Route::get('/deliveries/export', [DeliveryController::class, 'export'])->name('export');
+    });
+
+    Route::prefix('back_orders')->name('back_orders.')->group(function () {
+        Route::get('/back_orders', [BackOrderController::class, 'index'])->name('index');
+        Route::get('/back_orders/export', [BackOrderController::class, 'export'])->name('export');
     });
 
     Route::prefix('transactions')->name('transactions.')->group(function () {
