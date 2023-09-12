@@ -8,7 +8,7 @@ import { inject, provide, ref } from "vue";
 const props = defineProps(["deliveries", "date_from", "date_to"]);
 </script>
 <template>
-  <AppLayout title="Dashboard">
+  <AppLayout title="Delivery">
     <template #header>
       <div class="flex justify-between">
         <h2 class="font-semibold text-lg text-gray-800 leading-tight">

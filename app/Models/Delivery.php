@@ -13,15 +13,18 @@ class Delivery extends Model
 
     protected $guarded = [];
 
-    public function details(){
-        return $this->hasMany(DeliveryDetail::class)->with("product");
+    public function details()
+    {
+        return $this->hasMany(DeliveryDetail::class)->with("product")->with("price");
     }
 
-    public function supplier(){
+    public function supplier()
+    {
         return $this->belongsTo(Supplier::class);
-    } 
+    }
 
-    public function user_receiver(){
+    public function user_receiver()
+    {
         return $this->belongsTo(User::class, "received_by", "id");
-    } 
+    }
 }

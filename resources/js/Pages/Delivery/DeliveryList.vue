@@ -72,7 +72,7 @@ const count_total_success = (data) => {
   let temp_data = 0;
   data.forEach((element) => {
     if (element.status == 1) {
-      temp_data += element.quantity * element.price;
+      temp_data += element.quantity * element.price.price;
     }
   });
   return temp_data;
@@ -82,7 +82,7 @@ const count_total_unsuccess = (data) => {
   let temp_data = 0;
   data.forEach((element) => {
     if (element.status == 0) {
-      temp_data += element.quantity * element.price;
+      temp_data += element.quantity * element.price.price;
     }
   });
   return temp_data;
@@ -214,7 +214,7 @@ const count_total_unsuccess = (data) => {
                             {{ delivery_detail.quantity }}
                           </td>
                           <td class="px-1 py-1">
-                            {{ convert_money(delivery_detail.price) }}
+                            {{ convert_money(delivery_detail.price.price) }}
                           </td>
                           <td class="px-1 py-1">
                             <small
@@ -235,7 +235,8 @@ const count_total_unsuccess = (data) => {
                           <td class="px-1 py-1">
                             <small>{{
                               convert_money(
-                                delivery_detail.quantity * delivery_detail.price
+                                delivery_detail.quantity *
+                                  delivery_detail.price.price
                               )
                             }}</small>
                           </td>

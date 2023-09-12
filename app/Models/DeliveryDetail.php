@@ -16,8 +16,13 @@ class DeliveryDetail extends Model
     //     'products' => 'json',
     // ];
 
-    public function product(){
+    public function product()
+    {
         return $this->belongsTo(Product::class);
-    } 
-    
+    }
+
+    public function price()
+    {
+        return $this->belongsTo(SupplierPrice::class, "price_id", "id");
+    }
 }

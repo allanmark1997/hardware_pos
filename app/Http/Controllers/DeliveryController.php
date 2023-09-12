@@ -38,6 +38,7 @@ class DeliveryController extends Controller
         $deliveries = Delivery::with("details")->with("supplier")->with("user_receiver")->when($date_from !=  null || $date_from != "" && $date_to != null || $date_to != "", function ($query) use ($date_from, $date_to) {
             $query->whereBetween('created_at', [$date_from, $date_to]);
         })->get();
+
         $results = [];
         $grand_unsuccess_total = [];
 
@@ -76,8 +77,8 @@ class DeliveryController extends Controller
                         '',
                         $delivery->details[$i]['product']['name'],
                         $delivery->details[$i]['quantity'],
-                        "PHP " . number_format($delivery->details[$i]['price'], 2),
-                        "PHP " . number_format($delivery->details[$i]['quantity'] * $delivery->details[$i]['price'], 2),
+                        "PHP " . number_format($delivery->details[$i]['price']->price, 2),
+                        "PHP " . number_format($delivery->details[$i]['quantity'] * $delivery->details[$i]['price']->price, 2),
                         $delivery->details[$i]['status'] == 1 ? 'Delivered' : "Unsuccessful",
                         '',
                         '',
@@ -85,6 +86,7 @@ class DeliveryController extends Controller
                     ];
             }
         }
+        // dd($results);
         return (new DeliveryExport([$results, $grand_unsuccess_total], ['Delivery', 'Grand totals']))->download($request->date_from . " to " . $request->date_to . " Deliveries.xlsx");
         // return Excel::download(new DeliveryExport, 'Delivery.xlsx');
     }
@@ -96,7 +98,7 @@ class DeliveryController extends Controller
             foreach ($data as $key => $delivery) {
                 foreach ($delivery->details as $key => $value) {
                     if ($value->status == 1) {
-                        $grand_total += $value->price * $value->quantity;
+                        $grand_total += $value->price->price * $value->quantity;
                     }
                 }
             }
@@ -111,7 +113,7 @@ class DeliveryController extends Controller
             foreach ($data as $key => $delivery) {
                 foreach ($delivery->details as $key => $value) {
                     if ($value->status == 0) {
-                        $grand_total += $value->price * $value->quantity;
+                        $grand_total += $value->price->price * $value->quantity;
                     }
                 }
             }
@@ -140,7 +142,7 @@ class DeliveryController extends Controller
             $sum = 0;
             foreach ($data as $key => $value) {
                 if ($value["status"] == 1) {
-                    $sum += $value["price"] * $value["quantity"];
+                    $sum += $value["price"]->price * $value["quantity"];
                 }
             }
             return "PHP " . number_format($sum, 2);
@@ -155,7 +157,7 @@ class DeliveryController extends Controller
             $sum = 0;
             foreach ($data as $key => $value) {
                 if ($value["status"] == 0) {
-                    $sum += $value["price"] * $value["quantity"];
+                    $sum += $value["price"]->price * $value["quantity"];
                 }
             }
             return "PHP " . number_format($sum, 2);
