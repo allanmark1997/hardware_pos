@@ -129,7 +129,7 @@ const count_total_unsuccess = (data) => {
         })
       "
       class="bg-green-400 hover:bg-green-600 hover:text-white rounded-lg my-auto p-2"
-      >Export Delivery</a
+      >Export Back-orders</a
     >
   </div>
 
@@ -166,9 +166,7 @@ const count_total_unsuccess = (data) => {
                 <td class="px-6 py-4">
                   {{ convert_money(back_order.price.price) }}
                 </td>
-                <td class="px-6 py-4">
-                  {{ back_order.discount.discount }}
-                </td>
+                <td class="px-6 py-4">{{ back_order.discount.discount }}%</td>
                 <td class="px-6 py-4">
                   {{ back_order.quantity }}
                 </td>
