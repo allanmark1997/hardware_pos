@@ -66,6 +66,7 @@ Route::middleware([
         Route::post('/update_products/{product}', [ProductController::class, 'update'])->name('update');
         Route::put('/remove_products/{product}', [ProductController::class, 'destroy'])->name('remove');
         Route::get('/products/export', [ProductController::class, 'export'])->name('export');
+        Route::post('/products/back_order/{product}', [ProductController::class, 'back_order'])->name('back_order');
     });
 
     Route::prefix('taxes')->name('taxes.')->group(function () {

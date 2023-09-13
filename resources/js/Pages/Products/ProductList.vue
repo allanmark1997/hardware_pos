@@ -24,6 +24,7 @@ const props = defineProps([
   "special_discount",
 ]);
 const condfirmationModal = ref(false);
+const condfirmationBackOrderModal = ref(false);
 const post_images = ref([]);
 const specification = ref({});
 const spec_name = ref("");
@@ -41,6 +42,12 @@ const detailModalData = ref({
 const form = useForm({
   product: false,
 });
+
+const form_back_order = useForm({
+  product: false,
+  quantity: 0,
+});
+
 const openDetails = (detail, title, specs, img) => {
   detailModal.value = !detailModal.value;
   detailModalData.value.ProdTitle = title;
@@ -70,6 +77,11 @@ const form_update = useForm({
 const function_open_modal_confirmation = (product) => {
   form.product = product;
   condfirmationModal.value = !condfirmationModal.value;
+};
+
+const function_open_modal_back_order = (product) => {
+  form_back_order.product = product;
+  condfirmationBackOrderModal.value = !condfirmationBackOrderModal.value;
 };
 
 const function_open_modal_update = (product) => {
@@ -105,6 +117,42 @@ const remove_product = () => {
       });
     },
   });
+};
+
+const back_order = () => {
+  if (form_back_order.product.quantity < form_back_order.quantity) {
+    toast.error(
+      "Can't allow request, since the quantity inputed is above products stocks",
+      {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      }
+    );
+  } else {
+    form_back_order.post(
+      route("products.back_order", form_back_order.product),
+      {
+        preserveScroll: true,
+        onSuccess: () => {
+          toast.success("Product successfully send to back orders", {
+            autoClose: 1000,
+            transition: toast.TRANSITIONS.FLIP,
+            position: toast.POSITION.TOP_RIGHT,
+          });
+          condfirmationBackOrderModal.value = false;
+          form_back_order.reset();
+        },
+        onError: (error) => {
+          toast.error("Something went wrong " + error, {
+            autoClose: 1000,
+            transition: toast.TRANSITIONS.FLIP,
+            position: toast.POSITION.TOP_RIGHT,
+          });
+        },
+      }
+    );
+  }
 };
 
 const update_product = () => {
@@ -287,6 +335,13 @@ onMounted(() => {
                     <Icon icon="pencil" size="sm" />
                   </button>
                   <button
+                    @click="function_open_modal_back_order(product)"
+                    class="p-2 bg-red-400 rounded-lg hover:bg-red-600 w-auto mr-2 mt-2"
+                    title="Send to back orders"
+                  >
+                    <Icon icon="back_order" size="sm" />
+                  </button>
+                  <button
                     @click="function_open_modal_confirmation(product)"
                     class="p-2 bg-red-400 rounded-lg hover:bg-red-600 w-auto mt-2"
                   >
@@ -435,6 +490,54 @@ onMounted(() => {
         :disabled="form.processing"
         class="bg-green-200 hover:bg-green-400"
         @click="remove_product"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-auto"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+          /></svg
+        >&nbsp;Submit
+      </Button>
+    </template>
+  </ConfirmDialogModal>
+
+  <ConfirmDialogModal
+    :show="condfirmationBackOrderModal"
+    @close="condfirmationBackOrderModal = false"
+    maxWidth="2xl"
+  >
+    <template #title> Are you sure you want to sent this product?</template>
+    <template #content>
+      <p class="text-red-500">
+        This action can update the system and this is not reversible!
+      </p>
+      <Input
+        type="number"
+        label="Enter product quantity"
+        v-model="form_back_order.quantity"
+      />
+      <JetInputError :message="form_back_order.errors.quantity" class="mt-2" />
+    </template>
+    <template #footer>
+      <SecondaryButton
+        @click="condfirmationBackOrderModal = false"
+        class="mr-2"
+      >
+        nevermind
+      </SecondaryButton>
+      <Button
+        :class="{ 'opacity-25': form_back_order.processing }"
+        :disabled="form_back_order.processing"
+        class="bg-green-200 hover:bg-green-400"
+        @click="back_order"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

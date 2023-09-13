@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\ProductsExport;
+use App\Models\BackOrder;
 use App\Models\Category;
 use App\Models\SpecialDiscount;
 use App\Models\Price;
@@ -188,6 +189,31 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
+        return back();
+    }
+
+    public function back_order(Request $request, Product $product)
+    {
+
+        $request->validate([
+            'quantity' => ["required", "max:30", "integer"],
+        ]);
+
+        $result = $product->quantity - $request->quantity;
+
+        $product->update([
+            "quantity" => $result
+        ]);
+
+        $back_order = BackOrder::create([
+            "product_id" => $product->id,
+            "price_id" => $product->current_price->id,
+            "discount_id" => $product->current_discount->id,
+            "user_id" => Auth::user()->id,
+            "quantity" => $request->quantity,
+            "status" => false
+        ]);
+
         return back();
     }
 
