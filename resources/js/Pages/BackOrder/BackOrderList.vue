@@ -52,7 +52,7 @@ const convert_money = (data) => {
 
 const function_filter_range = () => {
   router.get(
-    route("deliveries.index", {
+    route("back_orders.index", {
       date_from: date_from.value,
       date_to: date_to.value,
     })
@@ -61,7 +61,7 @@ const function_filter_range = () => {
 
 const function_filter_remove = () => {
   router.get(
-    route("deliveries.index", {
+    route("back_orders.index", {
       date_from: null,
       date_to: null,
     })
@@ -123,7 +123,7 @@ const count_total_unsuccess = (data) => {
     </div>
     <a
       :href="
-        route('deliveries.export', {
+        route('back_orders.export', {
           date_from: date_from,
           date_to: date_to,
         })
@@ -145,7 +145,8 @@ const count_total_unsuccess = (data) => {
               <th scope="col" class="px-6 py-3">Discount</th>
               <th scope="col" class="px-6 py-3">Quantity</th>
               <th scope="col" class="px-6 py-3">Status</th>
-              <th scope="col" class="px-6 py-3">Sub-total</th>
+              <th scope="col" class="px-6 py-3">Success Sub-total</th>
+              <th scope="col" class="px-6 py-3">Inprogress Sub-total</th>
               <th scope="col" class="px-6 py-3">Created at</th>
             </tr>
           </thead>
@@ -180,16 +181,29 @@ const count_total_unsuccess = (data) => {
                   </span>
                   <span
                     v-else
-                    class="bg-green-400 rounded-md p-1 text-white flex gap-1"
+                    class="bg-red-400 rounded-md p-1 text-white flex gap-1"
                   >
                     <Icon icon="wrong" size="sm" />
-                    Unuccess
+                    In progress
                   </span>
                 </td>
 
                 <td class="px-6 py-4">
                   {{
-                    convert_money(back_order.price.price * back_order.quantity)
+                    convert_money(
+                      back_order.status == 1
+                        ? back_order.price.price * back_order.quantity
+                        : 0
+                    )
+                  }}
+                </td>
+                <td class="px-6 py-4">
+                  {{
+                    convert_money(
+                      back_order.status == 0
+                        ? back_order.price.price * back_order.quantity
+                        : 0
+                    )
                   }}
                 </td>
                 <td class="px-6 py-4 flex gap-2">
@@ -208,7 +222,7 @@ const count_total_unsuccess = (data) => {
           :date_to="date_to"
         />
         <p class="mt-6 text-sm text-gray-500">
-          Showing {{ back_orders.data.length }} Deliveries
+          Showing {{ back_orders.data.length }} Back-orders
         </p>
       </div>
     </div>
