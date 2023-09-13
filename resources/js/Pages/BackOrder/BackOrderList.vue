@@ -188,7 +188,9 @@ const count_total_unsuccess = (data) => {
                 </td>
 
                 <td class="px-6 py-4">
-                  {{ convert_money(10) }}
+                  {{
+                    convert_money(back_order.price.price * back_order.quantity)
+                  }}
                 </td>
                 <td class="px-6 py-4 flex gap-2">
                   <Icon icon="calendar" size="sm" />
