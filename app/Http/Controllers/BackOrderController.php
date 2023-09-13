@@ -90,6 +90,15 @@ class BackOrderController extends Controller
         return $result;
     }
 
+    public function authorize_(Request $request, BackOrder $backOrder)
+    {
+        // dd($backOrder);
+        $backOrder->update([
+            "status" => true
+        ]);
+        return back();
+    }
+
     /**
      * Show the form for creating a new resource.
      */

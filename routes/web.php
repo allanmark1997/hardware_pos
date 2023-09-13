@@ -91,6 +91,7 @@ Route::middleware([
     Route::prefix('back_orders')->name('back_orders.')->group(function () {
         Route::get('/back_orders', [BackOrderController::class, 'index'])->name('index');
         Route::get('/back_orders/export', [BackOrderController::class, 'export'])->name('export');
+        Route::put('/back_orders/authorize/{backOrder}', [BackOrderController::class, 'authorize_'])->name('authorize');
     });
 
     Route::prefix('transactions')->name('transactions.')->group(function () {

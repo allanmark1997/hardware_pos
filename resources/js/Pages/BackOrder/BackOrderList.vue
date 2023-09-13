@@ -1,6 +1,6 @@
 <script setup>
 import Button from "@/Components/Button.vue";
-import { router } from "@inertiajs/vue3";
+import { router, useForm } from "@inertiajs/vue3";
 import Icon from "@/Components/Icon.vue";
 import Pagination2 from "@/Components/Pagination2.vue";
 import TextInput from "@/Components/TextInput.vue";
@@ -15,9 +15,9 @@ const props = defineProps(["back_orders", "date_from", "date_to"]);
 const date_from = ref(props.date_from);
 const date_to = ref(props.date_to);
 
-// onMounted(()=>{
-//   console.log(props.deliveries)
-// })
+const form = useForm({
+  backorder: "",
+});
 
 const notify = () => {
   toast("Default Notification !");
@@ -87,6 +87,20 @@ const count_total_unsuccess = (data) => {
   });
   return temp_data;
 };
+
+const authorize = (data) => {
+  form.backorder = data;
+  form.put(route("back_orders.authorize", form.backorder), {
+    preserveScroll: true,
+    onSuccess: () => {
+      toast.success("Successfully authorized back order as settled", {
+        autoClose: false,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.BOTTOM_RIGHT,
+      });
+    },
+  });
+};
 </script>
 <template>
   <div class="flex justify-between mt-2">
@@ -148,6 +162,7 @@ const count_total_unsuccess = (data) => {
               <th scope="col" class="px-6 py-3">Success Sub-total</th>
               <th scope="col" class="px-6 py-3">Inprogress Sub-total</th>
               <th scope="col" class="px-6 py-3">Created at</th>
+              <th scope="col" class="px-6 py-3">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -209,6 +224,9 @@ const count_total_unsuccess = (data) => {
                 <td class="px-6 py-4 flex gap-2">
                   <Icon icon="calendar" size="sm" />
                   {{ date_time(back_order.created_at) }}
+                </td>
+                <td class="px-6 py-4 gap-2">
+                  <Button @click="authorize(back_order)">Authorize</Button>
                 </td>
               </tr>
             </template>
