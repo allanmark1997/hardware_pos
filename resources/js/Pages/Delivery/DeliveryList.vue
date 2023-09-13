@@ -226,7 +226,7 @@ const count_total_unsuccess = (data) => {
                             </small>
                             <small
                               v-else
-                              class="bg-green-400 rounded-md p-1 text-white flex gap-1"
+                              class="bg-red-400 rounded-md p-1 text-white flex gap-1"
                             >
                               <Icon icon="wrong" size="xs" />
                               Unuccess
