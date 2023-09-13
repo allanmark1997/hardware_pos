@@ -92,7 +92,6 @@ class BackOrderController extends Controller
 
     public function authorize_(Request $request, BackOrder $backOrder)
     {
-        // dd($backOrder);
         $backOrder->update([
             "status" => true
         ]);
