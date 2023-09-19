@@ -17,13 +17,17 @@ class TransactionController extends Controller
     {
         $date_from = $request->date_from ?? "";
         $date_to = $request->date_to ?? "";
+        $search = $request->search ?? "";
         $transactions = Transaction::with("accommodate_by")->with("tax")->with("special_discount")->with("transaction_details")->when($date_from !=  null || $date_from != "" && $date_to != null || $date_to != "", function ($query) use ($date_from, $date_to) {
             $query->whereBetween('created_at', [$date_from, $date_to]);
+        })->when($search != null || $search != "", function ($query) use ($search) {
+            $query->where("id", $search);
         })->paginate(20);
         return Inertia::render('Transactions/Transaction', [
             "transactions" => $transactions,
             "date_from" => $date_from,
-            "date_to" => $date_to
+            "date_to" => $date_to,
+            "search" => $search
         ]);
     }
 
@@ -31,9 +35,14 @@ class TransactionController extends Controller
     {
         $date_from = $request->date_from ?? "";
         $date_to = $request->date_to ?? "";
+        $search = $request->search ?? "";
+
         $transactions = Transaction::with("accommodate_by")->with("tax")->with("special_discount")->with("transaction_details")->when($date_from !=  null || $date_from != "" && $date_to != null || $date_to != "", function ($query) use ($date_from, $date_to) {
             $query->whereBetween('created_at', [$date_from, $date_to]);
+        })->when($search != null || $search != "", function ($query) use ($search) {
+            $query->where("id", $search);
         })->get();
+        // dd($transactions);
         $results = [];
         $grand_unsuccess_total = [];
         // $results[] = ['DATE RANGES', 'From', 'To', 'Paid grand total', "Unsuccessful grand total"];
@@ -92,7 +101,7 @@ class TransactionController extends Controller
             }
         }
 
-        return (new TransactionsExport([$results, $grand_unsuccess_total], ['Transactions', 'Grand Totals']))->download($request->date_from ?? "--" . " to " . $request->date_to ?? "--" . "Transactions.xlsx");
+        return (new TransactionsExport([$results, $grand_unsuccess_total], ['Transactions', 'Grand Totals']))->download($date_from . " to " . $date_to . "Transactions.xlsx");
     }
 
     private function calculate_sub_total_discounted($price, $discount, $quantity, $status)

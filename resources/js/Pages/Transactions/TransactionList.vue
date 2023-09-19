@@ -4,16 +4,18 @@ import { router } from "@inertiajs/vue3";
 import Icon from "@/Components/Icon.vue";
 import Pagination2 from "@/Components/Pagination2.vue";
 import TextInput from "@/Components/TextInput.vue";
+import Input from "@/Components/Input.vue";
 
 import moment from "moment";
 import { inject, onMounted, provide, ref } from "vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
-const props = defineProps(["transactions", "date_from", "date_to"]);
+const props = defineProps(["transactions", "date_from", "date_to", "search"]);
 
 const date_from = ref(props.date_from);
 const date_to = ref(props.date_to);
+const search = ref(props.search);
 
 // onMounted(()=>{
 //   console.log(props.deliveries)
@@ -59,11 +61,16 @@ const function_filter_range = () => {
   );
 };
 
+const search_ = () => {
+  router.get(route("transactions.index", { search: search.value }));
+};
+
 const function_filter_remove = () => {
   router.get(
     route("transactions.index", {
       date_from: null,
       date_to: null,
+      search: null,
     })
   );
 };
@@ -153,7 +160,6 @@ const calculate_grand_total_unsuccess = (data) => {
         </div>
         <div class="flex">
           <span class="text-md mt-2 mr-2">To</span>
-
           <TextInput
             id="date_to"
             v-model="date_to"
@@ -162,8 +168,17 @@ const calculate_grand_total_unsuccess = (data) => {
             @keyup.enter="function_filter_range"
           />
         </div>
+        <div class="flex">
+          <Input
+            v-model="search"
+            class="rounded-lg w-[30vmin]"
+            type="text"
+            label="Search transaction"
+            @keyup.enter="search_"
+          />
+        </div>
         <button
-          v-if="date_from || date_to"
+          v-if="date_from || date_to || search"
           class="h-10 my-auto mt-5"
           @click="function_filter_remove"
         >
@@ -176,6 +191,7 @@ const calculate_grand_total_unsuccess = (data) => {
         route('transactions.export', {
           date_from: date_from,
           date_to: date_to,
+          search: search,
         })
       "
       class="bg-green-400 hover:bg-green-600 hover:text-white rounded-lg my-auto p-2"
@@ -428,6 +444,7 @@ const calculate_grand_total_unsuccess = (data) => {
           :links="props.transactions.links"
           :date_from="date_from"
           :date_to="date_to"
+          :search="search"
         />
         <p class="mt-6 text-sm text-gray-500">
           Showing {{ transactions.data.length }} Transactions
