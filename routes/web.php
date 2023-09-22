@@ -8,6 +8,8 @@ use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SpecialDiscountController;
+use App\Http\Controllers\SupplierCategoryController;
+use App\Http\Controllers\SupplierProductController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\User;
@@ -69,6 +71,14 @@ Route::middleware([
         Route::post('/products/back_order/{product}', [ProductController::class, 'back_order'])->name('back_order');
     });
 
+    Route::prefix('supplier_products')->name('supplier_products.')->group(function () {
+        Route::get('/products', [SupplierProductController::class, 'index'])->name('index');
+        Route::post('/add_products', [SupplierProductController::class, 'store'])->name('store');
+        Route::post('/update_products/{product}', [SupplierProductController::class, 'update'])->name('update');
+        Route::post('/remove_products/{product}', [SupplierProductController::class, 'destroy'])->name('remove');
+        Route::get('/products/export', [SupplierProductController::class, 'export'])->name('export');
+    });
+
     Route::prefix('taxes')->name('taxes.')->group(function () {
         Route::post('/add_tax', [TaxController::class, 'store'])->name('store');
         Route::post('/update_tax/{tax}', [TaxController::class, 'update'])->name('update');
@@ -82,6 +92,11 @@ Route::middleware([
     Route::prefix('categories')->name('categories.')->group(function () {
         Route::post('/add_cat', [CategoryController::class, 'store'])->name('store');
         Route::put('/update_cat/{category}', [CategoryController::class, 'update'])->name('update');
+    });
+
+    Route::prefix('supplier_categories')->name('supplier_categories.')->group(function () {
+        Route::post('/add_cat', [SupplierCategoryController::class, 'store'])->name('store');
+        Route::put('/update_cat/{category}', [SupplierCategoryController::class, 'update'])->name('update');
     });
 
     Route::prefix('delivery')->name('deliveries.')->group(function () {

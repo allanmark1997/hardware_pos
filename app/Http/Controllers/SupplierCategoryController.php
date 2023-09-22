@@ -28,7 +28,13 @@ class SupplierCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            "name" => "required"
+        ]);
+        SupplierCategory::create([
+            "name" => $request->name
+        ]);
+        return back();
     }
 
     /**
@@ -50,9 +56,15 @@ class SupplierCategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, SupplierCategory $supplierCategory)
+    public function update(Request $request, SupplierCategory $category)
     {
-        //
+        $request->validate([
+            "name" => "required"
+        ]);
+        $category->update([
+            "name" => $request->name
+        ]);
+        return back();
     }
 
     /**

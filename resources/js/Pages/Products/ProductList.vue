@@ -475,7 +475,11 @@ onMounted(() => {
     @close="condfirmationModal = false"
     maxWidth="2xl"
   >
-    <template #title> Are you sure you want to remove this product?</template>
+    <template #title>
+      Are you sure you want to remove this product({{
+        form.product.name
+      }})?</template
+    >
     <template #content>
       <p class="text-red-500">
         This action can update the system and this is not reversible!

@@ -88,8 +88,8 @@ const logout = () => {
               </div>
               <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                 <NavLink
-                  :href="route('deliveries.index')"
-                  :active="route().current('deliveries.index')"
+                  :href="route('supplier_products.index')"
+                  :active="route().current('supplier_products.index')"
                 >
                   Supplier Products
                 </NavLink>

@@ -16,14 +16,7 @@ import { router, useForm } from "@inertiajs/vue3";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
-const props = defineProps([
-  "products",
-  "search",
-  "categories",
-  "category",
-  "tax",
-  "special_discount",
-]);
+const props = defineProps(["products", "search", "categories", "category"]);
 const search = ref(props.search);
 const category = ref(props.category);
 const add_modal = ref(false);
@@ -120,7 +113,7 @@ const open_modal_update_category = () => {
   action_modal.value = false;
 };
 const add_category = () => {
-  form_cat.post(route("categories.store"), {
+  form_cat.post(route("supplier_categories.store"), {
     preserveScroll: true,
     onSuccess: () => {
       toast.success("Successfully added category!", {
@@ -146,93 +139,17 @@ const update_selected_category = (category) => {
   form_update_cat.name = category.name;
 };
 const save_selected_category = () => {
-  form_update_cat.put(route("categories.update", category_object.value), {
-    preserveScroll: true,
-    onSuccess: () => {
-      form_update_cat.reset();
-      toast.success("Category successfully updated!", {
-        autoClose: 1000,
-        transition: toast.TRANSITIONS.FLIP,
-        position: toast.POSITION.TOP_RIGHT,
-      });
-    },
-  });
-};
-
-const open_modal_add_tax = () => {
-  addTaxModal.value = !addTaxModal.value;
-  action_modal.value = false;
-};
-const create_tax = () => {
-  form_tax.post(route("taxes.store"), {
-    preserveScroll: true,
-    onSuccess: () => {
-      toast.success("Tax successfully added!", {
-        autoClose: 1000,
-        transition: toast.TRANSITIONS.FLIP,
-        position: toast.POSITION.TOP_RIGHT,
-      });
-      form_tax.reset();
-      open_modal_add_tax();
-    },
-  });
-};
-
-const open_modal_update_tax = () => {
-  form_tax_update.tax = props.tax.tax ?? 0;
-  updateTaxEditModal.value = !updateTaxEditModal.value;
-};
-const update_tax = () => {
-  form_tax_update.post(route("taxes.update", { tax: props.tax }), {
-    preserveScroll: true,
-    onSuccess: () => {
-      toast.success("Tax successfully updated!", {
-        autoClose: 1000,
-        transition: toast.TRANSITIONS.FLIP,
-        position: toast.POSITION.TOP_RIGHT,
-      });
-      form_tax_update.reset();
-      open_modal_update_tax();
-    },
-  });
-};
-
-const open_modal_add_special = () => {
-  addSpecialModal.value = !addSpecialModal.value;
-  action_modal.value = false;
-};
-const create_special = () => {
-  form_special.post(route("specials.store"), {
-    preserveScroll: true,
-    onSuccess: () => {
-      toast.success("Special Discount successfully added!", {
-        autoClose: 1000,
-        transition: toast.TRANSITIONS.FLIP,
-        position: toast.POSITION.TOP_RIGHT,
-      });
-      form_special.reset();
-      open_modal_add_special();
-    },
-  });
-};
-
-const open_modal_update_special = () => {
-  form_special_update.discount = props.special_discount.discount ?? 0;
-  updateSpecialModal.value = !updateSpecialModal.value;
-};
-const update_special = () => {
-  form_special_update.post(
-    route("specials.update", { special: props.special_discount }),
+  form_update_cat.put(
+    route("supplier_categories.update", category_object.value),
     {
       preserveScroll: true,
       onSuccess: () => {
-        toast.success("Special Discount successfully updated!", {
+        form_update_cat.reset();
+        toast.success("Category successfully updated!", {
           autoClose: 1000,
           transition: toast.TRANSITIONS.FLIP,
           position: toast.POSITION.TOP_RIGHT,
         });
-        form_special_update.reset();
-        open_modal_update_special();
       },
     }
   );
@@ -240,97 +157,28 @@ const update_special = () => {
 
 const search_ = () => {
   router.get(
-    route("products.index", { search: search.value, category: category.value })
+    route("supplier_products.index", {
+      search: search.value,
+      category: category.value,
+    })
   );
 };
 const search_remove = () => {
-  search.value = "";
-  category.value = "";
   router.get(
-    route("products.index", { search: search.value, category: category.value })
+    route("supplier_products.index", {
+      search: null,
+      category: null,
+    })
   );
-};
-
-const add_specification = () => {
-  if (
-    specification.value.spec_name == null ||
-    specification.value.spec_name == ""
-  ) {
-    spec_name.value = "The specification name is required";
-  } else if (
-    specification.value.spec_details == null ||
-    specification.value.spec_details == ""
-  ) {
-    spec_details.value = "The specification details is required";
-  } else {
-    spec_details.value = "";
-    spec_name.value = "";
-    form.description.specification.spec_details.push(specification.value);
-    specification.value = {};
-  }
-};
-
-const openFile = () => {
-  let hidden = document.getElementById("post_image");
-  hidden.click();
-  hidden.onchange = (e) => {
-    for (let index = 0; index < e.target.files.length; index++) {
-      post_images.value.push(window.URL.createObjectURL(e.target.files[index]));
-      form.text_image = e.target.files[index];
-    }
-  };
-};
-
-const dragFile = (e) => {
-  e.preventDefault();
-  try {
-    if (e.dataTransfer.files.length > 1) {
-      // toast.error("Only 1 image can be selected");
-      return;
-    } else {
-      for (const file of e.dataTransfer.files) {
-        var objectURL = URL.createObjectURL(file);
-        post_images.value.push(objectURL);
-        form.text_image = file;
-      }
-    }
-  } catch (error) {
-    // toast.error(error);
-  }
-};
-
-const remove_image = (key) => {
-  post_images.value.splice(key, 1);
-  form.text_image = null;
-};
-
-const remove_spec = (key) => {
-  form.description.specification.spec_details.splice(key, 1);
 };
 </script>
 <template>
-  <AppLayout title="Dashboard">
+  <AppLayout title="Supplier Products">
     <template #header>
       <div class="flex justify-between">
         <h2 class="font-semibold text-lg text-gray-800 leading-tight">
-          Products management
+          Supplier Products
         </h2>
-        <div class="-mt-4">
-          <small
-            class="font-semibold text-xs text-white border p-1 rounded-lg bg-green-400 flex gap-1"
-          >
-            <Icon icon="tax" size="sm" />
-
-            VAT: {{ props.tax?.tax }}%
-          </small>
-          <h2
-            class="font-semibold text-xs text-white border p-1 rounded-lg mt-1 bg-red-400 -mb-5 flex gap-1"
-          >
-            <Icon icon="wheelchair" size="sm" />
-
-            SD: {{ props.special_discount?.discount }}%
-          </h2>
-        </div>
       </div>
     </template>
     <div class="py-">
@@ -373,64 +221,6 @@ const remove_spec = (key) => {
               </a>
             </button>
           </div>
-          <!-- <div class="grid grid-cols-5 gap-2 ml-1">
-            <button @click="open_modal_add"
-              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
-              <a class="my-auto gap-2 flex">
-                <Icon icon="cart" size="sm" />
-                <span>Add product</span>
-              </a>
-            </button>
-            <button @click="open_modal_add_category"
-              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
-              <a class="my-auto gap-2 flex">
-                <Icon icon="tag" size="sm" />
-                <span>Add category</span>
-              </a>
-            </button>
-
-            <button @click="open_modal_update_category"
-              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
-              <a class="my-auto gap-1 flex">
-                <Icon icon="pencil" size="sm" />
-                <span>Edit category</span>
-              </a>
-            </button>
-            <button v-if="props.tax?.tax == undefined || props.tax?.tax == null" @click="open_modal_add_tax"
-              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
-              <a class="my-auto gap-1 flex">
-                <Icon icon="tax" size="sm" />
-
-                <span>Add Tax</span>
-              </a>
-            </button>
-            <button v-if="props.tax?.tax != undefined || props.tax?.tax != null" @click="open_modal_update_tax"
-              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
-              <a class="my-auto gap-1 flex">
-                <Icon icon="tax" size="sm" />
-
-                <span>Edit Tax</span>
-              </a>
-            </button>
-            <button v-if="props.special_discount?.discount == undefined ||
-              props.special_discount?.discount == null
-              " @click="open_modal_add_special"
-              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
-              <a class="my-auto gap-1 flex">
-                <Icon icon="wheelchair" size="sm" />
-                <span>Add Special Discount</span>
-              </a>
-            </button>
-            <button v-if="props.special_discount?.discount != undefined ||
-              props.special_discount?.discount != null
-              " @click="open_modal_update_special"
-              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
-              <a class="my-auto gap-1 flex">
-                <Icon icon="wheelchair" size="sm" />
-                <span>Edit Special Discount</span>
-              </a>
-            </button>
-          </div> -->
         </div>
 
         <div class="mt-2 overflow-hidden">
@@ -439,8 +229,6 @@ const remove_spec = (key) => {
             :search="search"
             :category="category"
             :categories="categories"
-            :tax="tax"
-            :special_discount="special_discount"
           />
         </div>
       </div>
@@ -858,7 +646,7 @@ const remove_spec = (key) => {
           </div>
         </div>
         <div class="p-2 overflow-auto h-[380px]">
-          <template v-for="(category, key) in props.categories" :key="key">
+          <template v-for="(category, key) in categories" :key="key">
             <div
               class="flex justify-between border-2 border-gray-200 p-2 rounded-lg shadow-sm hover:border-gray-200 mb-1"
             >
