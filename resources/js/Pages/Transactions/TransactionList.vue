@@ -62,7 +62,13 @@ const function_filter_range = () => {
 };
 
 const search_ = () => {
-  router.get(route("transactions.index", { search: search.value }));
+  router.get(
+    route("transactions.index", {
+      search: search.value,
+      date_from: date_from.value,
+      date_to: date_to.value,
+    })
+  );
 };
 
 const function_filter_remove = () => {

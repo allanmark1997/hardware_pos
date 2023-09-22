@@ -4,16 +4,18 @@ import { router } from "@inertiajs/vue3";
 import Icon from "@/Components/Icon.vue";
 import Pagination2 from "@/Components/Pagination2.vue";
 import TextInput from "@/Components/TextInput.vue";
+import Input from "@/Components/Input.vue";
 
 import moment from "moment";
 import { inject, onMounted, provide, ref } from "vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
-const props = defineProps(["deliveries", "date_from", "date_to"]);
+const props = defineProps(["deliveries", "date_from", "date_to", "search"]);
 
 const date_from = ref(props.date_from);
 const date_to = ref(props.date_to);
+const search = ref(props.search);
 
 // onMounted(()=>{
 //   console.log(props.deliveries)
@@ -59,11 +61,22 @@ const function_filter_range = () => {
   );
 };
 
+const search_ = () => {
+  router.get(
+    route("deliveries.index", {
+      search: search.value,
+      date_from: date_from.value,
+      date_to: date_to.value,
+    })
+  );
+};
+
 const function_filter_remove = () => {
   router.get(
     route("deliveries.index", {
       date_from: null,
       date_to: null,
+      search: null,
     })
   );
 };
@@ -112,8 +125,17 @@ const count_total_unsuccess = (data) => {
             @keyup.enter="function_filter_range"
           />
         </div>
+        <div class="flex">
+          <Input
+            v-model="search"
+            class="rounded-lg w-[30vmin]"
+            type="text"
+            label="Search transaction"
+            @keyup.enter="search_"
+          />
+        </div>
         <button
-          v-if="date_from || date_to"
+          v-if="date_from || date_to || search"
           class="h-10 my-auto mt-5"
           @click="function_filter_remove"
         >
@@ -266,6 +288,7 @@ const count_total_unsuccess = (data) => {
           :links="props.deliveries.links"
           :date_from="date_from"
           :date_to="date_to"
+          :search="search"
         />
         <p class="mt-6 text-sm text-gray-500">
           Showing {{ deliveries.data.length }} Deliveries

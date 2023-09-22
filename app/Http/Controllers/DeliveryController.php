@@ -17,26 +17,33 @@ class DeliveryController extends Controller
      */
     public function index(Request $request)
     {
+        $search = $request->search ?? "";
         $date_from = $request->date_from ?? "";
         $date_to = $request->date_to ?? "";
         $deliveries = Delivery::with("details")->with("supplier")->with("user_receiver")->when($date_from !=  null || $date_from != "" && $date_to != null || $date_to != "", function ($query) use ($date_from, $date_to) {
             $query->whereBetween('created_at', [$date_from, $date_to]);
+        })->when($search != null || $search != "", function ($query) use ($search) {
+            $query->where("id", $search);
         })->paginate(20);
         // dd($deliveries);
         return Inertia::render('Delivery/Delivery', [
             "deliveries" => $deliveries,
             "date_from" => $date_from,
-            "date_to" => $date_to
+            "date_to" => $date_to,
+            "search" => $search
         ]);
     }
 
     public function export(Request $request)
     {
+        $search = $request->search ?? "";
         $date_from = $request->date_from ?? "";
         $date_to = $request->date_to ?? "";
         // return Excel::download(new DeliveryExport, 'deliveries.xlsx');
         $deliveries = Delivery::with("details")->with("supplier")->with("user_receiver")->when($date_from !=  null || $date_from != "" && $date_to != null || $date_to != "", function ($query) use ($date_from, $date_to) {
             $query->whereBetween('created_at', [$date_from, $date_to]);
+        })->when($search != null || $search != "", function ($query) use ($search) {
+            $query->where("id", $search);
         })->get();
 
         $results = [];

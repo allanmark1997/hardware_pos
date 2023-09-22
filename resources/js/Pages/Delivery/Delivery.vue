@@ -5,7 +5,7 @@ import Button from "@/Components/Button.vue";
 
 import { inject, provide, ref } from "vue";
 
-const props = defineProps(["deliveries", "date_from", "date_to"]);
+const props = defineProps(["deliveries", "date_from", "date_to", "search"]);
 </script>
 <template>
   <AppLayout title="Delivery">
@@ -22,6 +22,7 @@ const props = defineProps(["deliveries", "date_from", "date_to"]);
           :deliveries="deliveries"
           :date_from="date_from"
           :date_to="date_to"
+          :search="search"
         />
       </div>
     </div>
