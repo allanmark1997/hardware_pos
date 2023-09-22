@@ -16,7 +16,13 @@ import { router, useForm } from "@inertiajs/vue3";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
-const props = defineProps(["products", "search", "categories", "category"]);
+const props = defineProps([
+  "products",
+  "search",
+  "categories",
+  "category",
+  "users",
+]);
 const search = ref(props.search);
 const category = ref(props.category);
 const add_modal = ref(false);
@@ -344,14 +350,43 @@ const search_remove = () => {
           <div class="col-span-12">
             <Input type="text" label="Enter product name" v-model="form.name" />
             <JetInputError :message="form.errors.name" class="mt-2" />
-          </div>
-          <div class="col-span-12">
-            <Input
-              type="text"
-              label="Enter product barcode"
-              v-model="form.barcode"
-            />
-            <JetInputError :message="form.errors.barcode" class="mt-2" />
+            <div
+              v-if="form.name != ''"
+              class="absolute z-10 w-60 bg-white rounded shadow"
+            >
+              <ul
+                class="overflow-y-auto py-1 h-48 text-gray-700"
+                aria-labelledby="dropdownUsersButton"
+              >
+                <li v-for="(drpUser, index) in users" :key="index">
+                  <a
+                    v-if="
+                      drpUser.name
+                        .toLowerCase()
+                        .includes(form.name.toLowerCase())
+                    "
+                    class="flex items-center py-2 px-4 hover:bg-gray-100"
+                    @click="form.name = drpUser.name"
+                  >
+                    <img
+                      class="mr-2 w-6 h-6 rounded-full"
+                      :src="drpUser.profile_photo_url"
+                      alt="Jese image"
+                    />
+                    {{ drpUser.name }}
+                  </a>
+                </li>
+              </ul>
+              <div class="flex justify-center">
+                <small>Results</small>
+              </div>
+              <a
+                @click="form.name = ''"
+                class="flex items-center p-3 text-sm font-medium text-blue-600 bg-gray-50 border-t border-gray-200 hover:bg-gray-100 hover:underline"
+              >
+                clear search
+              </a>
+            </div>
           </div>
 
           <div class="col-span-12">
