@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\SupplierCategory;
 use App\Models\SupplierProduct;
+use App\Models\supplier;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -28,14 +30,16 @@ class SupplierProductController extends Controller
         })->paginate(20);
         // dd($products);
         $categories = SupplierCategory::orderBy("name", 'asc')->get();
-        $users = User::get();
-
+        $suppliers = supplier::get();
+        $product_lists = Product::get();
+        
         return Inertia::render('SupplierProducts/Product', [
             "products" => $products,
             "search" => $search,
             "categories" => $categories,
             "category" => $category,
-            "users" => $users
+            "suppliers" => $suppliers,
+            "product_lists" => $product_lists,
         ]);
     }
 

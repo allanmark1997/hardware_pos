@@ -82,7 +82,7 @@ class DeliveryController extends Controller
                         "",
                         '',
                         '',
-                        $delivery->details[$i]['product']['name'],
+                        $delivery->details[$i]['product']['product']['name'],
                         $delivery->details[$i]['quantity'],
                         "PHP " . number_format($delivery->details[$i]['price']->price, 2),
                         "PHP " . number_format($delivery->details[$i]['quantity'] * $delivery->details[$i]['price']->price, 2),
@@ -133,7 +133,7 @@ class DeliveryController extends Controller
         if (count($data) != 0) {
             foreach ($data as $key => $value) {
                 $array_sample[] =
-                    'Name: ' . $value["product"]["name"] .
+                    'Name: ' . $value["product"]["product"]["name"] .
                     ', Quantity: ' . $value['quantity'] .
                     ', Price: ' . "PHP" . number_format($value['price'], 2);
             }

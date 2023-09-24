@@ -21,7 +21,8 @@ const props = defineProps([
   "search",
   "categories",
   "category",
-  "users",
+  "product_lists",
+  "suppliers"
 ]);
 const search = ref(props.search);
 const category = ref(props.category);
@@ -31,9 +32,6 @@ const update_modal_category = ref(false);
 
 const category_object = ref(false);
 
-const specification = ref({});
-const spec_name = ref("");
-const spec_details = ref("");
 const post_images = ref([]);
 const addTaxModal = ref(false);
 const updateTaxEditModal = ref(false);
@@ -41,21 +39,16 @@ const addSpecialModal = ref(false);
 const updateSpecialModal = ref(false);
 const action_modal = ref(false);
 
+const search_results_products_to_add = ref(false);
+const search_results_suppliers_to_add = ref(false);
+
 const form = useForm({
-  name: "",
-  barcode: "",
-  description: {
-    details: "",
-    specification: {
-      spec_title: "",
-      spec_details: [],
-    },
-  },
-  product_image: "",
+  product_id: false,
+  product_name: "",
+  supplier_id: false,
+  supplier_name: "",
   category: "",
-  sale_discount: 0,
   price: "",
-  text_image: null,
 });
 
 const form_cat = useForm({
@@ -64,22 +57,6 @@ const form_cat = useForm({
 
 const form_update_cat = useForm({
   name: null,
-});
-
-const form_tax = useForm({
-  tax: "",
-});
-
-const form_tax_update = useForm({
-  tax: "",
-});
-
-const form_special = useForm({
-  discount: "",
-});
-
-const form_special_update = useForm({
-  discount: "",
 });
 
 const add_product = () => {
@@ -177,6 +154,10 @@ const search_remove = () => {
     })
   );
 };
+
+const open_search_product = () => {
+  search_results_products_to_add.value = !search_results_products_to_add.value
+}
 </script>
 <template>
   <AppLayout title="Supplier Products">
@@ -191,37 +172,24 @@ const search_remove = () => {
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="flex justify-between">
           <div class="flex gap-2">
-            <Input
-              v-model="search"
-              class="rounded-lg mb-2 w-[30vmin]"
-              type="text"
-              label="Search product"
-              @keyup.enter="search_"
-            />
+            <Input v-model="search" class="rounded-lg mb-2 w-[30vmin]" type="text" label="Search product"
+              @keyup.enter="search_" />
 
             <select
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-auto h-10 mt-5"
-              v-model="category"
-              @change="search_"
-            >
+              v-model="category" @change="search_">
               <option selected value="">Choose a category</option>
               <template v-for="(category, key) in props.categories" :key="key">
                 <option :value="category.id">{{ category.name }}</option>
               </template>
             </select>
-            <button
-              v-if="category || search"
-              class="h-10 my-auto mt-5"
-              @click="search_remove"
-            >
+            <button v-if="category || search" class="h-10 my-auto mt-5" @click="search_remove">
               <Icon icon="close_icon" size="sm" />
             </button>
           </div>
           <div class="">
-            <button
-              @click="action_modal = true"
-              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
-            >
+            <button @click="action_modal = true"
+              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
               <a class="my-auto gap-2 item-center flex">
                 <Icon icon="option" size="sm" />
               </a>
@@ -230,102 +198,71 @@ const search_remove = () => {
         </div>
 
         <div class="mt-2 overflow-hidden">
-          <ProductList
-            :products="products"
-            :search="search"
-            :category="category"
-            :categories="categories"
-          />
+          <ProductList :products="products" :search="search" :category="category" :categories="categories" />
         </div>
       </div>
     </div>
-    <buttonGroup
-      :show="action_modal"
-      @close="action_modal = false"
-      maxWidth="2xl"
-    >
+    <buttonGroup :show="action_modal" @close="action_modal = false" maxWidth="2xl">
       <template #title>Actions</template>
       <template #content>
         <div class="grid grid-cols-3 gap-3">
-          <button
-            @click="open_modal_add"
-            class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
-          >
+          <button @click="open_modal_add"
+            class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
             <a class="my-auto gap-2 flex">
               <Icon icon="cart" size="sm" />
               <span>Add product</span>
             </a>
           </button>
-          <button
-            @click="open_modal_add_category"
-            class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
-          >
+          <button @click="open_modal_add_category"
+            class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
             <a class="my-auto gap-2 flex">
               <Icon icon="tag" size="sm" />
               <span>Add category</span>
             </a>
           </button>
 
-          <button
-            @click="open_modal_update_category"
-            class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
-          >
+          <button @click="open_modal_update_category"
+            class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
             <a class="my-auto gap-1 flex">
               <Icon icon="pencil" size="sm" />
               <span>Edit category</span>
             </a>
           </button>
-          <button
-            v-if="props.tax?.tax == undefined || props.tax?.tax == null"
-            @click="open_modal_add_tax"
-            class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
-          >
+          <button v-if="props.tax?.tax == undefined || props.tax?.tax == null" @click="open_modal_add_tax"
+            class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
             <a class="my-auto gap-1 flex">
               <Icon icon="tax" size="sm" />
               <span>Add Tax</span>
             </a>
           </button>
-          <button
-            v-if="props.tax?.tax != undefined || props.tax?.tax != null"
-            @click="open_modal_update_tax"
-            class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
-          >
+          <button v-if="props.tax?.tax != undefined || props.tax?.tax != null" @click="open_modal_update_tax"
+            class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
             <a class="my-auto gap-1 flex">
               <Icon icon="tax" size="sm" />
 
               <span>Edit Tax</span>
             </a>
           </button>
-          <button
-            v-if="
-              props.special_discount?.discount == undefined ||
-              props.special_discount?.discount == null
-            "
-            @click="open_modal_add_special"
-            class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
-          >
+          <button v-if="props.special_discount?.discount == undefined ||
+            props.special_discount?.discount == null
+            " @click="open_modal_add_special"
+            class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
             <a class="my-auto gap-1 flex">
               <Icon icon="wheelchair" size="sm" />
               <span>Add Special Discount</span>
             </a>
           </button>
-          <button
-            v-if="
-              props.special_discount?.discount != undefined ||
-              props.special_discount?.discount != null
-            "
-            @click="open_modal_update_special"
-            class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
-          >
+          <button v-if="props.special_discount?.discount != undefined ||
+            props.special_discount?.discount != null
+            " @click="open_modal_update_special"
+            class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
             <a class="my-auto gap-1 flex">
               <Icon icon="wheelchair" size="sm" />
               <span>Edit Special Discount</span>
             </a>
           </button>
-          <a
-            :href="route('products.export')"
-            class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
-          >
+          <a :href="route('products.export')"
+            class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
             <a class="my-auto gap-1 flex">
               <Icon icon="report" size="sm" />
               <span>Export Inventory</span>
@@ -334,10 +271,7 @@ const search_remove = () => {
         </div>
       </template>
       <template #footer>
-        <SecondaryButton
-          @click="action_modal = false"
-          class="bg-green-200 mt-2 hover:bg-green-400"
-        >
+        <SecondaryButton @click="action_modal = false" class="bg-green-200 mt-2 hover:bg-green-400">
           close
         </SecondaryButton>
       </template>
@@ -347,149 +281,94 @@ const search_remove = () => {
       <template #title> Add product here!</template>
       <template #content>
         <div class="grid grid-cols-12 gap-1">
-          <div class="col-span-12">
-            <Input type="text" label="Enter product name" v-model="form.name" />
-            <JetInputError :message="form.errors.name" class="mt-2" />
-            <div
-              v-if="form.name != ''"
-              class="absolute z-10 w-60 bg-white rounded shadow"
-            >
-              <ul
-                class="overflow-y-auto py-1 h-48 text-gray-700"
-                aria-labelledby="dropdownUsersButton"
-              >
-                <li v-for="(drpUser, index) in users" :key="index">
-                  <a
-                    v-if="
-                      drpUser.name
-                        .toLowerCase()
-                        .includes(form.name.toLowerCase())
-                    "
-                    class="flex items-center py-2 px-4 hover:bg-gray-100"
-                    @click="form.name = drpUser.name"
-                  >
-                    <img
-                      class="mr-2 w-6 h-6 rounded-full"
-                      :src="drpUser.profile_photo_url"
-                      alt="Jese image"
-                    />
-                    {{ drpUser.name }}
+          <div class="col-span-6">
+            <Input type="text" label="Product name view" v-model="form.product_name" disabled />
+            <JetInputError :message="form.errors.product_name" class="mt-2" />
+          </div>
+          <div class="col-span-5">
+            <Input :disabled="search_results_products_to_add != true" type="text" label="Search product name"
+              v-model="form.product_name" />
+            <div v-if="search_results_products_to_add == true" class="absolute z-50 w-60 bg-white rounded shadow">
+              <ul class="overflow-y-auto py-1 h-[20vmin] text-gray-700" aria-labelledby="dropdownUsersButton">
+                <li v-for="(product, index) in product_lists" :key="index">
+                  <a v-if="product.name
+                    .toLowerCase()
+                    .includes(form.product_name.toLowerCase())
+                    " class="flex items-center py-2 px-4 hover:bg-gray-100 cursor-pointer"
+                    @click="(form.product_name = product.name), (form.product_id = product.id), (search_results_products_to_add = false)">
+                    <img class="mr-2 w-6 h-6 rounded-full" :src="product.product_image" />
+                    {{ product.name }}
                   </a>
                 </li>
               </ul>
               <div class="flex justify-center">
                 <small>Results</small>
               </div>
-              <a
-                @click="form.name = ''"
-                class="flex items-center p-3 text-sm font-medium text-blue-600 bg-gray-50 border-t border-gray-200 hover:bg-gray-100 hover:underline"
-              >
+              <a @click="(search_results_products_to_add = false), (form.product_name = ''), (form.product_id = false)"
+                class="flex items-center p-3 text-sm font-medium text-blue-600 bg-gray-50 border-t border-gray-200 hover:bg-gray-100 hover:underline">
                 clear search
               </a>
             </div>
           </div>
+          <div class="col-span-1 my-auto flex">
+            <button v-if="form.product_id" class="h-10 my-auto mt-5"
+              @click="(search_results_products_to_add = false), (form.product_name = ''), (form.product_id = false)">
+              <Icon icon="close_icon" size="sm" />
+            </button>
+            <button @click="open_search_product"
+              class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center mt-4">
+              <Icon icon="search_icon" size="sm" />
+            </button>
+          </div>
 
-          <div class="col-span-12">
-            <textarea
-              class="w-full rounded-lg border-1 border-gray-300 h-[100px] focus:ring-yellow-500 focus:border-yellow-500"
-              placeholder="Product description"
-              v-model="form.description.details"
-            >
-            </textarea>
-            <!-- <JetInputError
-              :message="form.errors.description.details"
-              class="mt-2"
-            /> -->
+          <div class="col-span-6">
+            <Input type="text" label="Supplier name view" v-model="form.supplier_name" disabled />
+            <JetInputError :message="form.errors.supplier_name" class="mt-2" />
           </div>
-          <div class="col-span-12">
-            <Input
-              type="text"
-              label="Specification title"
-              v-model="form.description.specification.spec_title"
-            />
-            <!-- <JetInputError
-              :message="form.errors.description.specification.spec_title"
-              class="mt-2"
-            /> -->
-          </div>
-          <div
-            v-if="form.description.specification.spec_title != ''"
-            class="col-span-3"
-          >
-            <Input
-              type="text"
-              label="Specification name"
-              v-model="specification.spec_name"
-            />
-            <JetInputError :message="spec_name" class="mt-2" />
-          </div>
-          <div
-            v-if="form.description.specification.spec_title != ''"
-            class="col-span-6"
-          >
-            <Input
-              type="text"
-              label="Specification details"
-              v-model="specification.spec_details"
-            />
-            <JetInputError :message="spec_details" class="mt-2" />
-          </div>
-          <div
-            v-if="form.description.specification.spec_title != ''"
-            class="col-span-3 flex flex-row item-center"
-          >
-            <SecondaryButton
-              @click="add_specification"
-              class="bg-green-200 mt-2 hover:bg-green-400"
-            >
-              Add Specification
-            </SecondaryButton>
-          </div>
-          <div
-            v-if="
-              form.description.specification.spec_details.length != 0 &&
-              form.description.specification.spec_title != ''
-            "
-            class="col-span-12"
-          >
-            <div class="grid grid-cols-12 border p-2 gap-2">
-              <template
-                v-for="(spec, key) in form.description.specification
-                  .spec_details"
-                :key="key"
-              >
-                <div class="col-span-11 border-b-2">
-                  <p>{{ spec.spec_details }}</p>
-                  <span>{{ spec.spec_name }}</span>
-                </div>
-                <div class="col-span-1">
-                  <Button
-                    class="bg-red-400 hover:bg-red-500 hover:text-white"
-                    title="Remove spec"
-                    @click="remove_spec(key)"
-                    >x</Button
-                  >
-                </div>
-              </template>
+          <div class="col-span-5">
+            <Input :disabled="search_results_suppliers_to_add != true" type="text" label="Search supplier's name"
+              v-model="form.supplier_name" />
+            <div v-if="search_results_suppliers_to_add == true" class="absolute z-50 w-60 bg-white rounded shadow">
+              <ul class="overflow-y-auto py-1 h-[20vmin] text-gray-700" aria-labelledby="dropdownUsersButton">
+                <li v-for="(supplier, index) in suppliers" :key="index">
+                  <a v-if="supplier.supplier_name
+                    .toLowerCase()
+                    .includes(form.supplier_name.toLowerCase())
+                    " class="flex items-center py-2 px-4 hover:bg-gray-100 cursor-pointer"
+                    @click="(form.supplier_name = supplier.supplier_name), (form.supplier_id = supplier.id), (search_results_suppliers_to_add = false)">
+                    <img class="mr-2 w-6 h-6 rounded-full" :src="supplier.image" />
+                    {{ supplier.supplier_name }}
+                  </a>
+                </li>
+              </ul>
+              <div class="flex justify-center">
+                <small>Results</small>
+              </div>
+              <a @click="(search_results_suppliers_to_add = false), (form.supplier_name = ''), (form.supplier_id = false)"
+                class="flex items-center p-3 text-sm font-medium text-blue-600 bg-gray-50 border-t border-gray-200 hover:bg-gray-100 hover:underline">
+                clear search
+              </a>
             </div>
           </div>
-          <div class="col-span-6">
+          <div class="col-span-1 my-auto flex">
+            <button v-if="form.supplier_id" class="h-10 my-auto mt-5"
+              @click="(search_results_suppliers_to_add = false), (form.supplier_name = ''), (form.supplier_id = false)">
+              <Icon icon="close_icon" size="sm" />
+            </button>
+            <button @click="search_results_suppliers_to_add = true"
+              class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center mt-4">
+              <Icon icon="search_icon" size="sm" />
+            </button>
+          </div>
+
+          <div class="col-span-full">
             <Input type="number" label="Product price" v-model="form.price" />
             <JetInputError :message="form.errors.price" class="mt-2" />
-          </div>
-          <div class="col-span-6">
-            <Input
-              type="number"
-              label="Product discount"
-              v-model="form.sale_discount"
-            />
-            <JetInputError :message="form.errors.sale_discount" class="mt-2" />
           </div>
           <div class="col-span-12">
             <select
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full h-10 my-auto mt-5"
-              v-model="form.category"
-            >
+              v-model="form.category">
               <option selected value="">Choose a category</option>
               <template v-for="(category, key) in props.categories" :key="key">
                 <option :value="category.id">{{ category.name }}</option>
@@ -497,185 +376,59 @@ const search_remove = () => {
             </select>
             <JetInputError :message="form.errors.category" class="mt-2" />
           </div>
-          <div
-            v-if="post_images == 0"
-            class="col-span-12 flex items-center justify-center w-full mt-4"
-            @dragover.prevent
-            @drop.prevent
-          >
-            <label
-              @drop="dragFile"
-              @click="openFile"
-              for="dropzone-file"
-              class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
-            >
-              <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                <svg
-                  aria-hidden="true"
-                  class="w-10 h-10 mb-3 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                  ></path>
-                </svg>
-                <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                  <span class="font-semibold">Click to upload</span> or drag and
-                  drop
-                </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">
-                  PNG, JPG or GIF (MAX. 800x400px)
-                </p>
-              </div>
-              <input
-                id="post_image"
-                type="file"
-                accept="image/png, image/gif, image/jpeg"
-                class="hidden"
-              />
-            </label>
-          </div>
-
-          <div class="col-span-12 flex items-center justify-center mt-4">
-            <template v-for="(image, key) in post_images" :key="key">
-              <div class="w-auto mt-2 mx-auto lg:max-w-[20vmin] z-30">
-                <div class="shadow-lg bg-white p-3">
-                  <img
-                    class="w-full max-h-[40vmin] object-cover"
-                    :src="image"
-                  />
-                  <ul class="mt-3 flex justify-end flex-wrap">
-                    <li>
-                      <button
-                        @click="remove_image(key)"
-                        class="flex text-gray-400 hover:text-gray-600"
-                      >
-                        <Icon icon="trash" size="sm" />
-                        <span class="text-red-500">Remove</span>
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </template>
-          </div>
-          <JetInputError
-            :message="form.errors.text_image"
-            class="mt-2 col-span-12"
-          />
         </div>
       </template>
       <template #footer>
-        <SecondaryButton
-          @click="add_modal = false"
-          class="mr-2 hover:bg-red-500"
-        >
+        <SecondaryButton @click="add_modal = false" class="mr-2 hover:bg-red-500">
           nevermind
         </SecondaryButton>
-        <Button
-          :class="{ 'opacity-25': form.processing }"
-          :disabled="form.processing"
-          class="bg-green-200 hover:bg-green-400"
-          @click="add_product"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-auto"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-            /></svg
-          >&nbsp;Submit
+        <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing"
+          class="bg-green-200 hover:bg-green-400" @click="add_product">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+          </svg>&nbsp;Submit
         </Button>
       </template>
     </JetDialogModal>
 
-    <JetDialogModal
-      :show="add_modal_category"
-      @close="add_modal_category = false"
-      maxWidth="2xl"
-    >
+    <JetDialogModal :show="add_modal_category" @close="add_modal_category = false" maxWidth="2xl">
       <template #title> Add category here!</template>
       <template #content>
         <div class="grid grid-cols-12 gap-1">
           <div class="col-span-12">
-            <Input
-              type="text"
-              label="Enter product category name"
-              v-model="form_cat.name"
-            />
+            <Input type="text" label="Enter product category name" v-model="form_cat.name" />
             <JetInputError :message="form_cat.errors.name" class="mt-2" />
           </div>
         </div>
       </template>
       <template #footer>
-        <SecondaryButton
-          @click="add_modal_category = false"
-          class="mr-2 hover:bg-red-400"
-        >
+        <SecondaryButton @click="add_modal_category = false" class="mr-2 hover:bg-red-400">
           nevermind
         </SecondaryButton>
-        <Button
-          :class="{ 'opacity-25': form.processing }"
-          :disabled="form.processing"
-          class="bg-green-200 hover:bg-green-400"
-          @click="add_category"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-auto"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-            /></svg
-          >&nbsp;Submit
+        <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing"
+          class="bg-green-200 hover:bg-green-400" @click="add_category">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+          </svg>&nbsp;Submit
         </Button>
       </template>
     </JetDialogModal>
 
-    <JetDialogModal
-      :show="update_modal_category"
-      @close="update_modal_category = false"
-      maxWidth="2xl"
-    >
+    <JetDialogModal :show="update_modal_category" @close="update_modal_category = false" maxWidth="2xl">
       <template #title> Update category here!</template>
       <template #content>
         <div class="grid grid-cols-12 gap-1">
           <div class="col-span-10">
-            <Input
-              type="text"
-              label="Enter product category name"
-              :disabled="form_update_cat.name == null"
-              v-model="form_update_cat.name"
-            />
-            <JetInputError
-              :message="form_update_cat.errors.name"
-              class="mt-2"
-            />
+            <Input type="text" label="Enter product category name" :disabled="form_update_cat.name == null"
+              v-model="form_update_cat.name" />
+            <JetInputError :message="form_update_cat.errors.name" class="mt-2" />
           </div>
           <div class="col-span-2 my-auto">
-            <SecondaryButton
-              @click="save_selected_category"
-              class="mr-2 hover:bg-green-300 mt-4"
-            >
+            <SecondaryButton @click="save_selected_category" class="mr-2 hover:bg-green-300 mt-4">
               Save
             </SecondaryButton>
           </div>
@@ -683,8 +436,7 @@ const search_remove = () => {
         <div class="p-2 overflow-auto h-[380px]">
           <template v-for="(category, key) in categories" :key="key">
             <div
-              class="flex justify-between border-2 border-gray-200 p-2 rounded-lg shadow-sm hover:border-gray-200 mb-1"
-            >
+              class="flex justify-between border-2 border-gray-200 p-2 rounded-lg shadow-sm hover:border-gray-200 mb-1">
               <div>
                 <p class="">
                   {{ category.name }}
@@ -699,28 +451,17 @@ const search_remove = () => {
         </div>
       </template>
       <template #footer>
-        <SecondaryButton
-          @click="update_modal_category = false"
-          class="mr-2 hover:bg-red-300"
-        >
+        <SecondaryButton @click="update_modal_category = false" class="mr-2 hover:bg-red-300">
           Close
         </SecondaryButton>
       </template>
     </JetDialogModal>
-    <JetDialogModal
-      :show="addTaxModal"
-      @close="addTaxModal = false"
-      maxWidth="2xl"
-    >
+    <JetDialogModal :show="addTaxModal" @close="addTaxModal = false" maxWidth="2xl">
       <template #title> Add new tax</template>
       <template #content>
         <div class="grid grid-cols-12 gap-1">
           <div class="col-span-12">
-            <Input
-              type="number"
-              label="Value added tax"
-              v-model="form_tax.tax"
-            />
+            <Input type="number" label="Value added tax" v-model="form_tax.tax" />
             <JetInputError :message="form_tax.errors.tax" class="mt-2" />
           </div>
         </div>
@@ -729,43 +470,22 @@ const search_remove = () => {
         <SecondaryButton @click="addTaxModal = false" class="mr-2">
           nevermind
         </SecondaryButton>
-        <Button
-          :class="{ 'opacity-25': form_tax.processing }"
-          :disabled="form_tax.processing"
-          class="bg-green-200 hover:bg-green-400"
-          @click="create_tax"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-auto"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-            /></svg
-          >&nbsp;Submit
+        <Button :class="{ 'opacity-25': form_tax.processing }" :disabled="form_tax.processing"
+          class="bg-green-200 hover:bg-green-400" @click="create_tax">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+          </svg>&nbsp;Submit
         </Button>
       </template>
     </JetDialogModal>
-    <JetDialogModal
-      :show="updateTaxEditModal"
-      @close="updateTaxEditModal = false"
-      maxWidth="2xl"
-    >
+    <JetDialogModal :show="updateTaxEditModal" @close="updateTaxEditModal = false" maxWidth="2xl">
       <template #title> Update tax</template>
       <template #content>
         <div class="grid grid-cols-12 gap-1">
           <div class="col-span-12">
-            <Input
-              type="number"
-              label="Value added tax"
-              v-model="form_tax_update.tax"
-            />
+            <Input type="number" label="Value added tax" v-model="form_tax_update.tax" />
             <JetInputError :message="form_tax_update.errors.tax" class="mt-2" />
           </div>
         </div>
@@ -774,47 +494,23 @@ const search_remove = () => {
         <SecondaryButton @click="updateTaxEditModal = false" class="mr-2">
           nevermind
         </SecondaryButton>
-        <Button
-          :class="{ 'opacity-25': form_tax.processing }"
-          :disabled="form_tax.processing"
-          class="bg-green-200 hover:bg-green-400"
-          @click="update_tax"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-auto"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-            /></svg
-          >&nbsp;Submit
+        <Button :class="{ 'opacity-25': form_tax.processing }" :disabled="form_tax.processing"
+          class="bg-green-200 hover:bg-green-400" @click="update_tax">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+          </svg>&nbsp;Submit
         </Button>
       </template>
     </JetDialogModal>
-    <JetDialogModal
-      :show="addSpecialModal"
-      @close="addSpecialModal = false"
-      maxWidth="2xl"
-    >
+    <JetDialogModal :show="addSpecialModal" @close="addSpecialModal = false" maxWidth="2xl">
       <template #title> Add new Special Discount</template>
       <template #content>
         <div class="grid grid-cols-12 gap-1">
           <div class="col-span-12">
-            <Input
-              type="number"
-              label="Special discount"
-              v-model="form_special.discount"
-            />
-            <JetInputError
-              :message="form_special.errors.discount"
-              class="mt-2"
-            />
+            <Input type="number" label="Special discount" v-model="form_special.discount" />
+            <JetInputError :message="form_special.errors.discount" class="mt-2" />
           </div>
         </div>
       </template>
@@ -822,47 +518,23 @@ const search_remove = () => {
         <SecondaryButton @click="addSpecialModal = false" class="mr-2">
           nevermind
         </SecondaryButton>
-        <Button
-          :class="{ 'opacity-25': form_special.processing }"
-          :disabled="form_special.processing"
-          class="bg-green-200 hover:bg-green-400"
-          @click="create_special"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-auto"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-            /></svg
-          >&nbsp;Submit
+        <Button :class="{ 'opacity-25': form_special.processing }" :disabled="form_special.processing"
+          class="bg-green-200 hover:bg-green-400" @click="create_special">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+          </svg>&nbsp;Submit
         </Button>
       </template>
     </JetDialogModal>
-    <JetDialogModal
-      :show="updateSpecialModal"
-      @close="updateSpecialModal = false"
-      maxWidth="2xl"
-    >
+    <JetDialogModal :show="updateSpecialModal" @close="updateSpecialModal = false" maxWidth="2xl">
       <template #title> Update Special Discount</template>
       <template #content>
         <div class="grid grid-cols-12 gap-1">
           <div class="col-span-12">
-            <Input
-              type="number"
-              label="Special discount"
-              v-model="form_special_update.discount"
-            />
-            <JetInputError
-              :message="form_special_update.errors.discount"
-              class="mt-2"
-            />
+            <Input type="number" label="Special discount" v-model="form_special_update.discount" />
+            <JetInputError :message="form_special_update.errors.discount" class="mt-2" />
           </div>
         </div>
       </template>
@@ -870,28 +542,14 @@ const search_remove = () => {
         <SecondaryButton @click="updateSpecialModal = false" class="mr-2">
           nevermind
         </SecondaryButton>
-        <Button
-          :class="{ 'opacity-25': form_special_update.processing }"
-          :disabled="form_special_update.processing"
-          class="bg-green-200 hover:bg-green-400"
-          @click="update_special"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-auto"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-            /></svg
-          >&nbsp;Submit
+        <Button :class="{ 'opacity-25': form_special_update.processing }" :disabled="form_special_update.processing"
+          class="bg-green-200 hover:bg-green-400" @click="update_special">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+          </svg>&nbsp;Submit
         </Button>
       </template>
-    </JetDialogModal>
-  </AppLayout>
-</template>
+  </JetDialogModal>
+</AppLayout></template>

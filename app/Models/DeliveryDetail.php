@@ -18,7 +18,7 @@ class DeliveryDetail extends Model
 
     public function product()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(SupplierProduct::class, "product_id", "id")->with("product");
     }
 
     public function price()
