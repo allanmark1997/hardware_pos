@@ -8,6 +8,7 @@ use App\Models\supplier;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class SupplierProductController extends Controller
@@ -32,7 +33,7 @@ class SupplierProductController extends Controller
         $categories = SupplierCategory::orderBy("name", 'asc')->get();
         $suppliers = supplier::get();
         $product_lists = Product::get();
-        
+
         return Inertia::render('SupplierProducts/Product', [
             "products" => $products,
             "search" => $search,
@@ -56,7 +57,14 @@ class SupplierProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $product = SupplierProduct::create([
+            "product_id" => $request->product_id,
+            "user_id" => Auth::user()->id,
+            "supplier_id" => $request->supplier_id,
+            "supplier_category_id" => $request->category
+        ]);
+
+        return back();
     }
 
     /**
