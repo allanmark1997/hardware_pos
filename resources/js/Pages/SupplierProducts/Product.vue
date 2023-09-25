@@ -43,9 +43,9 @@ const search_results_products_to_add = ref(false);
 const search_results_suppliers_to_add = ref(false);
 
 const form = useForm({
-  product_id: false,
+  product_id: "",
   product_name: "",
-  supplier_id: false,
+  supplier_id: "",
   supplier_name: "",
   category: "",
   price: "",
@@ -60,7 +60,7 @@ const form_update_cat = useForm({
 });
 
 const add_product = () => {
-  form.post(route("supplier_categories.store"), {
+  form.post(route("supplier_products.store"), {
     preserveScroll: true,
     onSuccess: () => {
       form.reset();
@@ -215,6 +215,8 @@ const open_search_product = () => {
             :search="search"
             :category="category"
             :categories="categories"
+            :product_lists="product_lists"
+            :suppliers="suppliers"
           />
         </div>
       </div>
@@ -255,53 +257,7 @@ const open_search_product = () => {
               <span>Edit category</span>
             </a>
           </button>
-          <button
-            v-if="props.tax?.tax == undefined || props.tax?.tax == null"
-            @click="open_modal_add_tax"
-            class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
-          >
-            <a class="my-auto gap-1 flex">
-              <Icon icon="tax" size="sm" />
-              <span>Add Tax</span>
-            </a>
-          </button>
-          <button
-            v-if="props.tax?.tax != undefined || props.tax?.tax != null"
-            @click="open_modal_update_tax"
-            class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
-          >
-            <a class="my-auto gap-1 flex">
-              <Icon icon="tax" size="sm" />
-
-              <span>Edit Tax</span>
-            </a>
-          </button>
-          <button
-            v-if="
-              props.special_discount?.discount == undefined ||
-              props.special_discount?.discount == null
-            "
-            @click="open_modal_add_special"
-            class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
-          >
-            <a class="my-auto gap-1 flex">
-              <Icon icon="wheelchair" size="sm" />
-              <span>Add Special Discount</span>
-            </a>
-          </button>
-          <button
-            v-if="
-              props.special_discount?.discount != undefined ||
-              props.special_discount?.discount != null
-            "
-            @click="open_modal_update_special"
-            class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
-          >
-            <a class="my-auto gap-1 flex">
-              <Icon icon="wheelchair" size="sm" />
-              <span>Edit Special Discount</span>
-            </a>
-          </button>
+          
           <a
             :href="route('products.export')"
             class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
@@ -334,7 +290,7 @@ const open_search_product = () => {
               v-model="form.product_name"
               disabled
             />
-            <JetInputError :message="form.errors.product_name" class="mt-2" />
+            <JetInputError :message="form.errors.product_id" class="mt-2" />
           </div>
           <div class="col-span-5">
             <Input
@@ -415,7 +371,7 @@ const open_search_product = () => {
               v-model="form.supplier_name"
               disabled
             />
-            <JetInputError :message="form.errors.supplier_name" class="mt-2" />
+            <JetInputError :message="form.errors.supplier_id" class="mt-2" />
           </div>
           <div class="col-span-5">
             <Input
@@ -643,191 +599,6 @@ const open_search_product = () => {
         </SecondaryButton>
       </template>
     </JetDialogModal>
-    <JetDialogModal
-      :show="addTaxModal"
-      @close="addTaxModal = false"
-      maxWidth="2xl"
-    >
-      <template #title> Add new tax</template>
-      <template #content>
-        <div class="grid grid-cols-12 gap-1">
-          <div class="col-span-12">
-            <Input
-              type="number"
-              label="Value added tax"
-              v-model="form_tax.tax"
-            />
-            <JetInputError :message="form_tax.errors.tax" class="mt-2" />
-          </div>
-        </div>
-      </template>
-      <template #footer>
-        <SecondaryButton @click="addTaxModal = false" class="mr-2">
-          nevermind
-        </SecondaryButton>
-        <Button
-          :class="{ 'opacity-25': form_tax.processing }"
-          :disabled="form_tax.processing"
-          class="bg-green-200 hover:bg-green-400"
-          @click="create_tax"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-auto"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-            /></svg
-          >&nbsp;Submit
-        </Button>
-      </template>
-    </JetDialogModal>
-    <JetDialogModal
-      :show="updateTaxEditModal"
-      @close="updateTaxEditModal = false"
-      maxWidth="2xl"
-    >
-      <template #title> Update tax</template>
-      <template #content>
-        <div class="grid grid-cols-12 gap-1">
-          <div class="col-span-12">
-            <Input
-              type="number"
-              label="Value added tax"
-              v-model="form_tax_update.tax"
-            />
-            <JetInputError :message="form_tax_update.errors.tax" class="mt-2" />
-          </div>
-        </div>
-      </template>
-      <template #footer>
-        <SecondaryButton @click="updateTaxEditModal = false" class="mr-2">
-          nevermind
-        </SecondaryButton>
-        <Button
-          :class="{ 'opacity-25': form_tax.processing }"
-          :disabled="form_tax.processing"
-          class="bg-green-200 hover:bg-green-400"
-          @click="update_tax"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-auto"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-            /></svg
-          >&nbsp;Submit
-        </Button>
-      </template>
-    </JetDialogModal>
-    <JetDialogModal
-      :show="addSpecialModal"
-      @close="addSpecialModal = false"
-      maxWidth="2xl"
-    >
-      <template #title> Add new Special Discount</template>
-      <template #content>
-        <div class="grid grid-cols-12 gap-1">
-          <div class="col-span-12">
-            <Input
-              type="number"
-              label="Special discount"
-              v-model="form_special.discount"
-            />
-            <JetInputError
-              :message="form_special.errors.discount"
-              class="mt-2"
-            />
-          </div>
-        </div>
-      </template>
-      <template #footer>
-        <SecondaryButton @click="addSpecialModal = false" class="mr-2">
-          nevermind
-        </SecondaryButton>
-        <Button
-          :class="{ 'opacity-25': form_special.processing }"
-          :disabled="form_special.processing"
-          class="bg-green-200 hover:bg-green-400"
-          @click="create_special"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-auto"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-            /></svg
-          >&nbsp;Submit
-        </Button>
-      </template>
-    </JetDialogModal>
-    <JetDialogModal
-      :show="updateSpecialModal"
-      @close="updateSpecialModal = false"
-      maxWidth="2xl"
-    >
-      <template #title> Update Special Discount</template>
-      <template #content>
-        <div class="grid grid-cols-12 gap-1">
-          <div class="col-span-12">
-            <Input
-              type="number"
-              label="Special discount"
-              v-model="form_special_update.discount"
-            />
-            <JetInputError
-              :message="form_special_update.errors.discount"
-              class="mt-2"
-            />
-          </div>
-        </div>
-      </template>
-      <template #footer>
-        <SecondaryButton @click="updateSpecialModal = false" class="mr-2">
-          nevermind
-        </SecondaryButton>
-        <Button
-          :class="{ 'opacity-25': form_special_update.processing }"
-          :disabled="form_special_update.processing"
-          class="bg-green-200 hover:bg-green-400"
-          @click="update_special"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-auto"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-            /></svg
-          >&nbsp;Submit
-        </Button>
-      </template>
-    </JetDialogModal>
+    
   </AppLayout>
 </template>

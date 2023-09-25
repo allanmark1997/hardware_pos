@@ -74,7 +74,7 @@ Route::middleware([
     Route::prefix('supplier_products')->name('supplier_products.')->group(function () {
         Route::get('/products', [SupplierProductController::class, 'index'])->name('index');
         Route::post('/add_products', [SupplierProductController::class, 'store'])->name('store');
-        Route::post('/update_products/{product}', [SupplierProductController::class, 'update'])->name('update');
+        Route::put('/update_products/{product}', [SupplierProductController::class, 'update'])->name('update');
         Route::post('/remove_products/{product}', [SupplierProductController::class, 'destroy'])->name('remove');
         Route::get('/products/export', [SupplierProductController::class, 'export'])->name('export');
     });

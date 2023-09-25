@@ -15,13 +15,19 @@ import { router, useForm } from "@inertiajs/vue3";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
-const props = defineProps(["products", "search", "category", "categories"]);
+const props = defineProps(["products", "search", "category", "categories","product_lists",
+  "suppliers",]);
 const condfirmationModal = ref(false);
 const post_images = ref([]);
 const specification = ref({});
 const spec_name = ref("");
 const spec_details = ref("");
 const detailModal = ref(false);
+
+const update_modal = ref(false)
+
+const search_results_products_to_add = ref(false);
+const search_results_suppliers_to_add = ref(false);
 
 const detailModalData = ref({
   ProdTitle: "",
@@ -32,7 +38,64 @@ const detailModalData = ref({
 
 const form = useForm({
   product: false,
+  product_id: "",
+  product_name: "",
+  supplier_id: "",
+  supplier_name: "",
+  category: "",
+  price: "",
 });
+
+const update_open_product = (product) => {
+  form.product = product
+  form.product_id = product.product.id
+  form.product_name = product.product.name
+  form.supplier_id = product.supplier_id
+  form.supplier_name = product.supplier.supplier_name
+  form.category = product.supplier_category_id
+  form.price = product.price.price
+  update_modal.value =! update_modal.value
+}
+
+const update_product = () => {
+  if(form.product_id == 0 || form.product_id == "" || form.product_id == null){
+    toast.error("Looks like there's no product selected, please select first", {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+  }
+  else if(form.supplier_id == 0 || form.supplier_id == "" || form.supplier_id == null){
+    toast.error("Looks like there's no supplier selected, please select first", {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+  }
+  else{
+    form.put(route("supplier_products.update", {product:form.product}), {
+    preserveScroll: true,
+    onSuccess: () => {
+      toast.success("Product successfully amended!", {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+      update_modal.value = false;
+      form.reset();
+    },
+    onError: (error) => {
+      toast.error("Something went wrong " + error, {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    },
+  });
+  }
+  
+};
+
 const openDetails = (detail, title, specs, img) => {
   detailModal.value = !detailModal.value;
   detailModalData.value.ProdTitle = title;
@@ -140,6 +203,13 @@ onMounted(() => {
                     class="p-2 bg-gray-400 rounded-lg hover:bg-gray-600 mr-2 w-auto"
                   >
                     <Icon icon="docs" />
+                  </button>
+                  <button
+                    @click="update_open_product(product)"
+                    class="p-2 bg-orange-400 rounded-lg hover:bg-orange-600 w-auto mt-2 mr-2"
+                    title="Update product"
+                  >
+                    <Icon icon="pencil" size="sm" />
                   </button>
                   <button
                     @click="function_open_modal_confirmation(product)"
@@ -329,4 +399,219 @@ onMounted(() => {
       </SecondaryButton>
     </template>
   </JetDialogModal>
+
+  <JetDialogModal :show="update_modal" @close="update_modal = false" maxWidth="2xl">
+      <template #title> Update product here!</template>
+      <template #content>
+        <div class="grid grid-cols-12 gap-1">
+          <div class="col-span-6">
+            <Input
+              type="text"
+              label="Product name view"
+              v-model="form.product_name"
+              disabled
+            />
+            <JetInputError :message="form.errors.product_id" class="mt-2" />
+          </div>
+          <div class="col-span-5">
+            <Input
+              :disabled="search_results_products_to_add != true"
+              type="text"
+              label="Search product name"
+              v-model="form.product_name"
+            />
+            <div
+              v-if="search_results_products_to_add == true"
+              class="absolute z-50 w-60 bg-white rounded shadow"
+            >
+              <ul
+                class="overflow-y-auto py-1 h-[20vmin] text-gray-700"
+                aria-labelledby="dropdownUsersButton"
+              >
+                <li v-for="(product, index) in product_lists" :key="index">
+                  <a
+                    v-if="
+                      product.name
+                        .toLowerCase()
+                        .includes(form.product_name.toLowerCase())
+                    "
+                    class="flex items-center py-2 px-4 hover:bg-gray-100 cursor-pointer"
+                    @click="
+                      (form.product_name = product.name),
+                        (form.product_id = product.id),
+                        (search_results_products_to_add = false)
+                    "
+                  >
+                    <img
+                      class="mr-2 w-6 h-6 rounded-full"
+                      :src="product.product_image"
+                    />
+                    {{ product.name }}
+                  </a>
+                </li>
+              </ul>
+              <div class="flex justify-center">
+                <small>Results</small>
+              </div>
+              <a
+                @click="
+                  (search_results_products_to_add = false),
+                    (form.product_name = ''),
+                    (form.product_id = false)
+                "
+                class="flex items-center p-3 text-sm font-medium text-blue-600 bg-gray-50 border-t border-gray-200 hover:bg-gray-100 hover:underline"
+              >
+                clear search
+              </a>
+            </div>
+          </div>
+          <div class="col-span-1 my-auto flex">
+            <button
+              v-if="form.product_id"
+              class="h-10 my-auto mt-5"
+              @click="
+                (search_results_products_to_add = false),
+                  (form.product_name = ''),
+                  (form.product_id = false)
+              "
+            >
+              <Icon icon="close_icon" size="sm" />
+            </button>
+            <button
+              @click="search_results_products_to_add = true"
+              class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center mt-4"
+            >
+              <Icon icon="search_icon" size="sm" />
+            </button>
+          </div>
+
+          <div class="col-span-6">
+            <Input
+              type="text"
+              label="Supplier name view"
+              v-model="form.supplier_name"
+              disabled
+            />
+            <JetInputError :message="form.errors.supplier_id" class="mt-2" />
+          </div>
+          <div class="col-span-5">
+            <Input
+              :disabled="search_results_suppliers_to_add != true"
+              type="text"
+              label="Search supplier's name"
+              v-model="form.supplier_name"
+            />
+            <div
+              v-if="search_results_suppliers_to_add == true"
+              class="absolute z-50 w-60 bg-white rounded shadow"
+            >
+              <ul
+                class="overflow-y-auto py-1 h-[20vmin] text-gray-700"
+                aria-labelledby="dropdownUsersButton"
+              >
+                <li v-for="(supplier, index) in suppliers" :key="index">
+                  <a
+                    v-if="
+                      supplier.supplier_name
+                        .toLowerCase()
+                        .includes(form.supplier_name.toLowerCase())
+                    "
+                    class="flex items-center py-2 px-4 hover:bg-gray-100 cursor-pointer"
+                    @click="
+                      (form.supplier_name = supplier.supplier_name),
+                        (form.supplier_id = supplier.id),
+                        (search_results_suppliers_to_add = false)
+                    "
+                  >
+                    <img
+                      class="mr-2 w-6 h-6 rounded-full"
+                      :src="supplier.image"
+                    />
+                    {{ supplier.supplier_name }}
+                  </a>
+                </li>
+              </ul>
+              <div class="flex justify-center">
+                <small>Results</small>
+              </div>
+              <a
+                @click="
+                  (search_results_suppliers_to_add = false),
+                    (form.supplier_name = ''),
+                    (form.supplier_id = false)
+                "
+                class="flex items-center p-3 text-sm font-medium text-blue-600 bg-gray-50 border-t border-gray-200 hover:bg-gray-100 hover:underline"
+              >
+                clear search
+              </a>
+            </div>
+          </div>
+          <div class="col-span-1 my-auto flex">
+            <button
+              v-if="form.supplier_id"
+              class="h-10 my-auto mt-5"
+              @click="
+                (search_results_suppliers_to_add = false),
+                  (form.supplier_name = ''),
+                  (form.supplier_id = false)
+              "
+            >
+              <Icon icon="close_icon" size="sm" />
+            </button>
+            <button
+              @click="search_results_suppliers_to_add = true"
+              class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center mt-4"
+            >
+              <Icon icon="search_icon" size="sm" />
+            </button>
+          </div>
+
+          <div class="col-span-full">
+            <Input type="number" label="Product price" v-model="form.price" />
+            <JetInputError :message="form.errors.price" class="mt-2" />
+          </div>
+          <div class="col-span-12">
+            <select
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full h-10 my-auto mt-5"
+              v-model="form.category"
+            >
+              <option selected value="">Choose a category</option>
+              <template v-for="(category, key) in props.categories" :key="key">
+                <option :value="category.id">{{ category.name }}</option>
+              </template>
+            </select>
+            <JetInputError :message="form.errors.category" class="mt-2" />
+          </div>
+        </div>
+      </template>
+      <template #footer>
+        <SecondaryButton
+          @click="(update_modal = false), (form.reset())"
+          class="mr-2 hover:bg-red-500"
+        >
+          nevermind
+        </SecondaryButton>
+        <Button
+          :class="{ 'opacity-25': form.processing }"
+          :disabled="form.processing"
+          class="bg-green-200 hover:bg-green-400"
+          @click="update_product"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-auto"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+            /></svg
+          >&nbsp;Submit
+        </Button>
+      </template>
+    </JetDialogModal>
 </template>
