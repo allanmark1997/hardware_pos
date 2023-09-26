@@ -33,7 +33,7 @@ class ProductController extends Controller
             $products = product::with('user')->with('current_price')->with('current_discount')->when($search != null || $search != "", function ($query) use ($search) {
                 $query->where("name", "LIKE", "%{$search}%");
             })->when($category != null || $category != "", function ($query) use ($category) {
-                $query->where("category_id", "LIKE", "%{$category}%");
+                $query->where("category_id", "LIKE", $category);
             })->orderBy('created_at', 'desc')->paginate(12);
             $categories = Category::orderBy('name', 'asc')->get();
             $tax = Tax::orderBy('created_at', 'desc')->first();
@@ -63,7 +63,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => ["required", "unique:products","max:30"],
+            'name' => ["required", "unique:products", "max:30"],
             'barcode' => ["required"],
             'price' => ["required", "regex:/^[0-9]+(\.[0-9][0-9]?)?$/"],
             'category' => "required",

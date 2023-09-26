@@ -24,7 +24,7 @@ class DeliveryController extends Controller
             $query->whereBetween('created_at', [$date_from, $date_to]);
         })->when($search != null || $search != "", function ($query) use ($search) {
             $query->where("id", $search);
-        })->paginate(20);
+        })->where("status", 1)->paginate(20);
         // dd($deliveries);
         return Inertia::render('Delivery/Delivery', [
             "deliveries" => $deliveries,
@@ -44,7 +44,7 @@ class DeliveryController extends Controller
             $query->whereBetween('created_at', [$date_from, $date_to]);
         })->when($search != null || $search != "", function ($query) use ($search) {
             $query->where("id", $search);
-        })->get();
+        })->where("status", 1)->get();
 
         $results = [];
         $grand_unsuccess_total = [];
@@ -82,7 +82,7 @@ class DeliveryController extends Controller
                         "",
                         '',
                         '',
-                        $delivery->details[$i]['product']['product']['name'],
+                        $delivery->details[$i]['product']?->product->name,
                         $delivery->details[$i]['quantity'],
                         "PHP " . number_format($delivery->details[$i]['price']->price, 2),
                         "PHP " . number_format($delivery->details[$i]['quantity'] * $delivery->details[$i]['price']->price, 2),
@@ -192,7 +192,7 @@ class DeliveryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $delivery = Delivery::create([]);
     }
 
     /**

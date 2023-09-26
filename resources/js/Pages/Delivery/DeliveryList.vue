@@ -230,7 +230,7 @@ const count_total_unsuccess = (data) => {
                           <td class="px-1 py-1 flex">
                             <Icon icon="shopping_cart" size="xs" />
 
-                            {{ delivery_detail.product.product?.name }}
+                            {{ delivery_detail.product?.product?.name }}
                           </td>
                           <td class="px-1 py-1">
                             {{ delivery_detail.quantity }}

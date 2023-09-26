@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\CashierStatusController;
 use App\Http\Controllers\DeliveryController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SpecialDiscountController;
@@ -76,6 +77,7 @@ Route::middleware([
         Route::post('/add_products', [SupplierProductController::class, 'store'])->name('store');
         Route::put('/update_products/{product}', [SupplierProductController::class, 'update'])->name('update');
         Route::post('/remove_products/{product}', [SupplierProductController::class, 'destroy'])->name('remove');
+        Route::post('/order', [OrderController::class, 'store'])->name('order');
         Route::get('/products/export', [SupplierProductController::class, 'export'])->name('export');
     });
 
