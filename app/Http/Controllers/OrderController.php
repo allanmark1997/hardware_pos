@@ -41,6 +41,7 @@ class OrderController extends Controller
             "price_id" => $request["product"]["price"]["id"],
             "quantity" => $request->quantity,
         ]);
+        return back();
     }
 
     /**
