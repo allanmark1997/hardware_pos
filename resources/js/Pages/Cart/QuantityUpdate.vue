@@ -1,5 +1,7 @@
 <script setup>
 import { useForm } from "@inertiajs/vue3";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 const props = defineProps(["quantity", "order"]);
 const form = useForm({
@@ -12,7 +14,7 @@ const update_quantity = (type) => {
     form.put(route("cart.update_quantity", { order: form.order }), {
       preserveScroll: true,
       onSuccess: () => {
-        toast.onSuccess("Added quantity", {
+        toast.success("Added quantity", {
           autoClose: 1000,
           transition: toast.TRANSITIONS.FLIP,
           position: toast.POSITION.TOP_RIGHT,
@@ -21,7 +23,7 @@ const update_quantity = (type) => {
     });
   } else {
     if (form.quantity <= 0) {
-      toast.onSuccess("Looks like your quantity is less than 0", {
+      toast.error("Looks like your quantity is less than 0", {
         autoClose: 1000,
         transition: toast.TRANSITIONS.FLIP,
         position: toast.POSITION.TOP_RIGHT,
@@ -31,7 +33,7 @@ const update_quantity = (type) => {
       form.put(route("cart.update_quantity", { order: form.order }), {
         preserveScroll: true,
         onSuccess: () => {
-          toast.onSuccess("Deducted quantity", {
+          toast.success("Deducted quantity", {
             autoClose: 1000,
             transition: toast.TRANSITIONS.FLIP,
             position: toast.POSITION.TOP_RIGHT,
