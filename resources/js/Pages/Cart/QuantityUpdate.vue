@@ -45,18 +45,27 @@ const update_quantity = (type) => {
 };
 
 const manual_inout = () => {
-  setTimeout(() => {
-    form.put(route("cart.update_quantity", { order: form.order }), {
-      preserveScroll: true,
-      onSuccess: () => {
-        toast.success("Quantity updated", {
-          autoClose: 1000,
-          transition: toast.TRANSITIONS.FLIP,
-          position: toast.POSITION.TOP_RIGHT,
-        });
-      },
+  if (form.quantity < 0) {
+    toast.success("Quantity cannot be negative", {
+      autoClose: 1000,
+      transition: toast.TRANSITIONS.FLIP,
+      position: toast.POSITION.TOP_RIGHT,
     });
-  }, 1000);
+    form.quantity = props.quantity;
+  } else {
+    setTimeout(() => {
+      form.put(route("cart.update_quantity", { order: form.order }), {
+        preserveScroll: true,
+        onSuccess: () => {
+          toast.success("Quantity updated", {
+            autoClose: 1000,
+            transition: toast.TRANSITIONS.FLIP,
+            position: toast.POSITION.TOP_RIGHT,
+          });
+        },
+      });
+    }, 1000);
+  }
 };
 </script>
 <template>
