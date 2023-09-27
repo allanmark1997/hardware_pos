@@ -43,6 +43,21 @@ const update_quantity = (type) => {
     }
   }
 };
+
+const manual_inout = () => {
+  setTimeout(() => {
+    form.put(route("cart.update_quantity", { order: form.order }), {
+      preserveScroll: true,
+      onSuccess: () => {
+        toast.success("Quantity updated", {
+          autoClose: 1000,
+          transition: toast.TRANSITIONS.FLIP,
+          position: toast.POSITION.TOP_RIGHT,
+        });
+      },
+    });
+  }, 1000);
+};
 </script>
 <template>
   <div
@@ -60,6 +75,7 @@ const update_quantity = (type) => {
       class="inline-block rounded-l bg-primary text-xs font-medium leading-normal w-full"
       type="number"
       v-model.number="form.quantity"
+      @change="manual_inout()"
     />
     <button
       @click="update_quantity(1)"
