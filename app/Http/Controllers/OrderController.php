@@ -14,7 +14,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $orders = Order::with("supplier")->with("user")->with("product")->with("price")->get();
+        $orders = Order::with("supplier")->with("user")->with("product")->with("price")->where("status", 0)->get();
         $group_suppliers = $orders->groupBy('supplier_id');
         $temp_array = [];
         foreach ($group_suppliers as $key => $supplier) {
@@ -27,21 +27,10 @@ class OrderController extends Controller
                 }
             }
         }
-        $people = array(
-            2 => array(
-                'name' => 'John',
-                'fav_color' => 'green'
-            ),
-            5 => array(
-                'name' => 'Samuel',
-                'fav_color' => 'blue'
-            )
-        );
-        // dd(array_search('blue', array_column($people, 'fav_color')));
+
         return Inertia::render('Cart/Cart', [
             "orders" => $orders,
-            "group_suppliers" => $group_suppliers,
-            "group_2" => $temp_array
+            "group_suppliers" => $temp_array,
         ]);
     }
 
@@ -94,7 +83,11 @@ class OrderController extends Controller
      */
     public function update(Request $request, Order $order)
     {
-        //
+        // dd($request->quantity);
+        $order->update([
+            "quantity" => $request->quantity
+        ]);
+        return back();
     }
 
     /**

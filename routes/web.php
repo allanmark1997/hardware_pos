@@ -83,6 +83,7 @@ Route::middleware([
     Route::prefix('cart')->name('cart.')->group(function () {
         Route::get('/cart', [OrderController::class, 'index'])->name('index');
         Route::post('/order', [OrderController::class, 'store'])->name('order');
+        Route::put('/update_quantity/{order}', [OrderController::class, 'update'])->name('update_quantity');
         // Route::put('/update_products/{product}', [OrderController::class, 'update'])->name('update');
         // Route::post('/remove_products/{product}', [OrderController::class, 'destroy'])->name('remove');
     });

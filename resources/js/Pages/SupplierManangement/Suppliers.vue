@@ -41,7 +41,6 @@ const add_supplier = () => {
       });
       addModal.value = !addModal.value;
       form.reset();
-      sex_label.value.reset();
       status_label.value.reset();
       type_label.value.reset();
     },

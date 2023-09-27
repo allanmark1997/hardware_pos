@@ -23,7 +23,7 @@ class Order extends Model
     }
     public function product()
     {
-        return $this->belongsTo(SupplierProduct::class);
+        return $this->belongsTo(SupplierProduct::class)->with("product");
     }
     public function price()
     {
