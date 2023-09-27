@@ -287,6 +287,10 @@ const logout = () => {
                       Profile
                     </DropdownLink>
 
+                    <DropdownLink :href="route('profile.show')">
+                      Cart
+                    </DropdownLink>
+
                     <DropdownLink
                       v-if="$page.props.jetstream.hasApiFeatures"
                       :href="route('api-tokens.index')"
