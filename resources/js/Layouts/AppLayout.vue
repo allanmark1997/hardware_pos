@@ -287,7 +287,7 @@ const logout = () => {
                       Profile
                     </DropdownLink>
 
-                    <DropdownLink :href="route('profile.show')">
+                    <DropdownLink :href="route('cart.index')">
                       Cart
                     </DropdownLink>
 

@@ -77,9 +77,16 @@ Route::middleware([
         Route::post('/add_products', [SupplierProductController::class, 'store'])->name('store');
         Route::put('/update_products/{product}', [SupplierProductController::class, 'update'])->name('update');
         Route::post('/remove_products/{product}', [SupplierProductController::class, 'destroy'])->name('remove');
-        Route::post('/order', [OrderController::class, 'store'])->name('order');
         Route::get('/products/export', [SupplierProductController::class, 'export'])->name('export');
     });
+
+    Route::prefix('cart')->name('cart.')->group(function () {
+        Route::get('/cart', [OrderController::class, 'index'])->name('index');
+        Route::post('/order', [OrderController::class, 'store'])->name('order');
+        // Route::put('/update_products/{product}', [OrderController::class, 'update'])->name('update');
+        // Route::post('/remove_products/{product}', [OrderController::class, 'destroy'])->name('remove');
+    });
+
 
     Route::prefix('taxes')->name('taxes.')->group(function () {
         Route::post('/add_tax', [TaxController::class, 'store'])->name('store');

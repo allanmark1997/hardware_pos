@@ -150,7 +150,7 @@ const remove_product = () => {
 };
 
 const order_product = () => {
-  form.post(route("supplier_products.order", form.product), {
+  form.post(route("cart.order", form.product), {
     preserveScroll: true,
     onSuccess: () => {
       toast.success("Product successfully ordered!", {
