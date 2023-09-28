@@ -226,7 +226,11 @@ const authorize = (data) => {
                   {{ date_time(back_order.created_at) }}
                 </td>
                 <td class="px-6 py-4 gap-2">
-                  <Button @click="authorize(back_order)">Authorize</Button>
+                  <Button
+                    v-if="back_order.status == 0"
+                    @click="authorize(back_order)"
+                    >Authorize</Button
+                  >
                 </td>
               </tr>
             </template>
