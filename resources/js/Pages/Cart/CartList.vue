@@ -3,10 +3,10 @@ import Icon from "@/Components/Icon.vue";
 import Button from "@/Components/Button.vue";
 import { useForm } from "@inertiajs/vue3";
 import QuantityUpdate from "./QuantityUpdate.vue";
-import { watch } from "vue";
+import { ref, watch } from "vue";
 
 const props = defineProps(["group_suppliers"]);
-
+const total_order = ref(0);
 const form = useForm({
   selected_product: [],
 });
@@ -23,8 +23,10 @@ const convert_money = (data) => {
 watch(
   () => form.selected_product,
   (product) => {
+    total_order.value = 0;
     product.forEach((element) => {
-      console.log(element.price.price);
+      // console.log(element.price.price);
+      total_order.value += element.price.price * element.quantity;
     });
   }
 );
@@ -103,17 +105,16 @@ watch(
     </div>
   </template>
   <div
-    class="fixed w-full bg-white border border-gray-200 rounded-md bottom-0 w-2/3 p-2 gap-2"
+    class="fixed bg-white border border-gray-200 rounded-md bottom-0 w-2/3 p-2 gap-2"
   >
     <p class="text-right text-md justify-right">
       Total ({{ form.selected_product.length }}
       {{ form.selected_product.length <= 0 ? " item" : " items" }}):
       <span class="text-lg font-bold text-red-500">
-        {{ convert_money(100) }}</span
+        {{ convert_money(total_order) }}</span
       >
     </p>
-    <Button
-      class="pt-1 pb-1 pl-4 pr-4 hover:bg-green-400 hover:text-white float-right"
+    <Button class="pt-1 pb-1 pl-4 pr-4 hover:bg-green-400 hover:text-white"
       >Check Out</Button
     >
   </div>
