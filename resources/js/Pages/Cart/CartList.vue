@@ -6,6 +6,7 @@ import QuantityUpdate from "./QuantityUpdate.vue";
 import { ref, watch } from "vue";
 
 const props = defineProps(["group_suppliers"]);
+const sub_total_order = ref(0);
 const total_order = ref(0);
 const form = useForm({
   selected_product: [],
@@ -26,6 +27,9 @@ watch(
     total_order.value = 0;
     product.forEach((element) => {
       // console.log(element.price.price);
+      // if (element.id == 1) {
+
+      // }
       total_order.value += element.price.price * element.quantity;
     });
   }
