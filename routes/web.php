@@ -85,7 +85,7 @@ Route::middleware([
         Route::post('/order', [OrderController::class, 'store'])->name('order');
         Route::put('/update_quantity/{order}', [OrderController::class, 'update'])->name('update_quantity');
         // Route::put('/update_products/{product}', [OrderController::class, 'update'])->name('update');
-        // Route::post('/remove_products/{product}', [OrderController::class, 'destroy'])->name('remove');
+        Route::delete('/remove_products/{order}', [OrderController::class, 'destroy'])->name('remove');
     });
 
 
@@ -111,6 +111,7 @@ Route::middleware([
 
     Route::prefix('delivery')->name('deliveries.')->group(function () {
         Route::get('/deliveries', [DeliveryController::class, 'index'])->name('index');
+        Route::post('/add_products', [DeliveryController::class, 'store'])->name('store');
         Route::get('/deliveries/export', [DeliveryController::class, 'export'])->name('export');
     });
 

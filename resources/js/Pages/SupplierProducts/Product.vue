@@ -258,7 +258,7 @@ const open_search_product = () => {
             </a>
           </button>
           
-          <a
+          <!-- <a
             :href="route('products.export')"
             class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
           >
@@ -266,7 +266,7 @@ const open_search_product = () => {
               <Icon icon="report" size="sm" />
               <span>Export Inventory</span>
             </a>
-          </a>
+          </a> -->
         </div>
       </template>
       <template #footer>

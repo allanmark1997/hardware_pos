@@ -1,14 +1,23 @@
 <script setup>
 import Icon from "@/Components/Icon.vue";
 import Button from "@/Components/Button.vue";
+import ConfirmDialogModal from "@/Components/ConfirmationModal.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
+
 import { useForm } from "@inertiajs/vue3";
 import QuantityUpdate from "./QuantityUpdate.vue";
 import { ref, watch } from "vue";
 
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
+
 const props = defineProps(["group_suppliers"]);
+const condfirmationModal = ref(false);
+const condfirmationDeliveryModal = ref(false);
 const sub_total_order = ref(0);
 const total_order = ref(0);
 const form = useForm({
+  order: "",
   selected_product: [],
 });
 
@@ -26,14 +35,55 @@ watch(
   (product) => {
     total_order.value = 0;
     product.forEach((element) => {
-      // console.log(element.price.price);
-      // if (element.id == 1) {
-
-      // }
       total_order.value += element.price.price * element.quantity;
     });
   }
 );
+
+const delete_open = (data) => {
+  form.order = data;
+  condfirmationModal.value = !condfirmationModal.value;
+};
+const delete_ = () => {
+  form.delete(route("cart.remove", form.order), {
+    preserveScroll: true,
+    onSuccess: () => {
+      toast.success("Successfully removed", {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+      condfirmationModal.value = false;
+      form.reset();
+    },
+  });
+};
+
+const delivery_open = () => {
+  if (form.selected_product.length <= 0) {
+    toast.error("Cannot check out if there's no products selected", {
+      autoClose: 1000,
+      transition: toast.TRANSITIONS.FLIP,
+      position: toast.POSITION.TOP_RIGHT,
+    });
+  } else {
+    condfirmationDeliveryModal.value = !condfirmationDeliveryModal.value;
+  }
+};
+const delivery_ = () => {
+  form.post(route("deliveries.store"), {
+    preserveScroll: true,
+    onSuccess: () => {
+      toast.success("Successfully added in deliveries", {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+      condfirmationDeliveryModal.value = false;
+      form.reset();
+    },
+  });
+};
 </script>
 <template>
   <div
@@ -97,7 +147,7 @@ watch(
             </div>
             <div class="col-span-2 px-1 py-1">
               <span class="my-auto">
-                <a class="cursor-pointer">
+                <a @click="delete_open(product[0])" class="cursor-pointer">
                   <Icon icon="trash" size="sm" />
                 </a>
               </span>
@@ -118,8 +168,86 @@ watch(
         {{ convert_money(total_order) }}</span
       >
     </p>
-    <Button class="pt-1 pb-1 pl-4 pr-4 hover:bg-green-400 hover:text-white"
+    <Button
+      @click="delivery_open"
+      class="pt-1 pb-1 pl-4 pr-4 hover:bg-green-400 hover:text-white"
       >Check Out</Button
     >
   </div>
+  <ConfirmDialogModal
+    :show="condfirmationModal"
+    @close="condfirmationModal = false"
+    maxWidth="2xl"
+  >
+    <template #title> Are you sure you want to remove this item?</template>
+    <template #content>
+      <p class="text-red-500">
+        This action can update the system and this is not reversible!
+      </p>
+    </template>
+    <template #footer>
+      <SecondaryButton @click="condfirmationModal = false" class="mr-2">
+        nevermind
+      </SecondaryButton>
+      <Button
+        :class="{ 'opacity-25': form.processing }"
+        :disabled="form.processing"
+        class="bg-green-200 hover:bg-green-400"
+        @click="delete_"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-auto"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+          /></svg
+        >&nbsp;Submit
+      </Button>
+    </template>
+  </ConfirmDialogModal>
+  <ConfirmDialogModal
+    :show="condfirmationDeliveryModal"
+    @close="condfirmationDeliveryModal = false"
+    maxWidth="2xl"
+  >
+    <template #title> Are you sure you want to deliver this item/s?</template>
+    <template #content>
+      <p class="text-red-500">
+        This action can update the system and this is not reversible!
+      </p>
+    </template>
+    <template #footer>
+      <SecondaryButton @click="condfirmationDeliveryModal = false" class="mr-2">
+        nevermind
+      </SecondaryButton>
+      <Button
+        :class="{ 'opacity-25': form.processing }"
+        :disabled="form.processing"
+        class="bg-green-200 hover:bg-green-400"
+        @click="delivery_"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-auto"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+          /></svg
+        >&nbsp;Submit
+      </Button>
+    </template>
+  </ConfirmDialogModal>
 </template>

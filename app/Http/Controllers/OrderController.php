@@ -14,7 +14,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $orders = Order::with("supplier")->with("user")->with("product")->with("price")->where("status", 0)->get();
+        $orders = Order::with("supplier")->with("user")->with("product")->has("product")->with("price")->where("status", 0)->get();
         $group_suppliers = $orders->groupBy('supplier_id');
         $temp_array = [];
         foreach ($group_suppliers as $key => $supplier) {
@@ -95,6 +95,7 @@ class OrderController extends Controller
      */
     public function destroy(Order $order)
     {
-        //
+        $order->delete();
+        return back();
     }
 }

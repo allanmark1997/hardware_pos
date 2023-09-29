@@ -22,7 +22,7 @@ const update_quantity = (type) => {
       },
     });
   } else {
-    if (form.quantity <= 0) {
+    if (form.quantity <= 1) {
       toast.error("Looks like your quantity is less than 0", {
         autoClose: 1000,
         transition: toast.TRANSITIONS.FLIP,
@@ -45,8 +45,8 @@ const update_quantity = (type) => {
 };
 
 const manual_inout = () => {
-  if (form.quantity < 0) {
-    toast.success("Quantity cannot be negative", {
+  if (form.quantity <= 0) {
+    toast.error("Quantity cannot be negative", {
       autoClose: 1000,
       transition: toast.TRANSITIONS.FLIP,
       position: toast.POSITION.TOP_RIGHT,

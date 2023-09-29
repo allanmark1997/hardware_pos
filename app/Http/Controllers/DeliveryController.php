@@ -192,7 +192,17 @@ class DeliveryController extends Controller
      */
     public function store(Request $request)
     {
-        $delivery = Delivery::create([]);
+        $temp_array = [];
+        foreach ($request->selected_product as $key => $supplier) {
+            if (array_search($supplier['supplier']['supplier_name'], $temp_array) <= 0) {
+                $temp_array[$supplier['supplier']['supplier_name']][] = [$supplier];
+            } else {
+                $temp_array[] = [$supplier];
+            }
+        }
+        dd($temp_array);
+
+        // $delivery = Delivery::create([])
     }
 
     /**

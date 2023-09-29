@@ -21,7 +21,7 @@ class SupplierProductController extends Controller
     {
         $search = $request->search ?? "";
         $category = $request->category ?? "";
-        $products = SupplierProduct::with("user")->with("product")->with("supplier")->with("price")->when($search != null || $search != "", function ($query) use ($search) {
+        $products = SupplierProduct::with("user")->with("product")->has("product")->with("supplier")->with("price")->when($search != null || $search != "", function ($query) use ($search) {
             $query->whereHas("product", function ($query2) use ($search) {
                 $query2->where("name", "LIKE", "%{$search}%");
             })->with(['product' => function ($query2) use ($search) {
@@ -109,18 +109,18 @@ class SupplierProductController extends Controller
         ]);
         $product_current = SupplierProduct::with("price")->where("id", $product->id)->first();
 
-        $product -> update([
+        $product->update([
             "product_id" => $request->product_id,
             "supplier_id" => $request->supplier_id,
             "supplier_category_id" => $request->category
         ]);
         if (floatVal($request->price) != $product_current->price->price) {
-        SupplierPrice::create([
-            'price' => $request->price,
-            'supplier_product_id' => $product->id,
-            'user_id' => Auth::user()->id
-        ]);
-    }
+            SupplierPrice::create([
+                'price' => $request->price,
+                'supplier_product_id' => $product->id,
+                'user_id' => Auth::user()->id
+            ]);
+        }
     }
 
     /**
