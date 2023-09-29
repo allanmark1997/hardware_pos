@@ -203,19 +203,21 @@ class DeliveryController extends Controller
         }
         $temp_index = 0;
         foreach ($temp_array as $key => $supplier) {
-            // $delivery = Delivery::created([
-            //     "supplier_id" => $supplier[$temp_index][0]["supplier_id"],
-            //     "status" => false
-            // ]);
+            dd($supplier[$temp_index][0]["supplier_id"]);
+            $delivery = Delivery::create([
+                "supplier_id" => $supplier[$temp_index][0]["supplier_id"],
+                "remarks" => "",
+                "status" => false
+            ]);
             foreach ($supplier[$temp_index] as $key => $product) {
-                dd($product["id"]);
+                // dd($product["id"]);
 
                 $product = DeliveryDetail::create([
-                    "product_id" => $product->id,
+                    "product_id" => $product["id"],
                     "delivery_id" => $delivery->id,
                     "status" => false,
-                    "price_id" => $product->price_id,
-                    "quantity" => $product->quantity,
+                    "price_id" => $product["price_id"],
+                    "quantity" => $product["quantity"],
 
                 ]);
             }
