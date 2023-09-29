@@ -113,7 +113,7 @@ watch(
   >
     <p class="text-right text-md justify-right">
       Total ({{ form.selected_product.length }}
-      {{ form.selected_product.length <= 0 ? " item" : " items" }}):
+      {{ form.selected_product.length <= 1 ? " item" : " items" }}):
       <span class="text-lg font-bold text-red-500">
         {{ convert_money(total_order) }}</span
       >
