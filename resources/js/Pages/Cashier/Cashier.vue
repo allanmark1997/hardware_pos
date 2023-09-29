@@ -17,16 +17,46 @@ const status = ref();
 
 onMounted(() => {
   keydownHandler();
+
 });
 
 const keydownHandler = (event) => {
-  if (!status.value) {
+  if (props.cashier_status == "false") {
     document.addEventListener("keydown", (e) => {
-      if (e.keyCode == 49 && router.page.component == "Cashier/Cashier") {
-        create_transaction();
-      }
+      if (e.keyCode == 112 && router.page.component == "Cashier/Cashier") {
+        console.log("Access the help menu or get assistance on using the POS system.")
+        e.preventDefault();
+      } else if (e.keyCode == 113 && router.page.component == "Cashier/Cashier") {
+        console.log("Sales: Start a new sales transaction or access the sales menu")
+        e.preventDefault();
+      } else if (e.keyCode == 114 && router.page.component == "Cashier/Cashier") {
+        console.log("Discounts: Apply discounts to items or access the discount menu.")
+        e.preventDefault();
+      } else if (e.keyCode == 115 && router.page.component == "Cashier/Cashier") {
+        console.log(" Void: Void or cancel a transaction or remove items from a sale.")
+        e.preventDefault();
+      } else if (e.keyCode == 116 && router.page.component == "Cashier/Cashier") {
+        console.log("Price Lookup: Look up the price of an item or access the price lookup feature")
+        e.preventDefault();
+      } else if (e.keyCode == 117 && router.page.component == "Cashier/Cashier") {
+        console.log("Quantity: Adjust the quantity of an item being sold.")
+        e.preventDefault();
+      } else if (e.keyCode == 118 && router.page.component == "Cashier/Cashier") {
+        console.log("Payment: Enter the payment amount or access the payment menu")
+        e.preventDefault();
+      } else if (e.keyCode == 119 && router.page.component == "Cashier/Cashier") {
+        console.log("Hold: Place a transaction on hold or retrieve a held transaction.")
+        e.preventDefault();
+      } else if (e.keyCode == 120 && router.page.component == "Cashier/Cashier") {
+        console.log("Search: Search for items, customers, or transactions within the POS system.")
+        e.preventDefault();
+      } else if (e.keyCode == 121 && router.page.component == "Cashier/Cashier") {
+        console.log("Exit: Exit or close the POS system.")
+        e.preventDefault();
+      } 
     });
   }
+  function_activate_status()
 };
 
 const domChecker = () => {
@@ -69,7 +99,7 @@ const form = useForm({
 const search_ = () => {
   form.get(route("cashier.index"), {
     preserveScroll: true,
-    onSuccess: () => {},
+    onSuccess: () => { },
   });
 };
 const create_transaction = (active) => {
@@ -87,7 +117,7 @@ const function_activate_status = () => {
 <template>
   <AppLayout title="Dashboard">
     <template #header>
-      <h2 class="font-semibold text-lg text-gray-800 leading-tight">Cashier</h2>
+      <h2 class="font-semibold text-lg text-gray-800 leading-tight">Cashier {{ props.cashier_status }}</h2>
     </template>
     <div class="py-5">
       <input type="text" v-model="form.search" />
@@ -98,30 +128,20 @@ const function_activate_status = () => {
             <form class="flex items-center">
               <label for="Search products" class="sr-only">Search</label>
               <div class="relative w-full">
-                <div
-                  class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
-                >
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                   <Icon class="mr-1" icon="shopping_bag" size="xs" />
                 </div>
-                <input
-                  type="text"
-                  id="Search products"
+                <input type="text" id="Search products"
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full pl-10 p-2.5"
-                  placeholder="Search products"
-                />
+                  placeholder="Search products" />
               </div>
-              <button
-                @click="function_activate_status"
-                type="submit"
-                class="inline-flex items-center py-2.5 px-3 ml-2 text-sm font-medium text-white bg-yellow-700 rounded-lg border border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300"
-              >
+              <button @click="function_activate_status" type="submit"
+                class="inline-flex items-center py-2.5 px-3 ml-2 text-sm font-medium text-white bg-yellow-700 rounded-lg border border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300">
                 <Icon class="mr-5" icon="search_icon" size="xs" />
               </button>
             </form>
 
-            <div
-              class="product_list bg-gray-50 p-1 rounded-lg mt-3 min-h-[60vmin] overflow-auto"
-            >
+            <div class="product_list bg-gray-50 p-1 rounded-lg mt-3 min-h-[60vmin] overflow-auto">
               <div class="mt-24 flex justify-center" v-if="sampleData == 0">
                 <div class="bg-white px-10 py-5 shadow-lg rounded xl">
                   <div class="flex justify-center mb-2">
@@ -133,18 +153,14 @@ const function_activate_status = () => {
             </div>
           </div>
           <div class="col-span-5">
-            <div
-              class="bg-white rounded-b-xl shadow-md p-5 flex justify-between max-h-[63vmin]"
-            >
+            <div class="bg-white rounded-b-xl shadow-md p-5 flex justify-between max-h-[63vmin]">
               <div class="flex">
                 <Icon icon="shopping_cart" size="sm"></Icon>
                 <span class="font-bold">Cart</span>
               </div>
               <div>
                 <span class="font-bold"> count: </span>
-                <span
-                  class="bg-red-500 ml-1 px-2 text-white rounded-xl w-10 text-center"
-                >
+                <span class="bg-red-500 ml-1 px-2 text-white rounded-xl w-10 text-center">
                   <small v-if="totalCart >= 1000">{{
                     nFormatter(totalCart)
                   }}</small>
@@ -158,28 +174,19 @@ const function_activate_status = () => {
             <form class="flex mt-5 mx-5 items-center">
               <label for="Search products" class="sr-only">Search</label>
               <div class="relative w-full">
-                <div
-                  class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
-                >
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                   <Icon class="mr-1" icon="shopping_bag" size="xs" />
                 </div>
-                <input
-                  type="text"
-                  id="Search products"
+                <input type="text" id="Search products"
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full pl-10 p-2.5"
-                  placeholder="Search products"
-                />
+                  placeholder="Search products" />
               </div>
-              <button
-                type="submit"
-                class="inline-flex items-center py-2.5 px-3 ml-2 text-sm font-medium text-white bg-yellow-700 rounded-lg border border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300"
-              >
+              <button type="submit"
+                class="inline-flex items-center py-2.5 px-3 ml-2 text-sm font-medium text-white bg-yellow-700 rounded-lg border border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300">
                 <Icon class="mr-5" icon="search_icon" size="xs" />
               </button>
             </form>
-            <div
-              class="relative mt-5 px-2 overflow-x-auto min-h-[45vmin] shadow-md"
-            >
+            <div class="relative mt-5 px-2 overflow-x-auto min-h-[45vmin] shadow-md">
               <table class="w-full text-sm text-left text-gray-500">
                 <tbody>
                   <tr v-for="data in totalCart" class="bg-white border-b">
@@ -192,53 +199,27 @@ const function_activate_status = () => {
                           <div class="flex items-center space-x-3">
                             <button
                               class="inline-flex items-center justify-center p-1 text-sm font-medium h-6 w-6 text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200"
-                              type="button"
-                            >
+                              type="button">
                               <span class="sr-only">Quantity button</span>
-                              <svg
-                                class="w-3 h-3"
-                                aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 18 2"
-                              >
-                                <path
-                                  stroke="currentColor"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M1 1h16"
-                                />
+                              <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 18 2">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                  stroke-width="2" d="M1 1h16" />
                               </svg>
                             </button>
                             <div>
-                              <input
-                                type="number"
-                                id="first_product"
+                              <input type="number" id="first_product"
                                 class="bg-gray-50 w-14 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-2.5 py-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="1"
-                                required
-                              />
+                                placeholder="1" required />
                             </div>
                             <button
                               class="inline-flex items-center justify-center h-6 w-6 p-1 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200"
-                              type="button"
-                            >
+                              type="button">
                               <span class="sr-only">Quantity button</span>
-                              <svg
-                                class="w-3 h-3"
-                                aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 18 18"
-                              >
-                                <path
-                                  stroke="currentColor"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M9 1v16M1 9h16"
-                                />
+                              <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 18 18">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                  stroke-width="2" d="M9 1v16M1 9h16" />
                               </svg>
                             </button>
                           </div>
@@ -257,10 +238,8 @@ const function_activate_status = () => {
             </div>
             <div class="bg-white flex justify-between item-center p-5">
               <p><span class="font-bold">Total:</span> 200</p>
-              <button
-                type="button"
-                class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
-              >
+              <button type="button"
+                class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2">
                 Charge
               </button>
             </div>
