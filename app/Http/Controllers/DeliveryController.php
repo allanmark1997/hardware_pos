@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\DeliveryExport;
 use App\Models\Delivery;
+use App\Models\DeliveryDetail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -200,9 +201,28 @@ class DeliveryController extends Controller
                 $temp_array[] = [$supplier];
             }
         }
-        dd($temp_array);
+        $temp_index = 0;
+        foreach ($temp_array as $key => $supplier) {
+            // $delivery = Delivery::created([
+            //     "supplier_id" => $supplier[$temp_index][0]["supplier_id"],
+            //     "status" => false
+            // ]);
+            foreach ($supplier[$temp_index] as $key => $product) {
+                dd($product["id"]);
 
-        // $delivery = Delivery::create([])
+                $product = DeliveryDetail::create([
+                    "product_id" => $product->id,
+                    "delivery_id" => $delivery->id,
+                    "status" => false,
+                    "price_id" => $product->price_id,
+                    "quantity" => $product->quantity,
+
+                ]);
+            }
+            $temp_index++;
+        };
+
+        return back();
     }
 
     /**
