@@ -70,11 +70,11 @@ watch(
               />
               <img
                 class="w-24 h-24 object-scale-down"
-                :src="product[0].product?.product?.product_image"
-                :alt="product[0].product?.product?.product_image"
+                :src="product[0].product?.product_image"
+                :alt="product[0].product?.product_image"
               />
               <p class="my-auto text-md font-bold">
-                {{ product[0].product?.product?.name }}
+                {{ product[0].product?.name }}
               </p>
             </div>
             <div class="col-span-2 px-1 py-1">
