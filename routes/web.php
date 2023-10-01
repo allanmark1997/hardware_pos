@@ -111,6 +111,7 @@ Route::middleware([
 
     Route::prefix('delivery')->name('deliveries.')->group(function () {
         Route::get('/deliveries', [DeliveryController::class, 'index'])->name('index');
+        Route::get('/receive_index', [DeliveryController::class, 'receive_index'])->name('receive_index');
         Route::post('/add_products', [DeliveryController::class, 'store'])->name('store');
         Route::get('/deliveries/export', [DeliveryController::class, 'export'])->name('export');
     });

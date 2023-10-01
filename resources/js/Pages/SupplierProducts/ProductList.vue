@@ -48,6 +48,7 @@ const form = useForm({
   category: "",
   price: "",
   quantity: "",
+  remarks: "",
 });
 
 const quantity_open_modal = (product) => {
@@ -413,6 +414,8 @@ onMounted(() => {
     <template #content>
       <Input type="number" label="Product Quantity" v-model="form.quantity" />
       <JetInputError :message="form.errors.quantity" class="mt-2" />
+      <Input type="text" label="Remarks" v-model="form.remarks" />
+
     </template>
     <template #footer>
       <SecondaryButton @click="quantityModal = false" class="mr-2">

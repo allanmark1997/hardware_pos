@@ -60,6 +60,7 @@ class OrderController extends Controller
                 "product_id" => $request->product["product_id"],
                 "price_id" => $request["product"]["price"]["id"],
                 "quantity" => $request->quantity,
+                "remarks" => $request->remarks
             ]);
         }
         else{

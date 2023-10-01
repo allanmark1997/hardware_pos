@@ -211,6 +211,7 @@ class ProductController extends Controller
             "discount_id" => $product->current_discount->id,
             "user_id" => Auth::user()->id,
             "quantity" => $request->quantity,
+            "remarks" => $request->remarks,
             "status" => false
         ]);
 

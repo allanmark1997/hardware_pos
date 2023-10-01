@@ -46,6 +46,7 @@ const form = useForm({
 const form_back_order = useForm({
   product: false,
   quantity: 0,
+  remarks:""
 });
 
 const openDetails = (detail, title, specs, img) => {
@@ -120,7 +121,7 @@ const remove_product = () => {
 };
 
 const back_order = () => {
-  if (form_back_order.product.quantity < form_back_order.quantity) {
+  if (form_back_order.product.quantity < form_back_order.quantity || form_back_order.product.quantity == 0) {
     toast.error(
       "Can't allow request, since the quantity inputed is above products stocks",
       {
@@ -529,6 +530,11 @@ onMounted(() => {
         v-model="form_back_order.quantity"
       />
       <JetInputError :message="form_back_order.errors.quantity" class="mt-2" />
+      <Input
+        type="text"
+        label="Enter your remarks"
+        v-model="form_back_order.remarks"
+      />
     </template>
     <template #footer>
       <SecondaryButton

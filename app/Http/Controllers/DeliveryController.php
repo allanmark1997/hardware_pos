@@ -22,13 +22,38 @@ class DeliveryController extends Controller
         $search = $request->search ?? "";
         $date_from = $request->date_from ?? "";
         $date_to = $request->date_to ?? "";
-        $deliveries = Delivery::with("details")->with("supplier")->with("user_receiver")->when($date_from !=  null || $date_from != "" && $date_to != null || $date_to != "", function ($query) use ($date_from, $date_to) {
+        $deliveries = Delivery::with("details")->with("supplier")->has("supplier")->with("user_receiver")->when($date_from !=  null || $date_from != "" && $date_to != null || $date_to != "", function ($query) use ($date_from, $date_to) {
             $query->whereBetween('created_at', [$date_from, $date_to]);
         })->when($search != null || $search != "", function ($query) use ($search) {
-            $query->where("id", $search);
+            $query->whereHas("supplier", function ($query2) use ($search) {
+                $query2->where("supplier_name", "LIKE", "%{$search}%");
+            })->with(['supplier' => function ($query2) use ($search) {
+                $query2->where("supplier_name", "LIKE", "%{$search}%");
+            }]);
         })->where("status", 1)->paginate(20);
-        // dd($deliveries);
         return Inertia::render('Delivery/Delivery', [
+            "deliveries" => $deliveries,
+            "date_from" => $date_from,
+            "date_to" => $date_to,
+            "search" => $search
+        ]);
+    }
+
+    public function receive_index(Request $request)
+    {
+        $search = $request->search ?? "";
+        $date_from = $request->date_from ?? "";
+        $date_to = $request->date_to ?? "";
+        $deliveries = Delivery::with("details")->with("supplier")->has("supplier")->with("user_receiver")->when($date_from !=  null || $date_from != "" && $date_to != null || $date_to != "", function ($query) use ($date_from, $date_to) {
+            $query->whereBetween('created_at', [$date_from, $date_to]);
+        })->when($search != null || $search != "", function ($query) use ($search) {
+            $query->whereHas("supplier", function ($query2) use ($search) {
+                $query2->where("supplier_name", "LIKE", "%{$search}%");
+            })->with(['supplier' => function ($query2) use ($search) {
+                $query2->where("supplier_name", "LIKE", "%{$search}%");
+            }]);
+        })->where("status", 0)->paginate(20);
+        return Inertia::render('ReceiveDelivery/Delivery', [
             "deliveries" => $deliveries,
             "date_from" => $date_from,
             "date_to" => $date_to,
