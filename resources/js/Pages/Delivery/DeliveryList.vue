@@ -130,7 +130,7 @@ const count_total_unsuccess = (data) => {
             v-model="search"
             class="rounded-lg w-[30vmin]"
             type="text"
-            label="Search transaction"
+            label="Search delivery"
             @keyup.enter="search_"
           />
         </div>

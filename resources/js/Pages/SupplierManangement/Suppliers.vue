@@ -91,7 +91,7 @@ const remove_image = (key) => {
 </script>
 
 <template>
-  <AppLayout title="Dashboard">
+  <AppLayout title="Supplier Management">
     <template #header>
       <h2 class="font-semibold text-lg text-gray-800 leading-tight">
         Supplier Management

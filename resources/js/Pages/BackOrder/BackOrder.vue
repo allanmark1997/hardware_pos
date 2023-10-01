@@ -8,7 +8,7 @@ import { inject, provide, ref } from "vue";
 const props = defineProps(["back_orders", "date_from", "date_to"]);
 </script>
 <template>
-  <AppLayout title="BackOrderList">
+  <AppLayout title="Back order list">
     <template #header>
       <div class="flex justify-between">
         <h2 class="font-semibold text-lg text-gray-800 leading-tight">

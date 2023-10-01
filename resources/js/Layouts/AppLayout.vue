@@ -7,6 +7,8 @@ import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
 import NavLink from "@/Components/NavLink.vue";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
+import Icon from "@/Components/Icon.vue";
+
 
 defineProps({
   title: String,
@@ -62,7 +64,7 @@ const logout = () => {
                   Dashboard
                 </NavLink>
               </div>
-              <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+              <!-- <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                 <NavLink
                   :href="route('users.index')"
                   :active="route().current('users.index')"
@@ -77,7 +79,7 @@ const logout = () => {
                 >
                   Supplier Management
                 </NavLink>
-              </div>
+              </div> -->
               <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                 <NavLink
                   :href="route('products.index')"
@@ -284,11 +286,31 @@ const logout = () => {
                     </div>
 
                     <DropdownLink :href="route('profile.show')">
-                      Profile
+                      <div class="flex gap-2">
+                        <Icon icon="administrator" size="sm" />
+                        Profile
+                      </div>
+                    </DropdownLink>
+
+                    <DropdownLink :href="route('users.index')">
+                      <div class="flex gap-2">
+                        <Icon icon="settings" size="sm" />
+                        User Management
+                      </div>
+                    </DropdownLink>
+
+                    <DropdownLink :href="route('suppliers.index')">
+                      <div class="flex gap-2">
+                        <Icon icon="settings" size="sm" />
+                        Supplier Management
+                      </div>
                     </DropdownLink>
 
                     <DropdownLink :href="route('cart.index')">
-                      Cart
+                      <div class="flex gap-2">
+                        <Icon icon="shopping_cart" size="sm" />
+                        Cart
+                      </div>
                     </DropdownLink>
 
                     <DropdownLink

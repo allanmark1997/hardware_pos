@@ -94,7 +94,7 @@ const authorize = (data) => {
     preserveScroll: true,
     onSuccess: () => {
       toast.success("Successfully authorized back order as settled", {
-        autoClose: false,
+        autoClose: true,
         transition: toast.TRANSITIONS.FLIP,
         position: toast.POSITION.BOTTOM_RIGHT,
       });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\DeliveryExport;
 use App\Models\Delivery;
+use App\Models\Order;
 use App\Models\DeliveryDetail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -195,35 +196,38 @@ class DeliveryController extends Controller
     {
         $temp_array = [];
         foreach ($request->selected_product as $key => $supplier) {
+            // dd($supplier['supplier_id']);
             if (array_search($supplier['supplier']['supplier_name'], $temp_array) <= 0) {
-                $temp_array[$supplier['supplier']['supplier_name']][] = [$supplier];
+                $temp_array[$supplier['supplier']['supplier_name']]["supplier_id"] = [$supplier['supplier_id']];
+
+                $temp_array[$supplier['supplier']['supplier_name']]["products"][] = [$supplier];
             } else {
-                $temp_array[] = [$supplier];
+                $temp_array["products"][] = [$supplier];
             }
         }
-        $temp_index = 0;
+        // dd($temp_array);
         foreach ($temp_array as $key => $supplier) {
-            dd($supplier[$temp_index][0]["supplier_id"]);
             $delivery = Delivery::create([
-                "supplier_id" => $supplier[$temp_index][0]["supplier_id"],
+                "supplier_id" => $supplier["supplier_id"][0],
                 "remarks" => "",
                 "status" => false
             ]);
-            foreach ($supplier[$temp_index] as $key => $product) {
-                // dd($product["id"]);
-
+            foreach ($supplier["products"] as $key => $product) {
+                $order = Order::find($product[0]["id"]);
+                // dd($order);
                 $product = DeliveryDetail::create([
-                    "product_id" => $product["id"],
-                    "delivery_id" => $delivery->id,
-                    "status" => false,
-                    "price_id" => $product["price_id"],
-                    "quantity" => $product["quantity"],
+                            "product_id" => $product[0]["id"],
+                            "delivery_id" => $delivery->id,
+                            "status" => false,
+                            "price_id" => $product[0]["price_id"],
+                            "quantity" => $product[0]["quantity"],
+                ]);
 
+                $order->update([
+                    "status" => true
                 ]);
             }
-            $temp_index++;
         };
-
         return back();
     }
 

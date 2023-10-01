@@ -48,17 +48,27 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'quantity' => ["required"],
+            'quantity' => ["required", "integer"],
         ]);
-        $order = Order::create([
-            "supplier_id" => $request->product["supplier_id"],
-            "user_id" => Auth::user()->id,
-            "status" => false,
-            "remarks" => "",
-            "product_id" => $request->product["product_id"],
-            "price_id" => $request["product"]["price"]["id"],
-            "quantity" => $request->quantity,
-        ]);
+        $order_find = Order::where("product_id", $request->product["product_id"])->where("status", 0)->first();
+        if ($order_find == null) {
+            $order = Order::create([
+                "supplier_id" => $request->product["supplier_id"],
+                "user_id" => Auth::user()->id,
+                "status" => false,
+                "remarks" => "",
+                "product_id" => $request->product["product_id"],
+                "price_id" => $request["product"]["price"]["id"],
+                "quantity" => $request->quantity,
+            ]);
+        }
+        else{
+            $added_quantity = $order_find->quantity + $request->quantity;
+            $order_find->update([
+                "quantity" => $added_quantity
+            ]);
+        }
+        
         return back();
     }
 
