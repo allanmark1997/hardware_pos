@@ -241,11 +241,11 @@ class DeliveryController extends Controller
                 $order = Order::find($product[0]["id"]);
                 // dd($order);
                 $product = DeliveryDetail::create([
-                            "product_id" => $product[0]["id"],
-                            "delivery_id" => $delivery->id,
-                            "status" => false,
-                            "price_id" => $product[0]["price_id"],
-                            "quantity" => $product[0]["quantity"],
+                    "product_id" => $product[0]["id"],
+                    "delivery_id" => $delivery->id,
+                    "status" => false,
+                    "price_id" => $product[0]["price_id"],
+                    "quantity" => $product[0]["quantity"],
                 ]);
 
                 $order->update([
@@ -275,6 +275,22 @@ class DeliveryController extends Controller
     /**
      * Update the specified resource in storage.
      */
+    public function update_item_status(Request $request, DeliveryDetail $item)
+    {
+        $item->update([
+            "status" => $request->status
+        ]);
+        return back();
+    }
+
+    public function authenticate(Request $request, Delivery $delivery)
+    {
+        $delivery->update([
+            "status" => $request->status
+        ]);
+        return back();
+    }
+
     public function update(Request $request, string $id)
     {
         //

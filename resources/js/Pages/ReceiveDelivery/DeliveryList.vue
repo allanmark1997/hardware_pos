@@ -5,6 +5,9 @@ import Icon from "@/Components/Icon.vue";
 import Pagination2 from "@/Components/Pagination2.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Input from "@/Components/Input.vue";
+import Product from "./Product.vue";
+import ConfirmDialogModal from "@/Components/ConfirmationModal.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 
 import moment from "moment";
 import { inject, onMounted, provide, ref } from "vue";
@@ -17,9 +20,12 @@ const date_from = ref(props.date_from);
 const date_to = ref(props.date_to);
 const search = ref(props.search);
 
+const condfirmationModal = ref(false);
+
 const form = useForm({
-  products:[]
-})
+  delivery: false,
+  status: false,
+});
 
 const date_time = (data) => {
   return moment(data).format("MM/DD/YYYY, h:mm:ss a");
@@ -81,6 +87,30 @@ const count_total_unsuccess = (data) => {
     }
   });
   return temp_data;
+};
+
+const open_authorize = (data) => {
+  form.product = data;
+  condfirmationModal.value = !condfirmationModal.value;
+};
+
+const authorize = () => {
+  if (form.product.status == 1) {
+    form.status = 0;
+  } else {
+    form.status = 1;
+  }
+  form.put(route("deliveries.authenticate", form.delivery), {
+    preserveScroll: true,
+    onSuccess: () => {
+      toast.success("Selected delivery has been updated", {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+      form.reset();
+    },
+  });
 };
 </script>
 <template>
@@ -175,70 +205,7 @@ const count_total_unsuccess = (data) => {
                   scope="row"
                   class="px-2 py-1 text-gray-900 whitespace-nowrap"
                 >
-                  <table class="w-full text-xs text-left text-gray-500">
-                    <thead class="text-xs text-gray-700 uppercase bg-gray-100">
-                      <tr>
-                        <th scope="col" class="px-1 py-1">Product</th>
-                        <th scope="col" class="px-1 py-1">No.</th>
-                        <th scope="col" class="px-1 py-1">Price</th>
-                        <!-- <th scope="col" class="px-1 py-1">Status</th> -->
-                        <th scope="col" class="px-1 py-1">Sub-total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <template
-                        v-for="(delivery_detail, key2) in delivery.details"
-                        :key="key2"
-                      >
-                        <tr class="bg-white border-">
-                          <td class="px-1 py-1 flex">
-                            <Icon icon="shopping_cart" size="xs" />
-
-                            {{ delivery_detail.product?.product?.name }}
-                          </td>
-                          <td class="px-1 py-1">
-                            {{ delivery_detail.quantity }}
-                          </td>
-                          <td class="px-1 py-1">
-                            {{ convert_money(delivery_detail.price.price) }}
-                          </td>
-                          <!-- <td class="px-1 py-1">
-                            <small
-                              v-if="delivery_detail.status == 1"
-                              class="bg-green-400 rounded-md p-1 text-white flex gap-1"
-                            >
-                              <Icon icon="check" size="sm" />
-                              Success
-                            </small>
-                            <small
-                              v-else
-                              class="bg-red-400 rounded-md p-1 text-white flex gap-1"
-                            >
-                              <Icon icon="wrong" size="xs" />
-                              Unuccess
-                            </small>
-                          </td> -->
-                          <td class="px-1 py-1">
-                            <small>{{
-                              convert_money(
-                                delivery_detail.quantity *
-                                  delivery_detail.price.price
-                              )
-                            }}</small>
-                          </td>
-                          <td class="px-1 py-1">
-                            <input
-                              class="my-auto relative -ml-[1.5rem] mr-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem] appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-neutral-300 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ml-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:after:-mt-px checked:focus:after:ml-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem] checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0 checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent"
-                              type="checkbox"
-                              :value="delivery_detail"
-                              v-model="form.products"
-                              id="checkboxChecked"
-                            />
-                          </td>
-                        </tr>
-                      </template>
-                    </tbody>
-                  </table>
+                  <Product :delivery_details="delivery.details" />
                 </td>
                 <!-- <td class="px-6 py-4">
                   {{ convert_money(count_total_success(delivery.details)) }}
@@ -252,7 +219,7 @@ const count_total_unsuccess = (data) => {
                   {{ date_time(delivery.created_at) }}
                 </td>
                 <td class="px-6 py-4 gap-2">
-                  <Button>Authorize</Button>
+                  <Button @click="open_authorize(delivery)">Authorize</Button>
                 </td>
               </tr>
             </template>
@@ -272,4 +239,44 @@ const count_total_unsuccess = (data) => {
       </div>
     </div>
   </section>
+  <ConfirmDialogModal
+    :show="condfirmationModal"
+    @close="condfirmationModal = false"
+    maxWidth="2xl"
+  >
+    <template #title>
+      Are you sure you want to authorize this delivery?</template
+    >
+    <template #content>
+      <p class="text-red-500">
+        Clicking can update the system and it may cause a possible error!
+      </p>
+    </template>
+    <template #footer>
+      <SecondaryButton @click="condfirmationModal = false" class="mr-2">
+        nevermind
+      </SecondaryButton>
+      <Button
+        :class="{ 'opacity-25': form.processing }"
+        :disabled="form.processing"
+        class="bg-green-200 hover:bg-green-400"
+        @click="authorize"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-auto"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+          /></svg
+        >&nbsp;Submit
+      </Button>
+    </template>
+  </ConfirmDialogModal>
 </template>
