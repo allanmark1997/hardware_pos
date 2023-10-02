@@ -90,12 +90,12 @@ const count_total_unsuccess = (data) => {
 };
 
 const open_authorize = (data) => {
-  form.product = data;
+  form.delivery = data;
   condfirmationModal.value = !condfirmationModal.value;
 };
 
 const authorize = () => {
-  if (form.product.status == 1) {
+  if (form.delivery.status == 1) {
     form.status = 0;
   } else {
     form.status = 1;
