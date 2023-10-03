@@ -21,7 +21,7 @@ class CashierController extends Controller
     public function index(Request $request)
     {
 
-        $product = product::with('current_price')->with('current_discount')->first();
+        $product = product::with('current_price')->with('current_discount')->get();
         $cashier_stat = CashierStatus::where("user_id", Auth::user()->id)->first();
         return Inertia::render('Cashier/Cashier', [
             "product" => $product,
