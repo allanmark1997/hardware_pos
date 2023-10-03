@@ -142,4 +142,8 @@ Route::middleware([
     Route::prefix('cashier')->name('cashier_dummy.')->group(function () {
         Route::post('/create_dummy', [CashierStatusController::class, 'store'])->name('store');
     });
+
+    Route::prefix('authenticate_user')->name('authenticate_user.')->group(function () {
+        Route::post('/authorize_user', [User::class, 'authorize_user'])->name('authenticate_user');
+    });
 });

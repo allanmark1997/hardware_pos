@@ -25,6 +25,7 @@ const condfirmationModal = ref(false);
 const form = useForm({
   delivery: false,
   status: false,
+  password: "",
 });
 
 const date_time = (data) => {
@@ -95,22 +96,40 @@ const open_authorize = (data) => {
 };
 
 const authorize = () => {
-  if (form.delivery.status == 1) {
-    form.status = 0;
-  } else {
-    form.status = 1;
-  }
-  form.put(route("deliveries.authenticate", form.delivery), {
+  form.post(route("authenticate_user.authenticate_user"), {
     preserveScroll: true,
     onSuccess: () => {
-      toast.success("Selected delivery has been updated", {
+      toast.success("sample", {
         autoClose: 1000,
         transition: toast.TRANSITIONS.FLIP,
         position: toast.POSITION.TOP_RIGHT,
       });
-      form.reset();
+    },
+    onError: (error) => {
+      toast.success(error.response.message, {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
     },
   });
+  // if (form.delivery.status == 1) {
+  //   form.status = 0;
+  // } else {
+  //   form.status = 1;
+  // }
+  // form.put(route("deliveries.authenticate", form.delivery), {
+  //   preserveScroll: true,
+  //   onSuccess: () => {
+  //     toast.success("Selected delivery has been updated", {
+  //       autoClose: 1000,
+  //       transition: toast.TRANSITIONS.FLIP,
+  //       position: toast.POSITION.TOP_RIGHT,
+  //     });
+  //     condfirmationModal.value = false;
+  //     form.reset();
+  //   },
+  // });
 };
 </script>
 <template>
@@ -245,12 +264,17 @@ const authorize = () => {
     maxWidth="2xl"
   >
     <template #title>
-      Are you sure you want to authorize this delivery?</template
-    >
+      Are you sure you want to authorize this delivery?
+    </template>
     <template #content>
       <p class="text-red-500">
         Clicking can update the system and it may cause a possible error!
       </p>
+      <Input
+        label="Administrator password"
+        type="password"
+        v-model="form.password"
+      />
     </template>
     <template #footer>
       <SecondaryButton @click="condfirmationModal = false" class="mr-2">
@@ -274,8 +298,9 @@ const authorize = () => {
             stroke-linecap="round"
             stroke-linejoin="round"
             d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-          /></svg
-        >&nbsp;Submit
+          />
+        </svg>
+        &nbsp;Submit
       </Button>
     </template>
   </ConfirmDialogModal>

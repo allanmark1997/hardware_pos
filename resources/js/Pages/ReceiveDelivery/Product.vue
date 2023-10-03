@@ -52,10 +52,10 @@ const recieve = (data) => {
     <tbody>
       <template v-for="(delivery_detail, key2) in delivery_details" :key="key2">
         <tr class="bg-white border-">
-          <td class="px-1 py-1 flex">
+          <td class="px-1 py-1 flex font-bold">
             <Icon icon="shopping_cart" size="xs" />
 
-            {{ delivery_detail.product?.product?.name }}
+            {{ delivery_detail.product?.name }}
           </td>
           <td class="px-1 py-1">
             {{ delivery_detail.quantity }}

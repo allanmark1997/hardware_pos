@@ -227,10 +227,10 @@ const count_total_unsuccess = (data) => {
                         :key="key2"
                       >
                         <tr class="bg-white border-">
-                          <td class="px-1 py-1 flex">
+                          <td class="px-1 py-1 flex pt-2 font-bold">
                             <Icon icon="shopping_cart" size="xs" />
 
-                            {{ delivery_detail.product?.product?.name }}
+                            {{ delivery_detail.product?.name }}
                           </td>
                           <td class="px-1 py-1">
                             {{ delivery_detail.quantity }}

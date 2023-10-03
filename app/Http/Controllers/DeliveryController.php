@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\DeliveryDetail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Redirect;
 use Maatwebsite\Excel\Facades\Excel;
@@ -109,7 +110,7 @@ class DeliveryController extends Controller
                         "",
                         '',
                         '',
-                        $delivery->details[$i]['product']?->product->name,
+                        $delivery->details[$i]['product']->name,
                         $delivery->details[$i]['quantity'],
                         "PHP " . number_format($delivery->details[$i]['price']->price, 2),
                         "PHP " . number_format($delivery->details[$i]['quantity'] * $delivery->details[$i]['price']->price, 2),
@@ -241,7 +242,7 @@ class DeliveryController extends Controller
                 $order = Order::find($product[0]["id"]);
                 // dd($order);
                 $product = DeliveryDetail::create([
-                    "product_id" => $product[0]["id"],
+                    "product_id" => $product[0]["product_id"],
                     "delivery_id" => $delivery->id,
                     "status" => false,
                     "price_id" => $product[0]["price_id"],
@@ -286,7 +287,8 @@ class DeliveryController extends Controller
     public function authenticate(Request $request, Delivery $delivery)
     {
         $delivery->update([
-            "status" => $request->status
+            "status" => $request->status,
+            "received_by" => Auth::user()->id
         ]);
         return back();
     }

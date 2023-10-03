@@ -62,14 +62,13 @@ class OrderController extends Controller
                 "quantity" => $request->quantity,
                 "remarks" => $request->remarks
             ]);
-        }
-        else{
+        } else {
             $added_quantity = $order_find->quantity + $request->quantity;
             $order_find->update([
                 "quantity" => $added_quantity
             ]);
         }
-        
+
         return back();
     }
 
