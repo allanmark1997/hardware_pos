@@ -18,10 +18,14 @@ class TransactionController extends Controller
         $date_from = $request->date_from ?? "";
         $date_to = $request->date_to ?? "";
         $search = $request->search ?? "";
-        $transactions = Transaction::with("accommodate_by")->with("tax")->with("special_discount")->with("transaction_details")->when($date_from !=  null || $date_from != "" && $date_to != null || $date_to != "", function ($query) use ($date_from, $date_to) {
+        $transactions = Transaction::with("accommodate_by")->has("accommodate_by")->with("tax")->with("special_discount")->with("transaction_details")->when($date_from !=  null || $date_from != "" && $date_to != null || $date_to != "", function ($query) use ($date_from, $date_to) {
             $query->whereBetween('created_at', [$date_from, $date_to]);
         })->when($search != null || $search != "", function ($query) use ($search) {
-            $query->where("id", $search);
+            $query->whereHas("accommodate_by", function ($query2) use ($search) {
+                $query2->where("name", "LIKE", "%{$search}%");
+            })->with(['accommodate_by' => function ($query2) use ($search) {
+                $query2->where("name", "LIKE", "%{$search}%");
+            }]);
         })->paginate(20);
         return Inertia::render('Transactions/Transaction', [
             "transactions" => $transactions,
@@ -37,10 +41,14 @@ class TransactionController extends Controller
         $date_to = $request->date_to ?? "";
         $search = $request->search ?? "";
 
-        $transactions = Transaction::with("accommodate_by")->with("tax")->with("special_discount")->with("transaction_details")->when($date_from !=  null || $date_from != "" && $date_to != null || $date_to != "", function ($query) use ($date_from, $date_to) {
+        $transactions = Transaction::with("accommodate_by")->has("accommodate_by")->with("tax")->with("special_discount")->with("transaction_details")->when($date_from !=  null || $date_from != "" && $date_to != null || $date_to != "", function ($query) use ($date_from, $date_to) {
             $query->whereBetween('created_at', [$date_from, $date_to]);
         })->when($search != null || $search != "", function ($query) use ($search) {
-            $query->where("id", $search);
+            $query->whereHas("accommodate_by", function ($query2) use ($search) {
+                $query2->where("name", "LIKE", "%{$search}%");
+            })->with(['accommodate_by' => function ($query2) use ($search) {
+                $query2->where("name", "LIKE", "%{$search}%");
+            }]);
         })->get();
         // dd($transactions);
         $results = [];
