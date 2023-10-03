@@ -105,24 +105,23 @@ class User extends Controller
         $user = ModelsUser::where('id', 1)->first();
         try {
             if (strlen($request->password) < 8) {
-                // return response()->json([
-                //     'message' => 'Password is minimum of 8 characters'
-                // ], 401);
-                // return back()->with("message", "Password is minimum of 8 characters");
-                return back()->with("message", "Password is minimum of 8 characters");
+                throw ValidationException::withMessages([
+                    'message' => "Password is minimum of 8 characters",
+                    "status" => 0
+                ]);
             } else if (Hash::check($request->password, $user->password)) {
-                return response()->json([
-                    'message' => 'ok'
-                ], 200);
+                return back();
             } else {
-                return response()->json([
-                    'message' => 'Wrong password'
-                ], 401);
+                throw ValidationException::withMessages([
+                    'message' => "Wrong password",
+                    "status" => 0
+                ]);
             }
         } catch (DecryptException $e) {
-            return response()->json([
-                'message' => 'Opps! These credentials do not match our records.'
-            ], 401);
+            throw ValidationException::withMessages([
+                'message' => "Opps! These credentials do not match our records.",
+                "status" => 0
+            ]);
         }
     }
 }

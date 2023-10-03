@@ -99,37 +99,37 @@ const authorize = () => {
   form.post(route("authenticate_user.authenticate_user"), {
     preserveScroll: true,
     onSuccess: () => {
-      toast.success("sample", {
+      toast.success("Delivery has been authorized", {
         autoClose: 1000,
         transition: toast.TRANSITIONS.FLIP,
         position: toast.POSITION.TOP_RIGHT,
       });
+      if (form.delivery.status == 1) {
+        form.status = 0;
+      } else {
+        form.status = 1;
+      }
+      form.put(route("deliveries.authenticate", form.delivery), {
+        preserveScroll: true,
+        onSuccess: () => {
+          toast.success("Delivery set as delivered", {
+            autoClose: 1000,
+            transition: toast.TRANSITIONS.FLIP,
+            position: toast.POSITION.TOP_RIGHT,
+          });
+          condfirmationModal.value = false;
+          form.reset();
+        },
+      });
     },
-    onError: (error) => {
-      toast.success(error.response.message, {
+    onError: () => {
+      toast.error(form.errors.message, {
         autoClose: 1000,
         transition: toast.TRANSITIONS.FLIP,
         position: toast.POSITION.TOP_RIGHT,
       });
     },
   });
-  // if (form.delivery.status == 1) {
-  //   form.status = 0;
-  // } else {
-  //   form.status = 1;
-  // }
-  // form.put(route("deliveries.authenticate", form.delivery), {
-  //   preserveScroll: true,
-  //   onSuccess: () => {
-  //     toast.success("Selected delivery has been updated", {
-  //       autoClose: 1000,
-  //       transition: toast.TRANSITIONS.FLIP,
-  //       position: toast.POSITION.TOP_RIGHT,
-  //     });
-  //     condfirmationModal.value = false;
-  //     form.reset();
-  //   },
-  // });
 };
 </script>
 <template>
