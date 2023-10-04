@@ -4,15 +4,26 @@ import Icon from "@/Components/Icon.vue";
 import { onMounted, ref } from "vue";
 import { router, useForm } from "@inertiajs/vue3";
 
+
+import deleteAll from '@/Components/cashierModals/deleteAll.vue'
+import SKU from '@/Components/cashierModals/SKU.vue'
+
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 const props = defineProps(["product", "cashier_status", "cashier_stat_id"]);
 
-const totalCart = ref(2);
+const totalCart = ref(0);
 const sampleData = ref(5);
 const samplePurchaseData = ref(2);
 const eventListenerStorage = ref();
 const status = ref();
+
+const deleteAllModal = ref(false)
+const spDiscount = ref(false)
+const SKULookup = ref(false)
+const prodScan = ref('')
+const scannedProducts = ref([])
+const scannedProductIMG = ref('')
 // const scannedCode = "323423465756";
 
 onMounted(() => {
@@ -24,36 +35,56 @@ const keydownHandler = (event) => {
   if (props.cashier_status == "false") {
     document.addEventListener("keydown", (e) => {
       if (e.keyCode == 112 && router.page.component == "Cashier/Cashier") {
-        console.log("Access the help menu or get assistance on using the POS system.")
+        console.log("Start transaction.")
         e.preventDefault();
       } else if (e.keyCode == 113 && router.page.component == "Cashier/Cashier") {
-        console.log("Sales: Start a new sales transaction or access the sales menu")
+        console.log("Discount")
+        spDiscount.value = !spDiscount.value
+        if (spDiscount.value) {
+          toast.success("Special discount has been applied!", {
+            autoClose: 1000,
+            transition: toast.TRANSITIONS.FLIP,
+            position: toast.POSITION.TOP_RIGHT,
+          });
+        } else {
+          toast.error("Special discount has been removed!", {
+            autoClose: 1000,
+            transition: toast.TRANSITIONS.FLIP,
+            position: toast.POSITION.TOP_RIGHT,
+          });
+        }
+
         e.preventDefault();
       } else if (e.keyCode == 114 && router.page.component == "Cashier/Cashier") {
-        console.log("Discounts: Apply discounts to items or access the discount menu.")
+        console.log("Transaction .")
         e.preventDefault();
       } else if (e.keyCode == 115 && router.page.component == "Cashier/Cashier") {
-        console.log(" Void: Void or cancel a transaction or remove items from a sale.")
+        console.log("Change Quantity.")
         e.preventDefault();
       } else if (e.keyCode == 116 && router.page.component == "Cashier/Cashier") {
-        console.log("Price Lookup: Look up the price of an item or access the price lookup feature")
+        console.log("Change Tax")
         e.preventDefault();
       } else if (e.keyCode == 117 && router.page.component == "Cashier/Cashier") {
-        console.log("Quantity: Adjust the quantity of an item being sold.")
+        console.log("Description.")
         e.preventDefault();
       } else if (e.keyCode == 118 && router.page.component == "Cashier/Cashier") {
-        console.log("Payment: Enter the payment amount or access the payment menu")
+        console.log("Delete Item ")
         e.preventDefault();
       } else if (e.keyCode == 119 && router.page.component == "Cashier/Cashier") {
-        console.log("Hold: Place a transaction on hold or retrieve a held transaction.")
+        if (!SKULookup.value) {
+          deleteAllModal.value = !deleteAllModal.value
+        }
         e.preventDefault();
       } else if (e.keyCode == 120 && router.page.component == "Cashier/Cashier") {
-        console.log("Search: Search for items, customers, or transactions within the POS system.")
+        console.log("SKU Look up")
+        if (!deleteAllModal.value) {
+          SKULookup.value = !SKULookup.value
+        }
         e.preventDefault();
       } else if (e.keyCode == 121 && router.page.component == "Cashier/Cashier") {
-        console.log("Exit: Exit or close the POS system.")
+        console.log("Sales Return.")
         e.preventDefault();
-      } 
+      }
     });
   }
   function_activate_status()
@@ -110,6 +141,32 @@ const create_transaction = (active) => {
 //   search_(scannedCode.value)
 // }
 
+const addtoCart = () => {
+  for(let index = 0; index < props.product.length; index++) {
+    const prod = props.product[index];
+    if (prodScan.value === prod.barcode) {
+      scannedProducts.value.push(prod)
+      scannedProductIMG.value = prod.product_image
+      toast.success("Product added to cart!", {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+     break
+    }else{
+      if(props.product.length == index + 1){
+        toast.error("Product not available!", {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+      }
+    }
+ 
+  }
+}
+
+
 const function_activate_status = () => {
   router.put(route("cashier_stat.update_status", props.cashier_stat_id));
 };
@@ -117,38 +174,26 @@ const function_activate_status = () => {
 <template>
   <AppLayout title="Dashboard">
     <template #header>
-      <h2 class="font-semibold text-lg text-gray-800 leading-tight">Cashier {{ props.cashier_status }}</h2>
+      <h2 class="font-semibold text-lg text-gray-800 leading-tight">Cashier</h2>
     </template>
     <div class="py-5">
-      <input type="text" v-model="form.search" />
-      <button @click="search_()" class="bg-red-200">scan</button>
+      <input v-model="prodScan">
+      <button type="button" @click="addtoCart()"
+        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-1 ml-2 text-center inline-flex items-center mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M1 5h12m0 0L9 1m4 4L9 9" />
+        </svg>
+        <span class="sr-only">Icon description</span>
+      </button>
+      <!-- <input type="text" v-model="form.search" /> -->
+      <!-- <button @click="search_()" class="bg-red-200">scan</button> -->
       <div class="max-w-7xl mx-auto bg-white rounded mt-5 px-1">
         <div class="grid grid-cols-12 gap-2">
           <div class="col-span-7 p-5">
-            <form class="flex items-center">
-              <label for="Search products" class="sr-only">Search</label>
-              <div class="relative w-full">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <Icon class="mr-1" icon="shopping_bag" size="xs" />
-                </div>
-                <input type="text" id="Search products"
-                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full pl-10 p-2.5"
-                  placeholder="Search products" />
-              </div>
-              <button @click="function_activate_status" type="submit"
-                class="inline-flex items-center py-2.5 px-3 ml-2 text-sm font-medium text-white bg-yellow-700 rounded-lg border border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300">
-                <Icon class="mr-5" icon="search_icon" size="xs" />
-              </button>
-            </form>
-
             <div class="product_list bg-gray-50 p-1 rounded-lg mt-3 min-h-[60vmin] overflow-auto">
-              <div class="mt-24 flex justify-center" v-if="sampleData == 0">
-                <div class="bg-white px-10 py-5 shadow-lg rounded xl">
-                  <div class="flex justify-center mb-2">
-                    <Icon icon="shopping_bag" size="md" />
-                  </div>
-                  Scan a product
-                </div>
+              <div class="mt-24 flex justify-center">
+                <img :src="scannedProductIMG">
               </div>
             </div>
           </div>
@@ -157,6 +202,9 @@ const function_activate_status = () => {
               <div class="flex">
                 <Icon icon="shopping_cart" size="sm"></Icon>
                 <span class="font-bold">Cart</span>
+                <span v-if="spDiscount"><small class="italic ml-1 text-white flex bg-red-600 p-1 rounded-lg">
+                    <Icon class="text-white" size="xs" icon="wheelchair" /> (Special Discount)
+                  </small></span>
               </div>
               <div>
                 <span class="font-bold"> count: </span>
@@ -187,7 +235,9 @@ const function_activate_status = () => {
               </button>
             </form>
             <div class="relative mt-5 px-2 overflow-x-auto min-h-[45vmin] shadow-md">
+
               <table class="w-full text-sm text-left text-gray-500">
+
                 <tbody>
                   <tr v-for="data in totalCart" class="bg-white border-b">
                     <td class="px-6 py-4 font-semibold text-gray-900">
@@ -226,7 +276,7 @@ const function_activate_status = () => {
                         </div>
                       </div>
                     </td>
-                    <td class="px-6 py-4 font-semibold text-gray-900">$9992</td>
+                    <td class="px-6 py-4 font-semibold text-gray-900"></td>
                     <td class="px-6 py-4 font-semibold text-gray-900">
                       <button>
                         <Icon icon="close_icon" size="sm" class="text-red" />
@@ -235,9 +285,37 @@ const function_activate_status = () => {
                   </tr>
                 </tbody>
               </table>
+              <div v-if="scannedProducts.length === 0" class="mx-auto  text-center text-xs">Scan a product</div>
+
+              <div v-else
+                class="w-full  ">
+           
+                <div class="flow-root max-h-[50vmin] overflow-auto p-2" id="addedCartScrll">
+                  <ul role="addedlist" v-for="items in scannedProducts" class="divide-y divide-gray-200 ">
+                    <li class="py-3 sm:py-4">
+                      <div class="flex items-center space-x-4">
+                        <div class="flex-shrink-0">
+                          <img class="w-8 h-8 rounded-full" :src="items.product_image"
+                            alt="Neil image">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                          <p class="text-sm font-medium text-gray-900 truncate ">
+                            {{items.name}}
+                          </p>
+                        </div>
+                        <div class="inline-flex items-center text-base font-semibold text-gray-900 ">
+                         {{items.current_price.price}}
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+
             </div>
             <div class="bg-white flex justify-between item-center p-5">
-              <p><span class="font-bold">Total:</span> 200</p>
+              <p><span class="font-bold">Total:</span> 0</p>
               <button type="button"
                 class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2">
                 Charge
@@ -247,5 +325,9 @@ const function_activate_status = () => {
         </div>
       </div>
     </div>
-  </AppLayout>
-</template>
+
+
+  <!-- MODAL FOR DATA -->
+  <deleteAll :modalDelete="deleteAllModal" />
+  <SKU :SKULookup="SKULookup" :products="props.product" />
+</AppLayout></template>
