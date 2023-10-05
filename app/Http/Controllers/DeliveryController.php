@@ -290,6 +290,7 @@ class DeliveryController extends Controller
 
     public function authenticate(Request $request, Delivery $delivery)
     {
+        dd($delivery->with("details"));
         $delivery->update([
             "status" => $request->status,
             "received_by" => Auth::user()->id
