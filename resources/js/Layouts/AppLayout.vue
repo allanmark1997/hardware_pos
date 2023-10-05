@@ -8,11 +8,12 @@ import DropdownLink from "@/Components/DropdownLink.vue";
 import NavLink from "@/Components/NavLink.vue";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
 import Icon from "@/Components/Icon.vue";
-
+import Helpers from "../helpers/helper.js";
 
 defineProps({
   title: String,
 });
+const { forbid_keys } = Helpers();
 
 onMounted(() => {
   localStorage.setItem("qrScanner", "");
