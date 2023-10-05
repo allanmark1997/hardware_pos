@@ -9,7 +9,13 @@ import SKU from "@/Components/cashierModals/SKU.vue";
 
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
-const props = defineProps(["product", "cashier_status", "cashier_stat_id", "tax", "special_discount"]); 
+const props = defineProps([
+  "product",
+  "cashier_status",
+  "cashier_stat_id",
+  "tax",
+  "special_discount",
+]);
 
 const totalCart = ref(0);
 const sampleData = ref(5);
@@ -21,10 +27,16 @@ const deleteAllModal = ref(false);
 const spDiscount = ref(false);
 const SKULookup = ref(false);
 const prodScan = ref("");
-const scannedProducts = ref([]);
+// const scannedProducts = ref([]);
 const scannedProductIMG = ref("");
 const quantity = ref(1);
 // const scannedCode = "323423465756";
+
+const form = useForm({
+  products: [],
+  search: "",
+  machine: false,
+});
 
 onMounted(() => {
   keydownHandler();
@@ -148,11 +160,6 @@ const nFormatter = (num) => {
   return num;
 };
 
-const form = useForm({
-  search: "",
-  machine: false,
-});
-
 const search_ = () => {
   form.get(route("cashier.index"), {
     preserveScroll: true,
@@ -165,21 +172,19 @@ const create_transaction = (active) => {
 
 const applyDiscount = (product, discountPercentage) => {
   if (discountPercentage < 0 || discountPercentage > 100) {
-   
-    
     return product;
   }
 
-  const discountedPrice = product - (product * (discountPercentage / 100));
+  const discountedPrice = product - product * (discountPercentage / 100);
 
   const discountedProduct = {
     ...product,
-    discountedPrice: discountedPrice.toFixed(2), 
+    discountedPrice: discountedPrice.toFixed(2),
     // discountApplied: discountPercentage.toFixed(2) + "%",
   };
 
   return discountedProduct;
-}
+};
 
 const addtoCart = () => {
   let scan_product = props.product.find(
@@ -192,15 +197,15 @@ const addtoCart = () => {
       position: toast.POSITION.TOP_RIGHT,
     });
   } else if (scan_product != undefined) {
-    let duplicate_auth = scannedProducts.value.find(
+    let duplicate_auth = form.products.find(
       (product) => product.barcode == scan_product.barcode
     );
-    let duplicate_index_auth = scannedProducts.value.findIndex(
+    let duplicate_index_auth = form.products.findIndex(
       (product) => product.barcode == scan_product.barcode
     );
     if (duplicate_auth == undefined) {
       scan_product.cashier_quantity = quantity.value;
-      scannedProducts.value.push(scan_product);
+      form.products.push(scan_product);
       scannedProductIMG.value = scan_product.product_image;
       toast.success("Product added to cart!", {
         autoClose: 1000,
@@ -209,10 +214,8 @@ const addtoCart = () => {
       });
     } else {
       let quantity_add =
-        scannedProducts.value[duplicate_index_auth].cashier_quantity +
-        quantity.value;
-      scannedProducts.value[duplicate_index_auth].cashier_quantity =
-        quantity_add;
+        form.products[duplicate_index_auth].cashier_quantity + quantity.value;
+      form.products[duplicate_index_auth].cashier_quantity = quantity_add;
       scannedProductIMG.value = scan_product.product_image;
       scannedProductIMG.value = scan_product.product_image;
       toast.success("Product added to cart!", {
@@ -225,7 +228,7 @@ const addtoCart = () => {
   // for (let index = 0; index < props.product.length; index++) {
   //   const prod = props.product[index];
   //   if (prodScan.value === prod.barcode) {
-  //     scannedProducts.value.push(prod);
+  //     form.products.value.push(prod);
   //     scannedProductIMG.value = prod.product_image;
   //     toast.success("Product added to cart!", {
   //       autoClose: 1000,
@@ -432,7 +435,7 @@ const function_activate_status = () => {
                 </tbody>
               </table>
               <div
-                v-if="scannedProducts.length === 0"
+                v-if="form.products.length === 0"
                 class="mx-auto text-center text-xs"
               >
                 Scan a product
@@ -445,7 +448,7 @@ const function_activate_status = () => {
                 >
                   <ul
                     role="addedlist"
-                    v-for="items in scannedProducts"
+                    v-for="items in form.products"
                     class="divide-y divide-gray-200"
                   >
                     <li class="py-3 sm:py-4">
@@ -465,8 +468,14 @@ const function_activate_status = () => {
                         <div
                           class="inline-flex items-center text-base font-semibold text-gray-900"
                         >
-                          {{ convert_money(applyDiscount(items.current_price.price, items.current_discount.discount).discountedPrice * items.cashier_quantity)  }}
-                          
+                          {{
+                            convert_money(
+                              applyDiscount(
+                                items.current_price.price,
+                                items.current_discount.discount
+                              ).discountedPrice * items.cashier_quantity
+                            )
+                          }}
                         </div>
                         <div
                           class="inline-flex items-center text-base font-semibold text-gray-900"
