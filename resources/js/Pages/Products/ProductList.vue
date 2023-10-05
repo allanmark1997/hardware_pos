@@ -419,13 +419,13 @@ onMounted(() => {
                 >
                   {{ convert_money(product.current_price.price) }}
                 </h2>
-                <!-- <svg
+                <svg
                   class="barcode w-[20vmin] h-[10vmin] mx-auto"
                   jsbarcode-format="CODE128"
                   :jsbarcode-value="product.barcode"
                   jsbarcode-textmargin="0"
                   jsbarcode-fontoptions="bold"
-                ></svg> -->
+                ></svg>
                 <p class="leading-relaxed text-xs flex gap-2 mb-2">
                   <img
                     class="w-6 h-6 rounded-full"

@@ -9,9 +9,12 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Redirect;
 use App\Models\Category;
 use App\Models\product;
+use App\Models\SpecialDiscount;
+use App\Models\Tax;
 use App\Models\transaction;
 use App\Models\TransactionDetail;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class CashierController extends Controller
 {
@@ -22,11 +25,15 @@ class CashierController extends Controller
     {
 
         $product = product::with('current_price')->with('current_discount')->get();
+        $tax = Tax::orderBy('created_at', 'desc')->first();
+        $special_discount = SpecialDiscount::orderBy('created_at', 'desc')->first();
         $cashier_stat = CashierStatus::where("user_id", Auth::user()->id)->first();
         return Inertia::render('Cashier/Cashier', [
             "product" => $product,
             "cashier_status" => $cashier_stat->status == 0 ? "false" : "true",
-            "cashier_stat_id" => $cashier_stat->id
+            "cashier_stat_id" => $cashier_stat->id,
+            "tax" => $tax,
+            "special_discount" => $special_discount
         ]);
     }
 
@@ -41,34 +48,43 @@ class CashierController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function create_transaction(Request $request)
-    {
-        $transaction = transaction::create([
-            "processed_by" => Auth::user()->id,
-            "status" => false,
-            "payment_method" => 0,
-            "customer_type" => 0
-        ]);
-        return back();
-    }
     public function store(Request $request)
     {
-        $product = product::where("barcode", $request->search)->with('current_price')->with('current_discount')->first();
-        if ($product != null) {
-            // dd($product->current_discount->id);
+        foreach ($request->products as $key => $product) {
+            $product_find = product::find($product->id);
+            if ($product->cashier_quantity < $product->quantity) {
+                throw ValidationException::withMessages([
+                    'transaction_validation' => "Opps, looks like your inputed quantity is beyond stocks in " . $product->name,
+                ]);
+                return back();
+            }
+        }
+
+        $transaction = transaction::create([
+            "processed_by" => Auth::user()->id,
+            "status" => true,
+            "payment_method" => false,
+            "customer_type" => false,
+            "tax_id" => $request->tax_id,
+            "special_discount_id" => $request->special_discount_id,
+        ]);
+
+        foreach ($request->products as $key => $product) {
+            $product_find = product::where("id", $product->id)->first();
+            $deduct_inventory = $product_find->quantity - $product->cashier_quantity;
+            $product_find->update([
+                "quantity" => $deduct_inventory
+            ]);
 
             TransactionDetail::create([
                 "product_id" => $product->id,
-                "transaction_id" => $request->transaction["id"],
+                "transaction_id" => $transaction->id,
                 "sale_discounts_id" => $product->current_discount->id,
-                "price_id" => $product->current_price->id
+                "price_id" => $product->current_price->id,
+                "quantity" => $product->cashier_quantity,
+                "status" => true,
             ]);
         }
-
-        $products = TransactionDetail::where('transaction_id')->get();
-        return Inertia::render('Cashier/Cashier', [
-            "product_listed" => $products
-        ]);
     }
 
     /**
