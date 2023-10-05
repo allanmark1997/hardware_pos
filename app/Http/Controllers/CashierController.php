@@ -51,15 +51,15 @@ class CashierController extends Controller
     public function store(Request $request)
     {
         foreach ($request->products as $key => $product) {
-            $product_find = product::find($product->id);
-            if ($product->cashier_quantity < $product->quantity) {
+            $product_find = product::find($product["id"]);
+            if ($product_find->quantity < $product["cashier_quantity"]) {
                 throw ValidationException::withMessages([
-                    'transaction_validation' => "Opps, looks like your inputed quantity is beyond stocks in " . $product->name,
+                    'transaction_validation' => "Opps, looks like your inputed quantity is beyond stocks in " . $product["name"],
                 ]);
                 return back();
             }
         }
-
+        dd("success");
         $transaction = transaction::create([
             "processed_by" => Auth::user()->id,
             "status" => true,
@@ -70,8 +70,8 @@ class CashierController extends Controller
         ]);
 
         foreach ($request->products as $key => $product) {
-            $product_find = product::where("id", $product->id)->first();
-            $deduct_inventory = $product_find->quantity - $product->cashier_quantity;
+            $product_find = product::where("id", $product["id"])->first();
+            $deduct_inventory = $product_find->quantity - $product["cashier_quantity"];
             $product_find->update([
                 "quantity" => $deduct_inventory
             ]);
@@ -81,7 +81,7 @@ class CashierController extends Controller
                 "transaction_id" => $transaction->id,
                 "sale_discounts_id" => $product->current_discount->id,
                 "price_id" => $product->current_price->id,
-                "quantity" => $product->cashier_quantity,
+                "quantity" => $product["cashier_quantity"],
                 "status" => true,
             ]);
         }

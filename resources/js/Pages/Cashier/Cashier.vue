@@ -212,6 +212,7 @@ const addtoCart = () => {
         transition: toast.TRANSITIONS.FLIP,
         position: toast.POSITION.TOP_RIGHT,
       });
+      prodScan.value = "";
     } else {
       let quantity_add =
         form.products[duplicate_index_auth].cashier_quantity + quantity.value;
@@ -223,6 +224,7 @@ const addtoCart = () => {
         transition: toast.TRANSITIONS.FLIP,
         position: toast.POSITION.TOP_RIGHT,
       });
+      prodScan.value = "";
     }
   }
   // for (let index = 0; index < props.product.length; index++) {
@@ -259,6 +261,26 @@ const convert_money = (data) => {
 
 const function_activate_status = () => {
   router.put(route("cashier_stat.update_status", props.cashier_stat_id));
+};
+
+const check_out = () => {
+  form.post(route("cashier.store"), {
+    preserveScroll: true,
+    onSuccess: () => {
+      toast.success("Print print", {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    },
+    onError: () => {
+      toast.error(form.errors.transaction_validation, {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    },
+  });
 };
 </script>
 <template>
@@ -491,6 +513,7 @@ const function_activate_status = () => {
             <div class="bg-white flex justify-between item-center p-5">
               <p><span class="font-bold">Total:</span> 0</p>
               <button
+                @click="check_out"
                 type="button"
                 class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
               >
