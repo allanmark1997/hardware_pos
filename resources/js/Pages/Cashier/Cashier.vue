@@ -4,9 +4,8 @@ import Icon from "@/Components/Icon.vue";
 import { onMounted, ref } from "vue";
 import { router, useForm } from "@inertiajs/vue3";
 
-
-import deleteAll from '@/Components/cashierModals/deleteAll.vue'
-import SKU from '@/Components/cashierModals/SKU.vue'
+import deleteAll from "@/Components/cashierModals/deleteAll.vue";
+import SKU from "@/Components/cashierModals/SKU.vue";
 
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -18,28 +17,31 @@ const samplePurchaseData = ref(2);
 const eventListenerStorage = ref();
 const status = ref();
 
-const deleteAllModal = ref(false)
-const spDiscount = ref(false)
-const SKULookup = ref(false)
-const prodScan = ref('')
-const scannedProducts = ref([])
-const scannedProductIMG = ref('')
+const deleteAllModal = ref(false);
+const spDiscount = ref(false);
+const SKULookup = ref(false);
+const prodScan = ref("");
+const scannedProducts = ref([]);
+const scannedProductIMG = ref("");
+const quantity = ref(1);
 // const scannedCode = "323423465756";
 
 onMounted(() => {
   keydownHandler();
-
 });
 
 const keydownHandler = (event) => {
   if (props.cashier_status == "false") {
     document.addEventListener("keydown", (e) => {
       if (e.keyCode == 112 && router.page.component == "Cashier/Cashier") {
-        console.log("Start transaction.")
+        console.log("Start transaction.");
         e.preventDefault();
-      } else if (e.keyCode == 113 && router.page.component == "Cashier/Cashier") {
-        console.log("Discount")
-        spDiscount.value = !spDiscount.value
+      } else if (
+        e.keyCode == 113 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        console.log("Discount");
+        spDiscount.value = !spDiscount.value;
         if (spDiscount.value) {
           toast.success("Special discount has been applied!", {
             autoClose: 1000,
@@ -55,39 +57,63 @@ const keydownHandler = (event) => {
         }
 
         e.preventDefault();
-      } else if (e.keyCode == 114 && router.page.component == "Cashier/Cashier") {
-        console.log("Transaction .")
+      } else if (
+        e.keyCode == 114 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        console.log("Transaction .");
         e.preventDefault();
-      } else if (e.keyCode == 115 && router.page.component == "Cashier/Cashier") {
-        console.log("Change Quantity.")
+      } else if (
+        e.keyCode == 115 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        console.log("Change Quantity.");
         e.preventDefault();
-      } else if (e.keyCode == 116 && router.page.component == "Cashier/Cashier") {
-        console.log("Change Tax")
+      } else if (
+        e.keyCode == 116 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        console.log("Change Tax");
         e.preventDefault();
-      } else if (e.keyCode == 117 && router.page.component == "Cashier/Cashier") {
-        console.log("Description.")
+      } else if (
+        e.keyCode == 117 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        console.log("Description.");
         e.preventDefault();
-      } else if (e.keyCode == 118 && router.page.component == "Cashier/Cashier") {
-        console.log("Delete Item ")
+      } else if (
+        e.keyCode == 118 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        console.log("Delete Item ");
         e.preventDefault();
-      } else if (e.keyCode == 119 && router.page.component == "Cashier/Cashier") {
+      } else if (
+        e.keyCode == 119 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
         if (!SKULookup.value) {
-          deleteAllModal.value = !deleteAllModal.value
+          deleteAllModal.value = !deleteAllModal.value;
         }
         e.preventDefault();
-      } else if (e.keyCode == 120 && router.page.component == "Cashier/Cashier") {
-        console.log("SKU Look up")
+      } else if (
+        e.keyCode == 120 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        console.log("SKU Look up");
         if (!deleteAllModal.value) {
-          SKULookup.value = !SKULookup.value
+          SKULookup.value = !SKULookup.value;
         }
         e.preventDefault();
-      } else if (e.keyCode == 121 && router.page.component == "Cashier/Cashier") {
-        console.log("Sales Return.")
+      } else if (
+        e.keyCode == 121 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        console.log("Sales Return.");
         e.preventDefault();
       }
     });
   }
-  function_activate_status()
+  function_activate_status();
 };
 
 const domChecker = () => {
@@ -130,7 +156,7 @@ const form = useForm({
 const search_ = () => {
   form.get(route("cashier.index"), {
     preserveScroll: true,
-    onSuccess: () => { },
+    onSuccess: () => {},
   });
 };
 const create_transaction = (active) => {
@@ -142,30 +168,68 @@ const create_transaction = (active) => {
 // }
 
 const addtoCart = () => {
-  for(let index = 0; index < props.product.length; index++) {
-    const prod = props.product[index];
-    if (prodScan.value === prod.barcode) {
-      scannedProducts.value.push(prod)
-      scannedProductIMG.value = prod.product_image
+  let scan_product = props.product.find(
+    (product) => product.barcode == prodScan.value
+  );
+  if (scan_product == undefined) {
+    toast.error("Product not available!", {
+      autoClose: 1000,
+      transition: toast.TRANSITIONS.FLIP,
+      position: toast.POSITION.TOP_RIGHT,
+    });
+  } else if (scan_product != undefined) {
+    let duplicate_auth = scannedProducts.value.find(
+      (product) => product.barcode == scan_product.barcode
+    );
+    let duplicate_index_auth = scannedProducts.value.findIndex(
+      (product) => product.barcode == scan_product.barcode
+    );
+    if (duplicate_auth == undefined) {
+      scan_product.cashier_quantity = quantity.value;
+      scannedProducts.value.push(scan_product);
+      scannedProductIMG.value = scan_product.product_image;
       toast.success("Product added to cart!", {
         autoClose: 1000,
         transition: toast.TRANSITIONS.FLIP,
         position: toast.POSITION.TOP_RIGHT,
       });
-     break
-    }else{
-      if(props.product.length == index + 1){
-        toast.error("Product not available!", {
+    } else {
+      let quantity_add =
+        scannedProducts.value[duplicate_index_auth].cashier_quantity +
+        quantity.value;
+      scannedProducts.value[duplicate_index_auth].cashier_quantity =
+        quantity_add;
+      scannedProductIMG.value = scan_product.product_image;
+      scannedProductIMG.value = scan_product.product_image;
+      toast.success("Product added to cart!", {
         autoClose: 1000,
         transition: toast.TRANSITIONS.FLIP,
         position: toast.POSITION.TOP_RIGHT,
       });
-      }
     }
- 
   }
-}
-
+  // for (let index = 0; index < props.product.length; index++) {
+  //   const prod = props.product[index];
+  //   if (prodScan.value === prod.barcode) {
+  //     scannedProducts.value.push(prod);
+  //     scannedProductIMG.value = prod.product_image;
+  //     toast.success("Product added to cart!", {
+  //       autoClose: 1000,
+  //       transition: toast.TRANSITIONS.FLIP,
+  //       position: toast.POSITION.TOP_RIGHT,
+  //     });
+  //     break;
+  //   } else {
+  //     if (props.product.length == index + 1) {
+  //       toast.error("Product not available!", {
+  //         autoClose: 1000,
+  //         transition: toast.TRANSITIONS.FLIP,
+  //         position: toast.POSITION.TOP_RIGHT,
+  //       });
+  //     }
+  //   }
+  // }
+};
 
 const function_activate_status = () => {
   router.put(route("cashier_stat.update_status", props.cashier_stat_id));
@@ -177,12 +241,27 @@ const function_activate_status = () => {
       <h2 class="font-semibold text-lg text-gray-800 leading-tight">Cashier</h2>
     </template>
     <div class="py-5">
-      <input v-model="prodScan">
-      <button type="button" @click="addtoCart()"
-        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-1 ml-2 text-center inline-flex items-center mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M1 5h12m0 0L9 1m4 4L9 9" />
+      <input v-model="prodScan" />
+      <input type="number" v-model="quantity" />
+      <button
+        type="button"
+        @click="addtoCart()"
+        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-1 ml-2 text-center inline-flex items-center mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+      >
+        <svg
+          class="w-5 h-5"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 14 10"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M1 5h12m0 0L9 1m4 4L9 9"
+          />
         </svg>
         <span class="sr-only">Icon description</span>
       </button>
@@ -191,24 +270,35 @@ const function_activate_status = () => {
       <div class="max-w-7xl mx-auto bg-white rounded mt-5 px-1">
         <div class="grid grid-cols-12 gap-2">
           <div class="col-span-7 p-5">
-            <div class="product_list bg-gray-50 p-1 rounded-lg mt-3 min-h-[60vmin] overflow-auto">
+            <div
+              class="product_list bg-gray-50 p-1 rounded-lg mt-3 min-h-[60vmin] overflow-auto"
+            >
               <div class="mt-24 flex justify-center">
-                <img :src="scannedProductIMG">
+                <img :src="scannedProductIMG" />
               </div>
             </div>
           </div>
           <div class="col-span-5">
-            <div class="bg-white rounded-b-xl shadow-md p-5 flex justify-between max-h-[63vmin]">
+            <div
+              class="bg-white rounded-b-xl shadow-md p-5 flex justify-between max-h-[63vmin]"
+            >
               <div class="flex">
                 <Icon icon="shopping_cart" size="sm"></Icon>
                 <span class="font-bold">Cart</span>
-                <span v-if="spDiscount"><small class="italic ml-1 text-white flex bg-red-600 p-1 rounded-lg">
-                    <Icon class="text-white" size="xs" icon="wheelchair" /> (Special Discount)
-                  </small></span>
+                <span v-if="spDiscount"
+                  ><small
+                    class="italic ml-1 text-white flex bg-red-600 p-1 rounded-lg"
+                  >
+                    <Icon class="text-white" size="xs" icon="wheelchair" />
+                    (Special Discount)
+                  </small></span
+                >
               </div>
               <div>
                 <span class="font-bold"> count: </span>
-                <span class="bg-red-500 ml-1 px-2 text-white rounded-xl w-10 text-center">
+                <span
+                  class="bg-red-500 ml-1 px-2 text-white rounded-xl w-10 text-center"
+                >
                   <small v-if="totalCart >= 1000">{{
                     nFormatter(totalCart)
                   }}</small>
@@ -222,22 +312,29 @@ const function_activate_status = () => {
             <form class="flex mt-5 mx-5 items-center">
               <label for="Search products" class="sr-only">Search</label>
               <div class="relative w-full">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <div
+                  class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+                >
                   <Icon class="mr-1" icon="shopping_bag" size="xs" />
                 </div>
-                <input type="text" id="Search products"
+                <input
+                  type="text"
+                  id="Search products"
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full pl-10 p-2.5"
-                  placeholder="Search products" />
+                  placeholder="Search products"
+                />
               </div>
-              <button type="submit"
-                class="inline-flex items-center py-2.5 px-3 ml-2 text-sm font-medium text-white bg-yellow-700 rounded-lg border border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300">
+              <button
+                type="submit"
+                class="inline-flex items-center py-2.5 px-3 ml-2 text-sm font-medium text-white bg-yellow-700 rounded-lg border border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300"
+              >
                 <Icon class="mr-5" icon="search_icon" size="xs" />
               </button>
             </form>
-            <div class="relative mt-5 px-2 overflow-x-auto min-h-[45vmin] shadow-md">
-
+            <div
+              class="relative mt-5 px-2 overflow-x-auto min-h-[45vmin] shadow-md"
+            >
               <table class="w-full text-sm text-left text-gray-500">
-
                 <tbody>
                   <tr v-for="data in totalCart" class="bg-white border-b">
                     <td class="px-6 py-4 font-semibold text-gray-900">
@@ -249,27 +346,53 @@ const function_activate_status = () => {
                           <div class="flex items-center space-x-3">
                             <button
                               class="inline-flex items-center justify-center p-1 text-sm font-medium h-6 w-6 text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200"
-                              type="button">
+                              type="button"
+                            >
                               <span class="sr-only">Quantity button</span>
-                              <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 18 2">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                  stroke-width="2" d="M1 1h16" />
+                              <svg
+                                class="w-3 h-3"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 18 2"
+                              >
+                                <path
+                                  stroke="currentColor"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M1 1h16"
+                                />
                               </svg>
                             </button>
                             <div>
-                              <input type="number" id="first_product"
+                              <input
+                                type="number"
+                                id="first_product"
                                 class="bg-gray-50 w-14 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-2.5 py-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="1" required />
+                                placeholder="1"
+                                required
+                              />
                             </div>
                             <button
                               class="inline-flex items-center justify-center h-6 w-6 p-1 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200"
-                              type="button">
+                              type="button"
+                            >
                               <span class="sr-only">Quantity button</span>
-                              <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 18 18">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                  stroke-width="2" d="M9 1v16M1 9h16" />
+                              <svg
+                                class="w-3 h-3"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 18 18"
+                              >
+                                <path
+                                  stroke="currentColor"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M9 1v16M1 9h16"
+                                />
                               </svg>
                             </button>
                           </div>
@@ -285,39 +408,59 @@ const function_activate_status = () => {
                   </tr>
                 </tbody>
               </table>
-              <div v-if="scannedProducts.length === 0" class="mx-auto  text-center text-xs">Scan a product</div>
+              <div
+                v-if="scannedProducts.length === 0"
+                class="mx-auto text-center text-xs"
+              >
+                Scan a product
+              </div>
 
-              <div v-else
-                class="w-full  ">
-           
-                <div class="flow-root max-h-[50vmin] overflow-auto p-2" id="addedCartScrll">
-                  <ul role="addedlist" v-for="items in scannedProducts" class="divide-y divide-gray-200 ">
+              <div v-else class="w-full">
+                <div
+                  class="flow-root max-h-[50vmin] overflow-auto p-2"
+                  id="addedCartScrll"
+                >
+                  <ul
+                    role="addedlist"
+                    v-for="items in scannedProducts"
+                    class="divide-y divide-gray-200"
+                  >
                     <li class="py-3 sm:py-4">
                       <div class="flex items-center space-x-4">
                         <div class="flex-shrink-0">
-                          <img class="w-8 h-8 rounded-full" :src="items.product_image"
-                            alt="Neil image">
+                          <img
+                            class="w-8 h-8 rounded-full"
+                            :src="items.product_image"
+                            alt="Neil image"
+                          />
                         </div>
                         <div class="flex-1 min-w-0">
-                          <p class="text-sm font-medium text-gray-900 truncate ">
-                            {{items.name}}
+                          <p class="text-sm font-medium text-gray-900 truncate">
+                            {{ items.name }}
                           </p>
                         </div>
-                        <div class="inline-flex items-center text-base font-semibold text-gray-900 ">
-                         {{items.current_price.price}}
+                        <div
+                          class="inline-flex items-center text-base font-semibold text-gray-900"
+                        >
+                          {{ items.current_price.price }}
+                        </div>
+                        <div
+                          class="inline-flex items-center text-base font-semibold text-gray-900"
+                        >
+                          {{ items.cashier_quantity }}
                         </div>
                       </div>
                     </li>
                   </ul>
                 </div>
               </div>
-
-
             </div>
             <div class="bg-white flex justify-between item-center p-5">
               <p><span class="font-bold">Total:</span> 0</p>
-              <button type="button"
-                class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2">
+              <button
+                type="button"
+                class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
+              >
                 Charge
               </button>
             </div>
@@ -326,8 +469,8 @@ const function_activate_status = () => {
       </div>
     </div>
 
-
-  <!-- MODAL FOR DATA -->
-  <deleteAll :modalDelete="deleteAllModal" />
-  <SKU :SKULookup="SKULookup" :products="props.product" />
-</AppLayout></template>
+    <!-- MODAL FOR DATA -->
+    <deleteAll :modalDelete="deleteAllModal" />
+    <SKU :SKULookup="SKULookup" :products="props.product" />
+  </AppLayout>
+</template>

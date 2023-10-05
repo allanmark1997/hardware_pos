@@ -46,7 +46,7 @@ const form = useForm({
 const form_back_order = useForm({
   product: false,
   quantity: 0,
-  remarks:""
+  remarks: "",
 });
 
 const openDetails = (detail, title, specs, img) => {
@@ -121,7 +121,10 @@ const remove_product = () => {
 };
 
 const back_order = () => {
-  if (form_back_order.product.quantity < form_back_order.quantity || form_back_order.product.quantity == 0) {
+  if (
+    form_back_order.product.quantity < form_back_order.quantity ||
+    form_back_order.product.quantity == 0
+  ) {
     toast.error(
       "Can't allow request, since the quantity inputed is above products stocks",
       {
