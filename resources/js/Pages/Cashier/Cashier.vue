@@ -9,7 +9,7 @@ import SKU from "@/Components/cashierModals/SKU.vue";
 
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
-const props = defineProps(["product", "cashier_status", "cashier_stat_id"]);
+const props = defineProps(["product", "cashier_status", "cashier_stat_id", "tax", "special_discount"]); 
 
 const totalCart = ref(0);
 const sampleData = ref(5);
@@ -163,9 +163,23 @@ const create_transaction = (active) => {
   console.log("active cashier");
 };
 
-// const scan = () =>{
-//   search_(scannedCode.value)
-// }
+const applyDiscount = (product, discountPercentage) => {
+  if (discountPercentage < 0 || discountPercentage > 100) {
+   
+    
+    return product;
+  }
+
+  const discountedPrice = product - (product * (discountPercentage / 100));
+
+  const discountedProduct = {
+    ...product,
+    discountedPrice: discountedPrice.toFixed(2), 
+    // discountApplied: discountPercentage.toFixed(2) + "%",
+  };
+
+  return discountedProduct;
+}
 
 const addtoCart = () => {
   let scan_product = props.product.find(
@@ -229,6 +243,15 @@ const addtoCart = () => {
   //     }
   //   }
   // }
+};
+
+const convert_money = (data) => {
+  const formatter = new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+  });
+  formatter.format(data);
+  return formatter.format(data);
 };
 
 const function_activate_status = () => {
@@ -442,7 +465,8 @@ const function_activate_status = () => {
                         <div
                           class="inline-flex items-center text-base font-semibold text-gray-900"
                         >
-                          {{ items.current_price.price }}
+                          {{ convert_money(applyDiscount(items.current_price.price, items.current_discount.discount).discountedPrice * items.cashier_quantity)  }}
+                          
                         </div>
                         <div
                           class="inline-flex items-center text-base font-semibold text-gray-900"
