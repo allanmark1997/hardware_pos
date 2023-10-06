@@ -58,7 +58,7 @@ class TransactionController extends Controller
         $grand_unsuccess_total[] = ['Paid grand total', "Unsuccessful grand total"];
         $grand_unsuccess_total[] = ["PHP " . number_format($this->grand_total_success($transactions), 2), "PHP " . number_format($this->grand_total_unsuccess($transactions), 2)];
 
-        $results[] = ['TRANSACTION ID', 'ACCOMMODATED BY', 'STATUS', 'PAYMENT METHOD', 'CUSTOMER TYPE', 'TAX IN PERCENT', 'SPECIAL DISCOUNT IN PERCENT', '', '', '', '', '', '', '', "TOTAL VAT ADDED", "TOTAL SPECIAL DISCOUNTED", "TOTAL PRICE PAID", "TOTAL BACK ORDER", 'CREATED AT'];
+        $results[] = ['TRANSACTION ID', 'ACCOMMODATED BY', 'STATUS', 'PAYMENT METHOD', 'CUSTOMER TYPE', 'TAX IN PERCENT', 'SPECIAL DISCOUNT IN PERCENT', '', '', '', '', '', '', '', "TOTAL VAT ADDED", "TOTAL SPECIAL DISCOUNTED", "TOTAL PRICE PAID", "CUSTOMER CASH", "CUSTOMER CHANGE", "TOTAL BACK ORDER", 'CREATED AT'];
 
         foreach ($transactions as $key => $transaction) {
             // dd($transaction->accommodate_by);
@@ -69,7 +69,7 @@ class TransactionController extends Controller
                 $transaction->payment_method == 0 ? "Cash" : "Other",
                 $transaction->customer_type == 0 ? "Walk-in" : "Regular",
                 $transaction->tax->tax / 100,
-                $transaction->special_discount->discount / 100,
+                $transaction->special_discount?->discount ? $transaction->special_discount->discount:0 / 100,
                 count($transaction->transaction_details) != 0 ? "Product name" : "--",
                 count($transaction->transaction_details) != 0 ? "Quantity" : "--",
                 count($transaction->transaction_details) != 0 ? "Price" : "--",
@@ -77,10 +77,12 @@ class TransactionController extends Controller
                 count($transaction->transaction_details) != 0 ? "Status" : "--",
                 count($transaction->transaction_details) != 0 ? "Total Discount" : "--",
                 count($transaction->transaction_details) != 0 ? "Sub-total" : "--",
-                "PHP " . number_format($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount->discount, 0, $transaction->status), 2),
-                "PHP " . number_format($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount->discount, 1, $transaction->status), 2),
-                "PHP " . number_format($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount->discount, 2, $transaction->status), 2),
-                "PHP " . number_format($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount->discount, 3, $transaction->status), 2),
+                "PHP " . number_format($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount:0, 0, $transaction->status), 2),
+                "PHP " . number_format($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount:0, 1, $transaction->status), 2),
+                "PHP " . number_format($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount:0, 2, $transaction->status), 2),
+                "PHP " . number_format($transaction->cash, 2),
+                "PHP " . number_format(($transaction->cash - $this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount:0, 2, $transaction->status)), 2),
+                "PHP " . number_format($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount:0, 3, $transaction->status), 2),
 
                 Carbon::parse($transaction->created_at)->format('d-m-Y')
             ];
@@ -196,7 +198,7 @@ class TransactionController extends Controller
     {
         $grand_total = 0;
         foreach ($transactions as $key => $transaction) {
-            $grand_total += $this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount->discount, 2, $transaction->status);
+            $grand_total += $this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount?->discount: 0, 2, $transaction->status);
         }
         return $grand_total;
     }
@@ -205,7 +207,7 @@ class TransactionController extends Controller
     {
         $grand_total = 0;
         foreach ($transactions as $key => $transaction) {
-            $grand_total += $this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount->discount, 3, $transaction->status);
+            $grand_total += $this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount?->discount: 0, 3, $transaction->status);
         }
         return $grand_total;
     }

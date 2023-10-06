@@ -27,6 +27,7 @@ const samplePurchaseData = ref(2);
 const eventListenerStorage = ref();
 const status = ref();
 
+const logoutlModal = ref(false);
 const deleteAllModal = ref(false);
 const cash_input_modal = ref(false);
 const spDiscount = ref(false);
@@ -46,7 +47,7 @@ const form = useForm({
   tax_id: props.tax.id,
   special_discount_id:
     spDiscount.value == true ? props.special_discount.id : null,
-  cash: 0,
+  cash: null,
 });
 
 onMounted(() => {
@@ -157,17 +158,43 @@ const keydownHandler = (event) => {
         router.page.component == "Cashier/Cashier"
       ) {
         log_out();
-      } else if (
+      }
+      else if (
+        logoutlModal.value == true &&
+        e.ctrlKey &&
+        e.keyCode == 89 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        logout_confirm();
+      }
+      else if (
+        logoutlModal.value == true &&
+        e.ctrlKey &&
+        e.keyCode == 78 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        logoutlModal.value =! logoutlModal.value
+      }
+       else if (
         e.ctrlKey &&
         e.altKey &&
         e.keyCode == 80 &&
         router.page.component == "Cashier/Cashier"
       ) {
-        // alert("Hello");
-        // document.getElementById("cash_input").focus();
-        // form.cash.focus();
+  unsetFocusToTextBox()
+  // setFocusToTextBoxCash()
         cash_input_modal.value = !cash_input_modal.value;
       } else if (
+        cash_input_modal.value == true &&
+        e.ctrlKey &&
+        e.altKey &&
+        e.keyCode == 70 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        // alert("hell")
+        setFocusToTextBoxCash()
+      }
+       else if (
         cash_input_modal.value == true &&
         e.ctrlKey &&
         e.altKey &&
@@ -345,7 +372,14 @@ const function_activate_status = () => {
 };
 
 const check_out = () => {
-  if (form.cash == 0 || form.cash == "" || form.cash == null) {
+  if (form.cash < item_grand_total.value) {
+    toast.error("Inputed cash is insuficient", {
+      autoClose: 1000,
+      transition: toast.TRANSITIONS.FLIP,
+      position: toast.POSITION.TOP_RIGHT,
+    });
+  }
+ else if (form.cash == 0 || form.cash == "" || form.cash == null) {
     toast.error("Please input cash first to proceed!", {
       autoClose: 1000,
       transition: toast.TRANSITIONS.FLIP,
@@ -371,6 +405,7 @@ const check_out = () => {
         });
         form.reset();
         scannedProductIMG.value = "";
+        cash_input_modal.value = false
       },
       onError: () => {
         toast.error(form.errors.transaction_validation, {
@@ -384,8 +419,13 @@ const check_out = () => {
 };
 
 const log_out = () => {
-  form.post(route("logout"));
+  logoutlModal.value =! logoutlModal.value
 };
+
+const logout_confirm = () => {
+  form.post(route("logout"));
+
+}
 
 watch(form.products, (products) => {
   let temp_quantity = 0;
@@ -412,6 +452,21 @@ const setFocusToTextBox = () => {
     position: toast.POSITION.TOP_RIGHT,
   });
   prodScan.value = "";
+};
+
+const unsetFocusToTextBox = () => {
+  document.querySelector("#prodBarcodeInput").blur();
+  toast.success("Scanner is disconnected!", {
+    autoClose: 1000,
+    transition: toast.TRANSITIONS.FLIP,
+    position: toast.POSITION.TOP_RIGHT,
+  });
+  prodScan.value = "";
+};
+
+const setFocusToTextBoxCash = () => {
+  document.querySelector("#prodBarcodeInput").blur();
+  document.querySelector("#inputCash").focus();
 };
 
 const addQuantitytoPurchase = (add, subtract) => {
@@ -831,10 +886,10 @@ const addQuantitytoPurchase = (add, subtract) => {
   >
     <template #title>
       You are going to check out this trasaction, please input Amount
-      cash?</template
+      cash. Payable amount is {{ convert_money(item_grand_total) }}</template
     >
     <template #content>
-      <Input type="number" label="Enter Cash" v-model="form.cash" />
+      <input id="inputCash" class="rounded-lg w-full" type="text" v-model="form.cash" autofocus @keyup.enter="check_out" />
     </template>
     <template #footer>
       <SecondaryButton @click="cash_input_modal = false" class="mr-2">
@@ -865,4 +920,41 @@ const addQuantitytoPurchase = (add, subtract) => {
   </ConfirmDialogModal>
   <SKU :SKULookup="SKULookup" :products="props.product" />
   <!-- </AppLayout> -->
+  <ConfirmDialogModal
+    :show="logoutlModal"
+    @close="logoutlModal = false"
+    maxWidth="2xl"
+  >
+    <template #title>
+      Are you sure you want to log-out?</template
+    >
+    <template #content>
+    </template>
+    <template #footer>
+      <SecondaryButton @click="logoutlModal = false" class="mr-2">
+        Cancel (CTRL + ALT + N)
+      </SecondaryButton>
+      <Button
+        :class="{ 'opacity-25': form.processing }"
+        :disabled="form.processing"
+        class="bg-green-200 hover:bg-green-400"
+        @click="logout_confirm"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-auto"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+          /></svg
+        >&nbsp;Proceed (CTRL + ALT + Y)
+      </Button>
+    </template>
+  </ConfirmDialogModal>
 </template>

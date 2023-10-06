@@ -221,6 +221,8 @@ const calculate_grand_total_unsuccess = (data) => {
               <th scope="col" class="px-6 py-3">Products</th>
               <th scope="col" class="px-6 py-3">Total Discount & VAT</th>
               <th scope="col" class="px-6 py-3">Total Paid</th>
+              <th scope="col" class="px-6 py-3">Customer Cash</th>
+              <th scope="col" class="px-6 py-3">Customer Change</th>
               <th scope="col" class="px-6 py-3">Total Unsuccess</th>
               <th scope="col" class="px-6 py-3">Created at</th>
             </tr>
@@ -420,6 +422,27 @@ const calculate_grand_total_unsuccess = (data) => {
                         transaction.tax?.tax ?? 0,
                         0
                       )
+                    )
+                  }}
+                </td>
+                <td class="px-6 py-4">
+                  {{
+                    convert_money(
+                      transaction.cash
+                    )
+                  }}
+                </td>
+                <td class="px-6 py-4">
+                  {{
+                    convert_money(
+                      transaction.cash
+-
+                      calculate_grand_total(
+                        transaction.transaction_details,
+                        transaction.special_discount?.discount ?? 0,
+                        transaction.tax?.tax ?? 0,
+                        0
+                      ) 
                     )
                   }}
                 </td>
