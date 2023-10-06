@@ -132,6 +132,7 @@ Route::middleware([
     Route::prefix('cashier')->name('cashier.')->group(function () {
         Route::get('/cashier', [CashierController::class, 'index'])->name('index');
         Route::post('/store', [CashierController::class, 'store'])->name('store');
+        Route::post('/logout', [CashierController::class, 'logout'])->name('logout');
     });
 
     Route::prefix('cashier')->name('cashier_stat.')->group(function () {

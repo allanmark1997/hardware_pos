@@ -336,6 +336,10 @@ const check_out = () => {
   });
 };
 
+const log_out = () => {
+  form.post(route("logout"));
+};
+
 watch(form.products, (products) => {
   let temp_quantity = 0;
   let temp_grand_total = 0;
@@ -400,6 +404,13 @@ const addQuantitytoPurchase = (add, subtract) => {
     <!-- <input type="text" v-model="form.search" /> -->
     <!-- <button @click="search_()" class="bg-red-200">scan</button> -->
     <div class="flex max-w-7xl mx-auto justify-end">
+      <button
+        @click="log_out"
+        type="button"
+        class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
+      >
+        Log out
+      </button>
       <kbd
         class="px-2 py-1.5 text-xs font-semibold text-white bg-yellow-700 border rounded-lg"
         >Purchase Quantity: {{ quantity }}</kbd
