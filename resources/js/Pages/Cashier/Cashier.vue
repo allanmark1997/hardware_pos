@@ -86,12 +86,6 @@ const keydownHandler = (event) => {
         console.log("Change Quantity.");
         e.preventDefault();
       } else if (
-        e.keyCode == 116 &&
-        router.page.component == "Cashier/Cashier"
-      ) {
-        console.log("Change Tax");
-        e.preventDefault();
-      } else if (
         e.keyCode == 117 &&
         router.page.component == "Cashier/Cashier"
       ) {
@@ -162,6 +156,24 @@ const keydownHandler = (event) => {
         router.page.component == "Cashier/Cashier"
       ) {
         check_out();
+      } else if (
+        deleteAllModal.value == true &&
+        e.ctrlKey &&
+        e.altKey &&
+        e.keyCode == 89 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        form.products = [];
+        scannedProductIMG.value = "";
+        deleteAllModal.value = false;
+      } else if (
+        deleteAllModal.value == true &&
+        e.ctrlKey &&
+        e.altKey &&
+        e.keyCode == 78 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        deleteAllModal.value = false;
       }
     });
   }
@@ -290,27 +302,6 @@ const addtoCart = () => {
       }
     }
   }
-  // for (let index = 0; index < props.product.length; index++) {
-  //   const prod = props.product[index];
-  //   if (prodScan.value === prod.barcode) {
-  //     form.products.value.push(prod);
-  //     scannedProductIMG.value = prod.product_image;
-  //     toast.success("Product added to cart!", {
-  //       autoClose: 1000,
-  //       transition: toast.TRANSITIONS.FLIP,
-  //       position: toast.POSITION.TOP_RIGHT,
-  //     });
-  //     break;
-  //   } else {
-  //     if (props.product.length == index + 1) {
-  //       toast.error("Product not available!", {
-  //         autoClose: 1000,
-  //         transition: toast.TRANSITIONS.FLIP,
-  //         position: toast.POSITION.TOP_RIGHT,
-  //       });
-  //     }
-  //   }
-  // }
 };
 
 const convert_money = (data) => {
@@ -438,7 +429,7 @@ const addQuantitytoPurchase = (add, subtract) => {
     </div>
     <div class="flex max-w-7xl mx-auto justify-end">
       <kbd
-        class="px-2 py-1.5 text-xs font-semibold text-white bg-yellow-700 border rounded-lg"
+        class="px-2 py-1.5 text-2xl font-semibold text-white bg-yellow-700 border rounded-lg"
         >Purchase Quantity: {{ quantity }}</kbd
       >
     </div>
@@ -490,7 +481,7 @@ const addQuantitytoPurchase = (add, subtract) => {
               </span>
             </div>
           </div>
-          <form class="flex mt-5 mx-5 items-center">
+          <!-- <form class="flex mt-5 mx-5 items-center">
             <label for="Search products" class="sr-only">Search</label>
             <div class="relative w-full">
               <div
@@ -511,7 +502,7 @@ const addQuantitytoPurchase = (add, subtract) => {
             >
               <Icon class="mr-5" icon="search_icon" size="xs" />
             </button>
-          </form>
+          </form> -->
           <div
             class="relative mt-5 px-2 overflow-x-auto min-h-[45vmin] shadow-md"
           >
@@ -649,12 +640,37 @@ const addQuantitytoPurchase = (add, subtract) => {
           <div class="item-center p-5">
             <div>
               <p>
-                <span class="font-bold">VAT({{ tax.tax }}%)</span>
+                <span class="font-bold">VAT({{ tax.tax }}%): </span>
+                {{
+                  convert_money(
+                    applyTax(
+                      applyDiscount(
+                        item_grand_total,
+                        spDiscount == true ? special_discount.discount : 0
+                      ).discountedPrice
+                    ) -
+                      applyDiscount(
+                        item_grand_total,
+                        spDiscount == true ? special_discount.discount : 0
+                      ).discountedPrice
+                  )
+                }}
               </p>
               <p>
                 <span class="font-bold"
-                  >Special Discount({{ special_discount.discount }}%)</span
-                >
+                  >Special Discount({{
+                    spDiscount == true ? special_discount.discount : 0
+                  }}%):
+                </span>
+                {{
+                  convert_money(
+                    item_grand_total -
+                      applyDiscount(
+                        item_grand_total,
+                        spDiscount == true ? special_discount.discount : 0
+                      ).discountedPrice
+                  )
+                }}
               </p>
               <p>
                 <span class="font-bold">Sub-Total (Excluding VAT):</span>
@@ -664,8 +680,10 @@ const addQuantitytoPurchase = (add, subtract) => {
                 <span class="font-bold">Sub-Total:</span>
                 {{
                   convert_money(
-                    applyDiscount(item_grand_total, special_discount.discount)
-                      .discountedPrice
+                    applyDiscount(
+                      item_grand_total,
+                      spDiscount == true ? special_discount.discount : 0
+                    ).discountedPrice
                   )
                 }}
               </p>
@@ -674,8 +692,10 @@ const addQuantitytoPurchase = (add, subtract) => {
                 {{
                   convert_money(
                     applyTax(
-                      applyDiscount(item_grand_total, special_discount.discount)
-                        .discountedPrice
+                      applyDiscount(
+                        item_grand_total,
+                        spDiscount == true ? special_discount.discount : 0
+                      ).discountedPrice
                     )
                   )
                 }}
@@ -686,7 +706,7 @@ const addQuantitytoPurchase = (add, subtract) => {
                   type="button"
                   class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
                 >
-                  Charge
+                  Check out
                 </button>
               </div>
             </div>
@@ -697,7 +717,78 @@ const addQuantitytoPurchase = (add, subtract) => {
   </div>
 
   <!-- MODAL FOR DATA -->
-  <deleteAll :modalDelete="deleteAllModal" />
+  <!-- <deleteAll :modalDelete="deleteAllModal" /> -->
+  <div
+    v-if="deleteAllModal"
+    id="defaultModal"
+    tabindex="-1"
+    aria-hidden="true"
+    class="fixed top-0 left-0 right-0 backdrop-blur-sm z-50 pt-52 flex justify-center item-center w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full"
+  >
+    <div class="relative w-full max-w-2xl max-h-full">
+      <!-- Modal content -->
+      <div class="relative bg-white rounded-lg shadow">
+        <!-- Modal header -->
+        <div class="flex items-start justify-between p-4 border-b rounded-t">
+          <h3 class="text-xl font-semibold text-gray-900">Delete All?</h3>
+          <button
+            @click="deleteAllModal = false"
+            type="button"
+            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center"
+            data-modal-hide="defaultModal"
+          >
+            <svg
+              class="w-3 h-3"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 14 14"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+              />
+            </svg>
+            <span class="sr-only">Close modal</span>
+          </button>
+        </div>
+        <!-- Modal body -->
+        <div class="p-6 space-y-6">
+          <p class="text-base leading-relaxed text-gray-500">
+            Are you sure you want to delete all transactions?
+          </p>
+        </div>
+        <!-- Modal footer -->
+        <div
+          class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b"
+        >
+          <button
+            @click="
+              (form.products = []),
+                (scannedProductIMG = ''),
+                (deleteAllModal = false)
+            "
+            data-modal-hide="defaultModal"
+            type="button"
+            class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+          >
+            Delete All (CTRL + ALT + Y)
+          </button>
+          <button
+            @click="deleteAllModal = false"
+            data-modal-hide="defaultModal"
+            type="button"
+            class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10"
+          >
+            Decline (CTRL + ALT + N)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
   <SKU :SKULookup="SKULookup" :products="props.product" />
   <!-- </AppLayout> -->
 </template>
