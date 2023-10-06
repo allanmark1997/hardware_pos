@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Icon from "@/Components/Icon.vue";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { router, useForm } from "@inertiajs/vue3";
 
 import deleteAll from "@/Components/cashierModals/deleteAll.vue";
@@ -30,6 +30,7 @@ const prodScan = ref("");
 // const scannedProducts = ref([]);
 const scannedProductIMG = ref("");
 const quantity = ref(1);
+const item_count = ref(0);
 // const scannedCode = "323423465756";
 
 const form = useForm({
@@ -196,7 +197,21 @@ const addtoCart = () => {
       transition: toast.TRANSITIONS.FLIP,
       position: toast.POSITION.TOP_RIGHT,
     });
+    prodScan.value = "";
+    quantity.value = 1;
+
+
   } else if (scan_product != undefined) {
+    if (scan_product.quantity <= 0) {
+      toast.error("Product is out of stock!", {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+      prodScan.value = "";
+      quantity.value = 1;
+    }
+    else{
     let duplicate_auth = form.products.find(
       (product) => product.barcode == scan_product.barcode
     );
@@ -213,6 +228,8 @@ const addtoCart = () => {
         position: toast.POSITION.TOP_RIGHT,
       });
       prodScan.value = "";
+      quantity.value = 1;
+
     } else {
       let quantity_add =
         form.products[duplicate_index_auth].cashier_quantity + quantity.value;
@@ -225,7 +242,9 @@ const addtoCart = () => {
         position: toast.POSITION.TOP_RIGHT,
       });
       prodScan.value = "";
+      quantity.value = 1;
     }
+  }
   }
   // for (let index = 0; index < props.product.length; index++) {
   //   const prod = props.product[index];
@@ -282,6 +301,15 @@ const check_out = () => {
     },
   });
 };
+
+watch(form.products, (products)=>{
+  let temp_quantity = 0
+  products.forEach(product => {
+    temp_quantity =+ product.cashier_quantity
+  });
+  item_count.value = temp_quantity;
+})
+
 </script>
 <template>
   <AppLayout title="Dashboard">
@@ -289,7 +317,7 @@ const check_out = () => {
       <h2 class="font-semibold text-lg text-gray-800 leading-tight">Cashier</h2>
     </template>
     <div class="py-5">
-      <input v-model="prodScan" />
+      <input v-model="prodScan" @change="addtoCart" />
       <input type="number" v-model="quantity" />
       <button
         type="button"
@@ -343,17 +371,18 @@ const check_out = () => {
                 >
               </div>
               <div>
-                <span class="font-bold"> count: </span>
+                <span class="font-bold"> Items: </span>
                 <span
                   class="bg-red-500 ml-1 px-2 text-white rounded-xl w-10 text-center"
                 >
-                  <small v-if="totalCart >= 1000">{{
+                <small>{{ item_count }}</small>
+                  <!-- <small v-if="totalCart >= 1000">{{
                     nFormatter(totalCart)
                   }}</small>
                   <small v-else-if="totalCart >= 100">{{
                     nFormatter(totalCart)
                   }}</small>
-                  <small v-else>{{ totalCart }}</small>
+                  <small v-else>{{ totalCart }}</small> -->
                 </span>
               </div>
             </div>
@@ -490,6 +519,20 @@ const check_out = () => {
                         <div
                           class="inline-flex items-center text-base font-semibold text-gray-900"
                         >
+                        {{
+                            convert_money(
+                                items.current_price.price
+                            )
+                          }} 
+                        </div>
+                        <div
+                          class="inline-flex items-center text-base font-semibold text-gray-900"
+                        >
+                        <small>x{{ items.cashier_quantity }}</small>
+                        </div>
+                        <div
+                          class="inline-flex items-center text-base font-semibold text-gray-900"
+                        > 
                           {{
                             convert_money(
                               applyDiscount(
@@ -499,11 +542,7 @@ const check_out = () => {
                             )
                           }}
                         </div>
-                        <div
-                          class="inline-flex items-center text-base font-semibold text-gray-900"
-                        >
-                          {{ items.cashier_quantity }}
-                        </div>
+                       
                       </div>
                     </li>
                   </ul>

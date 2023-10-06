@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\DeliveryExport;
 use App\Models\Delivery;
+use App\Models\Product;
 use App\Models\Order;
 use App\Models\DeliveryDetail;
 use Carbon\Carbon;
@@ -290,7 +291,15 @@ class DeliveryController extends Controller
 
     public function authenticate(Request $request, Delivery $delivery)
     {
-        dd($delivery->with("details"));
+        // dd($delivery);
+        $delivery_details = DeliveryDetail::where("delivery_id", $delivery->id)->where("status", 1)->get();
+        foreach ($delivery_details as $key => $product) {
+            $product_live = product::where("id", $product->product_id)->first();
+            $quantity_added = $product_live->quantity + $product->quantity;
+            $product_live->update([
+                "quantity"=>$quantity_added
+            ]);
+        }
         $delivery->update([
             "status" => $request->status,
             "received_by" => Auth::user()->id
