@@ -194,8 +194,8 @@ const applyTax = (subtotal) => {
   let result_grandtotal = 0;
   let temp_result = 0;
   let converted_tax = props.tax.tax / 100;
-  temp_result = subtotal * converted_tax;
-  result_grandtotal = subtotal + temp_result;
+  temp_result = parseFloat(subtotal) * converted_tax;
+  result_grandtotal = parseFloat(subtotal) + temp_result;
   return result_grandtotal;
 };
 
