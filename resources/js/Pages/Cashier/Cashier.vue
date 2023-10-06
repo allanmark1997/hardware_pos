@@ -32,6 +32,10 @@ const scannedProductIMG = ref("");
 const quantity = ref(1);
 const item_count = ref(0);
 const item_grand_total = ref(0);
+const secretout = ref({
+  exe: false,
+  pass: 0
+})
 // const scannedCode = "323423465756";
 
 const form = useForm({
@@ -151,7 +155,7 @@ const keydownHandler = (event) => {
       ) {
         addtoCart();
       }else if (
-        e.ctrlKey &&
+        e.ctrlKey && e.altKey &&
         e.keyCode == 35 &&
         router.page.component == "Cashier/Cashier"
       ) {
@@ -348,6 +352,18 @@ const log_out = () => {
   form.post(route("logout"));
 };
 
+const secretEmergencyout = () =>{
+  secretout.value.pass ++
+  if(secretout.value.pass == 5){
+    log_out()
+    secretout.value.pass = 0
+
+    setTimeout(() => {
+      secretout.value.pass = 0
+    }, 5000);
+  }
+}
+
 watch(form.products, (products) => {
   let temp_quantity = 0;
   let temp_grand_total = 0;
@@ -420,7 +436,7 @@ const addQuantitytoPurchase = (add, subtract) => {
         Log out
       </button> -->
       <kbd
-        class="px-2 py-1.5 text-xs font-semibold text-white bg-yellow-700 border rounded-lg"
+        class="px-2 py-1.5 text-xs font-semibold text-white bg-yellow-700 border rounded-lg" @click="secretEmergencyout()"
         >Purchase Quantity: {{ quantity }}</kbd
       >
     </div>
