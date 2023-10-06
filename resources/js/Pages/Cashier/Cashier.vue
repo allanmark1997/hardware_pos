@@ -150,7 +150,15 @@ const keydownHandler = (event) => {
         router.page.component == "Cashier/Cashier"
       ) {
         addtoCart();
+      }else if (
+        e.ctrlKey &&
+        e.keyCode == 35 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        log_out();
       }
+
+      
     });
   }
   function_activate_status();
@@ -404,13 +412,13 @@ const addQuantitytoPurchase = (add, subtract) => {
     <!-- <input type="text" v-model="form.search" /> -->
     <!-- <button @click="search_()" class="bg-red-200">scan</button> -->
     <div class="flex max-w-7xl mx-auto justify-end">
-      <button
+      <!-- <button
         @click="log_out"
         type="button"
         class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
       >
         Log out
-      </button>
+      </button> -->
       <kbd
         class="px-2 py-1.5 text-xs font-semibold text-white bg-yellow-700 border rounded-lg"
         >Purchase Quantity: {{ quantity }}</kbd
