@@ -190,6 +190,15 @@ const applyDiscount = (product, discountPercentage) => {
   return discountedProduct;
 };
 
+const applyTax = (subtotal) => {
+  let result_grandtotal = 0;
+  let temp_result = 0;
+  let converted_tax = props.tax.tax / 100;
+  temp_result = subtotal * converted_tax;
+  result_grandtotal = subtotal + temp_result;
+  return result_grandtotal;
+};
+
 const addtoCart = () => {
   let scan_product = props.product.find(
     (product) => product.barcode == prodScan.value
@@ -553,10 +562,38 @@ watch(form.products, (products) => {
                 </div>
               </div>
             </div>
-            <div class="bg-white flex justify-between item-center p-5">
+            <div class="bg-white item-center p-5">
               <p>
-                <span class="font-bold">Total:</span>
+                <span class="font-bold">VAT({{ tax.tax }}%)</span>
+              </p>
+              <p>
+                <span class="font-bold"
+                  >Special Discount({{ special_discount.discount }}%)</span
+                >
+              </p>
+              <p>
+                <span class="font-bold">Sub-Total (Excluding VAT):</span>
                 {{ convert_money(item_grand_total) }}
+              </p>
+              <p>
+                <span class="font-bold">Sub-Total:</span>
+                {{
+                  convert_money(
+                    applyDiscount(item_grand_total, special_discount.discount)
+                      .discountedPrice
+                  )
+                }}
+              </p>
+              <p>
+                <span class="font-bold">Grand Total:</span>
+                {{
+                  convert_money(
+                    applyTax(
+                      applyDiscount(item_grand_total, special_discount.discount)
+                        .discountedPrice
+                    )
+                  )
+                }}
               </p>
               <button
                 @click="check_out"
