@@ -2,7 +2,11 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Icon from "@/Components/Icon.vue";
 import { onMounted, ref, watch } from "vue";
-import { router, useForm } from "@inertiajs/vue3";
+import { Head, router, useForm } from "@inertiajs/vue3";
+import ConfirmDialogModal from "@/Components/ConfirmationModal.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
+import Input from "@/Components/Input.vue";
+import Button from "@/Components/Button.vue";
 
 import deleteAll from "@/Components/cashierModals/deleteAll.vue";
 import SKU from "@/Components/cashierModals/SKU.vue";
@@ -24,6 +28,7 @@ const eventListenerStorage = ref();
 const status = ref();
 
 const deleteAllModal = ref(false);
+const cash_input_modal = ref(false);
 const spDiscount = ref(false);
 const SKULookup = ref(false);
 const prodScan = ref("");
@@ -39,7 +44,9 @@ const form = useForm({
   search: "",
   machine: false,
   tax_id: props.tax.id,
-  special_discount_id: props.special_discount.id,
+  special_discount_id:
+    spDiscount.value == true ? props.special_discount.id : null,
+  cash: 0,
 });
 
 onMounted(() => {
@@ -152,10 +159,30 @@ const keydownHandler = (event) => {
         log_out();
       } else if (
         e.ctrlKey &&
+        e.altKey &&
         e.keyCode == 80 &&
         router.page.component == "Cashier/Cashier"
       ) {
+        // alert("Hello");
+        // document.getElementById("cash_input").focus();
+        // form.cash.focus();
+        cash_input_modal.value = !cash_input_modal.value;
+      } else if (
+        cash_input_modal.value == true &&
+        e.ctrlKey &&
+        e.altKey &&
+        e.keyCode == 89 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
         check_out();
+      } else if (
+        cash_input_modal.value == true &&
+        e.ctrlKey &&
+        e.altKey &&
+        e.keyCode == 78 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        cash_input_modal.value = !cash_input_modal.value;
       } else if (
         deleteAllModal.value == true &&
         e.ctrlKey &&
@@ -318,7 +345,13 @@ const function_activate_status = () => {
 };
 
 const check_out = () => {
-  if (form.products.length <= 0) {
+  if (form.cash == 0 || form.cash == "" || form.cash == null) {
+    toast.error("Please input cash first to proceed!", {
+      autoClose: 1000,
+      transition: toast.TRANSITIONS.FLIP,
+      position: toast.POSITION.TOP_RIGHT,
+    });
+  } else if (form.products.length <= 0) {
     toast.error(
       "Opps looks like there's no products in the cart, please add them first!",
       {
@@ -392,6 +425,8 @@ const addQuantitytoPurchase = (add, subtract) => {
 };
 </script>
 <template>
+  <Head :title="'Cashier'" />
+
   <!-- <AppLayout title="Dashboard">
     <template #header>
       <h2 class="font-semibold text-lg text-gray-800 leading-tight">Cashier</h2>
@@ -789,6 +824,45 @@ const addQuantitytoPurchase = (add, subtract) => {
       </div>
     </div>
   </div>
+  <ConfirmDialogModal
+    :show="cash_input_modal"
+    @close="cash_input_modal = false"
+    maxWidth="2xl"
+  >
+    <template #title>
+      You are going to check out this trasaction, please input Amount
+      cash?</template
+    >
+    <template #content>
+      <Input type="number" label="Enter Cash" v-model="form.cash" />
+    </template>
+    <template #footer>
+      <SecondaryButton @click="cash_input_modal = false" class="mr-2">
+        Cancel (CTRL + ALT + N)
+      </SecondaryButton>
+      <Button
+        :class="{ 'opacity-25': form.processing }"
+        :disabled="form.processing"
+        class="bg-green-200 hover:bg-green-400"
+        @click="check_out"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-auto"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+          /></svg
+        >&nbsp;Proceed (CTRL + ALT + Y)
+      </Button>
+    </template>
+  </ConfirmDialogModal>
   <SKU :SKULookup="SKULookup" :products="props.product" />
   <!-- </AppLayout> -->
 </template>
