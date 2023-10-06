@@ -59,7 +59,7 @@ class CashierController extends Controller
                 return back();
             }
         }
-        dd("success");
+        // dd("success");
         $transaction = transaction::create([
             "processed_by" => Auth::user()->id,
             "status" => true,
@@ -77,10 +77,10 @@ class CashierController extends Controller
             ]);
 
             TransactionDetail::create([
-                "product_id" => $product->id,
+                "product_id" => $product["id"],
                 "transaction_id" => $transaction->id,
-                "sale_discounts_id" => $product->current_discount->id,
-                "price_id" => $product->current_price->id,
+                "sale_discounts_id" => $product["current_discount"]["id"],
+                "price_id" => $product["current_price"]["id"],
                 "quantity" => $product["cashier_quantity"],
                 "status" => true,
             ]);

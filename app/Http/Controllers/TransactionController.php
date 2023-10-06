@@ -26,7 +26,7 @@ class TransactionController extends Controller
             })->with(['accommodate_by' => function ($query2) use ($search) {
                 $query2->where("name", "LIKE", "%{$search}%");
             }]);
-        })->paginate(20);
+        })->orderBy("created_at", "desc")->paginate(20);
         return Inertia::render('Transactions/Transaction', [
             "transactions" => $transactions,
             "date_from" => $date_from,

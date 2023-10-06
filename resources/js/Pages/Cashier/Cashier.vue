@@ -38,6 +38,8 @@ const form = useForm({
   products: [],
   search: "",
   machine: false,
+  tax_id: props.tax.id,
+  special_discount_id: props.special_discount.id,
 });
 
 onMounted(() => {
@@ -288,6 +290,8 @@ const check_out = () => {
         transition: toast.TRANSITIONS.FLIP,
         position: toast.POSITION.TOP_RIGHT,
       });
+      form.reset();
+      scannedProductIMG.value = "";
     },
     onError: () => {
       toast.error(form.errors.transaction_validation, {
