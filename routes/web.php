@@ -4,6 +4,7 @@ use App\Http\Controllers\BackOrderController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\CashierStatusController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
@@ -44,9 +45,7 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::prefix('usermanagement')->name('users.')->group(function () {
         Route::get('/users', [User::class, 'index'])->name('index');
