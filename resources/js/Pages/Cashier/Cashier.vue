@@ -156,6 +156,12 @@ const keydownHandler = (event) => {
         router.page.component == "Cashier/Cashier"
       ) {
         log_out();
+      } else if (
+        e.ctrlKey &&
+        e.keyCode == 80 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        check_out();
       }
     });
   }
@@ -321,25 +327,36 @@ const function_activate_status = () => {
 };
 
 const check_out = () => {
-  form.post(route("cashier.store"), {
-    preserveScroll: true,
-    onSuccess: () => {
-      toast.success("Print print", {
+  if (form.products.length <= 0) {
+    toast.error(
+      "Opps looks like there's no products in the cart, please add them first!",
+      {
         autoClose: 1000,
         transition: toast.TRANSITIONS.FLIP,
         position: toast.POSITION.TOP_RIGHT,
-      });
-      form.reset();
-      scannedProductIMG.value = "";
-    },
-    onError: () => {
-      toast.error(form.errors.transaction_validation, {
-        autoClose: 1000,
-        transition: toast.TRANSITIONS.FLIP,
-        position: toast.POSITION.TOP_RIGHT,
-      });
-    },
-  });
+      }
+    );
+  } else {
+    form.post(route("cashier.store"), {
+      preserveScroll: true,
+      onSuccess: () => {
+        toast.success("Print print", {
+          autoClose: 1000,
+          transition: toast.TRANSITIONS.FLIP,
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        form.reset();
+        scannedProductIMG.value = "";
+      },
+      onError: () => {
+        toast.error(form.errors.transaction_validation, {
+          autoClose: 1000,
+          transition: toast.TRANSITIONS.FLIP,
+          position: toast.POSITION.TOP_RIGHT,
+        });
+      },
+    });
+  }
 };
 
 const log_out = () => {
@@ -410,13 +427,16 @@ const addQuantitytoPurchase = (add, subtract) => {
     <!-- <input type="text" v-model="form.search" /> -->
     <!-- <button @click="search_()" class="bg-red-200">scan</button> -->
     <div class="flex max-w-7xl mx-auto justify-end">
-      <!-- <button
+      <button
         @click="log_out"
         type="button"
-        class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
+        class="focus:outline-none text-white bg-red-600 hover:bg-red-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 flex"
       >
+        <Icon icon="logout" size="sm" />
         Log out
-      </button> -->
+      </button>
+    </div>
+    <div class="flex max-w-7xl mx-auto justify-end">
       <kbd
         class="px-2 py-1.5 text-xs font-semibold text-white bg-yellow-700 border rounded-lg"
         >Purchase Quantity: {{ quantity }}</kbd
