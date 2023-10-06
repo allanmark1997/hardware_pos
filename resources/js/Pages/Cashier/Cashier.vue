@@ -31,6 +31,7 @@ const prodScan = ref("");
 const scannedProductIMG = ref("");
 const quantity = ref(1);
 const item_count = ref(0);
+const item_grand_total = ref(0);
 // const scannedCode = "323423465756";
 
 const form = useForm({
@@ -199,8 +200,6 @@ const addtoCart = () => {
     });
     prodScan.value = "";
     quantity.value = 1;
-
-
   } else if (scan_product != undefined) {
     if (scan_product.quantity <= 0) {
       toast.error("Product is out of stock!", {
@@ -210,41 +209,39 @@ const addtoCart = () => {
       });
       prodScan.value = "";
       quantity.value = 1;
-    }
-    else{
-    let duplicate_auth = form.products.find(
-      (product) => product.barcode == scan_product.barcode
-    );
-    let duplicate_index_auth = form.products.findIndex(
-      (product) => product.barcode == scan_product.barcode
-    );
-    if (duplicate_auth == undefined) {
-      scan_product.cashier_quantity = quantity.value;
-      form.products.push(scan_product);
-      scannedProductIMG.value = scan_product.product_image;
-      toast.success("Product added to cart!", {
-        autoClose: 1000,
-        transition: toast.TRANSITIONS.FLIP,
-        position: toast.POSITION.TOP_RIGHT,
-      });
-      prodScan.value = "";
-      quantity.value = 1;
-
     } else {
-      let quantity_add =
-        form.products[duplicate_index_auth].cashier_quantity + quantity.value;
-      form.products[duplicate_index_auth].cashier_quantity = quantity_add;
-      scannedProductIMG.value = scan_product.product_image;
-      scannedProductIMG.value = scan_product.product_image;
-      toast.success("Product added to cart!", {
-        autoClose: 1000,
-        transition: toast.TRANSITIONS.FLIP,
-        position: toast.POSITION.TOP_RIGHT,
-      });
-      prodScan.value = "";
-      quantity.value = 1;
+      let duplicate_auth = form.products.find(
+        (product) => product.barcode == scan_product.barcode
+      );
+      let duplicate_index_auth = form.products.findIndex(
+        (product) => product.barcode == scan_product.barcode
+      );
+      if (duplicate_auth == undefined) {
+        scan_product.cashier_quantity = quantity.value;
+        form.products.push(scan_product);
+        scannedProductIMG.value = scan_product.product_image;
+        toast.success("Product added to cart!", {
+          autoClose: 1000,
+          transition: toast.TRANSITIONS.FLIP,
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        prodScan.value = "";
+        quantity.value = 1;
+      } else {
+        let quantity_add =
+          form.products[duplicate_index_auth].cashier_quantity + quantity.value;
+        form.products[duplicate_index_auth].cashier_quantity = quantity_add;
+        scannedProductIMG.value = scan_product.product_image;
+        scannedProductIMG.value = scan_product.product_image;
+        toast.success("Product added to cart!", {
+          autoClose: 1000,
+          transition: toast.TRANSITIONS.FLIP,
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        prodScan.value = "";
+        quantity.value = 1;
+      }
     }
-  }
   }
   // for (let index = 0; index < props.product.length; index++) {
   //   const prod = props.product[index];
@@ -302,14 +299,22 @@ const check_out = () => {
   });
 };
 
-watch(form.products, (products)=>{
-  let temp_quantity = 0
-  products.forEach(product => {
-    temp_quantity =+ product.cashier_quantity
+watch(form.products, (products) => {
+  let temp_quantity = 0;
+  let temp_grand_total = 0;
+  let temp_sub_total = 0;
+  products.forEach((product) => {
+    temp_quantity = temp_quantity + product.cashier_quantity;
+    temp_sub_total =
+      applyDiscount(
+        product.current_price.price,
+        product.current_discount.discount
+      ).discountedPrice * product.cashier_quantity;
+    temp_grand_total = temp_grand_total + temp_sub_total;
   });
   item_count.value = temp_quantity;
-})
-
+  item_grand_total.value = temp_grand_total;
+});
 </script>
 <template>
   <AppLayout title="Dashboard">
@@ -375,7 +380,7 @@ watch(form.products, (products)=>{
                 <span
                   class="bg-red-500 ml-1 px-2 text-white rounded-xl w-10 text-center"
                 >
-                <small>{{ item_count }}</small>
+                  <small>{{ item_count }}</small>
                   <!-- <small v-if="totalCart >= 1000">{{
                     nFormatter(totalCart)
                   }}</small>
@@ -519,20 +524,16 @@ watch(form.products, (products)=>{
                         <div
                           class="inline-flex items-center text-base font-semibold text-gray-900"
                         >
-                        {{
-                            convert_money(
-                                items.current_price.price
-                            )
-                          }} 
+                          {{ convert_money(items.current_price.price) }}
                         </div>
                         <div
                           class="inline-flex items-center text-base font-semibold text-gray-900"
                         >
-                        <small>x{{ items.cashier_quantity }}</small>
+                          <small>x{{ items.cashier_quantity }}</small>
                         </div>
                         <div
                           class="inline-flex items-center text-base font-semibold text-gray-900"
-                        > 
+                        >
                           {{
                             convert_money(
                               applyDiscount(
@@ -542,7 +543,6 @@ watch(form.products, (products)=>{
                             )
                           }}
                         </div>
-                       
                       </div>
                     </li>
                   </ul>
@@ -550,7 +550,10 @@ watch(form.products, (products)=>{
               </div>
             </div>
             <div class="bg-white flex justify-between item-center p-5">
-              <p><span class="font-bold">Total:</span> 0</p>
+              <p>
+                <span class="font-bold">Total:</span>
+                {{ convert_money(item_grand_total) }}
+              </p>
               <button
                 @click="check_out"
                 type="button"
