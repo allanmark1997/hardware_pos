@@ -150,15 +150,13 @@ const keydownHandler = (event) => {
         router.page.component == "Cashier/Cashier"
       ) {
         addtoCart();
-      }else if (
+      } else if (
         e.ctrlKey &&
         e.keyCode == 35 &&
         router.page.component == "Cashier/Cashier"
       ) {
         log_out();
       }
-
-      
     });
   }
   function_activate_status();

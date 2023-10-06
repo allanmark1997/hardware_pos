@@ -14,7 +14,7 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        if (Auth::user()->type == 1) {
+        if (Auth::user()->type === 1) {
             return Inertia::render("Dashboard", [
                 // "dashboard" => "dash"
             ]);
