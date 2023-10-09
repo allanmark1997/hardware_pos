@@ -50,6 +50,9 @@ class CashierController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            "cash" => ["required"],
+        ]);
         foreach ($request->products as $key => $product) {
             $product_find = product::find($product["id"]);
             if ($product_find->quantity < $product["cashier_quantity"]) {
@@ -67,6 +70,7 @@ class CashierController extends Controller
             "customer_type" => false,
             "tax_id" => $request->tax_id,
             "special_discount_id" => $request->special_discount_id,
+            "cash" => $request->cash,
         ]);
 
         foreach ($request->products as $key => $product) {

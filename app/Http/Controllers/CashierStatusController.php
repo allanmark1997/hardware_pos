@@ -67,7 +67,7 @@ class CashierStatusController extends Controller
     public function update_status(Request $request, CashierStatus $cashierStatus)
     {
         $cashierStatus->update([
-            "status" => true
+            "status" => false
         ]);
     }
 

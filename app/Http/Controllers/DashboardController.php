@@ -14,12 +14,12 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        if (Auth::user()->type == 1) {
+        if (Auth::user()->type != 0) {
+            return Redirect::route('cashier.index');
+        } else {
             return Inertia::render("Dashboard", [
                 // "dashboard" => "dash"
             ]);
-        } else {
-            return Redirect::route('cashier.index');
         }
     }
 

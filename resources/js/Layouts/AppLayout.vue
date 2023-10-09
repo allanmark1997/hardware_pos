@@ -333,7 +333,12 @@ const logout = () => {
 
                     <!-- Authentication -->
                     <form @submit.prevent="logout">
-                      <DropdownLink as="button"> Log Out </DropdownLink>
+                      <DropdownLink as="button">
+                        <div class="flex">
+                          <Icon icon="logout" size="md" />
+                          <p class="my-auto">Log Out</p>
+                        </div>
+                      </DropdownLink>
                     </form>
                   </template>
                 </Dropdown>

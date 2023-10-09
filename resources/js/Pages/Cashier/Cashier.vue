@@ -2,7 +2,11 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Icon from "@/Components/Icon.vue";
 import { onMounted, ref, watch } from "vue";
-import { router, useForm } from "@inertiajs/vue3";
+import { Head, router, useForm } from "@inertiajs/vue3";
+import ConfirmDialogModal from "@/Components/ConfirmationModal.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
+import Input from "@/Components/Input.vue";
+import Button from "@/Components/Button.vue";
 
 import deleteAll from "@/Components/cashierModals/deleteAll.vue";
 import SKU from "@/Components/cashierModals/SKU.vue";
@@ -23,7 +27,9 @@ const samplePurchaseData = ref(2);
 const eventListenerStorage = ref();
 const status = ref();
 
+const logoutlModal = ref(false);
 const deleteAllModal = ref(false);
+const cash_input_modal = ref(false);
 const spDiscount = ref(false);
 const SKULookup = ref(false);
 const prodScan = ref("");
@@ -43,7 +49,9 @@ const form = useForm({
   search: "",
   machine: false,
   tax_id: props.tax.id,
-  special_discount_id: props.special_discount.id,
+  special_discount_id:
+    spDiscount.value == true ? props.special_discount.id : null,
+  cash: null,
 });
 
 onMounted(() => {
@@ -88,12 +96,6 @@ const keydownHandler = (event) => {
         router.page.component == "Cashier/Cashier"
       ) {
         console.log("Change Quantity.");
-        e.preventDefault();
-      } else if (
-        e.keyCode == 116 &&
-        router.page.component == "Cashier/Cashier"
-      ) {
-        console.log("Change Tax");
         e.preventDefault();
       } else if (
         e.keyCode == 117 &&
@@ -154,15 +156,83 @@ const keydownHandler = (event) => {
         router.page.component == "Cashier/Cashier"
       ) {
         addtoCart();
-      }else if (
-        e.ctrlKey && e.altKey &&
+      } else if (
+        e.ctrlKey &&
         e.keyCode == 35 &&
         router.page.component == "Cashier/Cashier"
       ) {
         log_out();
       }
-
-      
+      else if (
+        logoutlModal.value == true &&
+        e.ctrlKey &&
+        e.keyCode == 89 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        logout_confirm();
+      }
+      else if (
+        logoutlModal.value == true &&
+        e.ctrlKey &&
+        e.keyCode == 78 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        logoutlModal.value =! logoutlModal.value
+      }
+       else if (
+        e.ctrlKey &&
+        e.altKey &&
+        e.keyCode == 80 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+  unsetFocusToTextBox()
+  // setFocusToTextBoxCash()
+        cash_input_modal.value = !cash_input_modal.value;
+      } else if (
+        cash_input_modal.value == true &&
+        e.ctrlKey &&
+        e.altKey &&
+        e.keyCode == 70 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        // alert("hell")
+        setFocusToTextBoxCash()
+      }
+       else if (
+        cash_input_modal.value == true &&
+        e.ctrlKey &&
+        e.altKey &&
+        e.keyCode == 89 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        check_out();
+      } else if (
+        cash_input_modal.value == true &&
+        e.ctrlKey &&
+        e.altKey &&
+        e.keyCode == 78 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        cash_input_modal.value = !cash_input_modal.value;
+      } else if (
+        deleteAllModal.value == true &&
+        e.ctrlKey &&
+        e.altKey &&
+        e.keyCode == 89 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        form.products = [];
+        scannedProductIMG.value = "";
+        deleteAllModal.value = false;
+      } else if (
+        deleteAllModal.value == true &&
+        e.ctrlKey &&
+        e.altKey &&
+        e.keyCode == 78 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        deleteAllModal.value = false;
+      }
     });
   }
   function_activate_status();
@@ -290,27 +360,6 @@ const addtoCart = () => {
       }
     }
   }
-  // for (let index = 0; index < props.product.length; index++) {
-  //   const prod = props.product[index];
-  //   if (prodScan.value === prod.barcode) {
-  //     form.products.value.push(prod);
-  //     scannedProductIMG.value = prod.product_image;
-  //     toast.success("Product added to cart!", {
-  //       autoClose: 1000,
-  //       transition: toast.TRANSITIONS.FLIP,
-  //       position: toast.POSITION.TOP_RIGHT,
-  //     });
-  //     break;
-  //   } else {
-  //     if (props.product.length == index + 1) {
-  //       toast.error("Product not available!", {
-  //         autoClose: 1000,
-  //         transition: toast.TRANSITIONS.FLIP,
-  //         position: toast.POSITION.TOP_RIGHT,
-  //       });
-  //     }
-  //   }
-  // }
 };
 
 const convert_money = (data) => {
@@ -327,41 +376,61 @@ const function_activate_status = () => {
 };
 
 const check_out = () => {
-  form.post(route("cashier.store"), {
-    preserveScroll: true,
-    onSuccess: () => {
-      toast.success("Print print", {
+  let grand_payable = applyTax(applyDiscount(item_grand_total.value,spDiscount.value == true ? special_discount.discount : 0).discountedPrice);
+  // alert(grand_payable)
+  if (parseFloat(form.cash) < parseFloat(grand_payable)) {
+    toast.error("Inputed cash is insuficient", {
+      autoClose: 1000,
+      transition: toast.TRANSITIONS.FLIP,
+      position: toast.POSITION.TOP_RIGHT,
+    });
+  }
+ else if (parseFloat(form.cash)== 0 || form.cash == "" || form.cash == null) {
+    toast.error("Please input cash first to proceed!", {
+      autoClose: 1000,
+      transition: toast.TRANSITIONS.FLIP,
+      position: toast.POSITION.TOP_RIGHT,
+    });
+  } else if (form.products.length <= 0) {
+    toast.error(
+      "Opps looks like there's no products in the cart, please add them first!",
+      {
         autoClose: 1000,
         transition: toast.TRANSITIONS.FLIP,
         position: toast.POSITION.TOP_RIGHT,
-      });
-      form.reset();
-      scannedProductIMG.value = "";
-    },
-    onError: () => {
-      toast.error(form.errors.transaction_validation, {
-        autoClose: 1000,
-        transition: toast.TRANSITIONS.FLIP,
-        position: toast.POSITION.TOP_RIGHT,
-      });
-    },
-  });
+      }
+    );
+  } else {
+    form.post(route("cashier.store"), {
+      preserveScroll: true,
+      onSuccess: () => {
+        toast.success("Print print", {
+          autoClose: 1000,
+          transition: toast.TRANSITIONS.FLIP,
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        form.reset();
+        scannedProductIMG.value = "";
+        cash_input_modal.value = false
+      },
+      onError: () => {
+        toast.error(form.errors.transaction_validation, {
+          autoClose: 1000,
+          transition: toast.TRANSITIONS.FLIP,
+          position: toast.POSITION.TOP_RIGHT,
+        });
+      },
+    });
+  }
 };
 
 const log_out = () => {
-  form.post(route("logout"));
+  logoutlModal.value =! logoutlModal.value
 };
 
-const secretEmergencyout = () =>{
-  secretout.value.pass ++
-  if(secretout.value.pass == 5){
-    log_out()
-    secretout.value.pass = 0
+const logout_confirm = () => {
+  form.post(route("logout"));
 
-    setTimeout(() => {
-      secretout.value.pass = 0
-    }, 5000);
-  }
 }
 
 watch(form.products, (products) => {
@@ -391,6 +460,21 @@ const setFocusToTextBox = () => {
   prodScan.value = "";
 };
 
+const unsetFocusToTextBox = () => {
+  document.querySelector("#prodBarcodeInput").blur();
+  toast.success("Scanner is disconnected!", {
+    autoClose: 1000,
+    transition: toast.TRANSITIONS.FLIP,
+    position: toast.POSITION.TOP_RIGHT,
+  });
+  prodScan.value = "";
+};
+
+const setFocusToTextBoxCash = () => {
+  document.querySelector("#prodBarcodeInput").blur();
+  document.querySelector("#inputCash").focus();
+};
+
 const addQuantitytoPurchase = (add, subtract) => {
   if (add) {
     quantity.value++;
@@ -402,6 +486,8 @@ const addQuantitytoPurchase = (add, subtract) => {
 };
 </script>
 <template>
+  <Head :title="'Cashier'" />
+
   <!-- <AppLayout title="Dashboard">
     <template #header>
       <h2 class="font-semibold text-lg text-gray-800 leading-tight">Cashier</h2>
@@ -428,15 +514,18 @@ const addQuantitytoPurchase = (add, subtract) => {
     <!-- <input type="text" v-model="form.search" /> -->
     <!-- <button @click="search_()" class="bg-red-200">scan</button> -->
     <div class="flex max-w-7xl mx-auto justify-end">
-      <!-- <button
+      <button
         @click="log_out"
         type="button"
-        class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
+        class="focus:outline-none text-white bg-red-600 hover:bg-red-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 flex"
       >
+        <Icon icon="logout" size="sm" />
         Log out
-      </button> -->
+      </button>
+    </div>
+    <div class="flex max-w-7xl mx-auto justify-end">
       <kbd
-        class="px-2 py-1.5 text-xs font-semibold text-white bg-yellow-700 border rounded-lg" @click="secretEmergencyout()"
+        class="px-2 py-1.5 text-2xl font-semibold text-white bg-yellow-700 border rounded-lg"
         >Purchase Quantity: {{ quantity }}</kbd
       >
     </div>
@@ -488,7 +577,7 @@ const addQuantitytoPurchase = (add, subtract) => {
               </span>
             </div>
           </div>
-          <form class="flex mt-5 mx-5 items-center">
+          <!-- <form class="flex mt-5 mx-5 items-center">
             <label for="Search products" class="sr-only">Search</label>
             <div class="relative w-full">
               <div
@@ -509,7 +598,7 @@ const addQuantitytoPurchase = (add, subtract) => {
             >
               <Icon class="mr-5" icon="search_icon" size="xs" />
             </button>
-          </form>
+          </form> -->
           <div
             class="relative mt-5 px-2 overflow-x-auto min-h-[45vmin] shadow-md"
           >
@@ -647,44 +736,77 @@ const addQuantitytoPurchase = (add, subtract) => {
           <div class="item-center p-5">
             <div>
               <p>
-                <span class="font-bold">VAT({{ tax.tax }}%)</span>
+                <span class="font-bold">VAT({{ tax.tax }}%): </span>
+                {{
+                  form.products.length == 0 ? convert_money(0):
+                  convert_money(
+                    applyTax(
+                      applyDiscount(
+                        item_grand_total,
+                        spDiscount == true ? special_discount.discount : 0
+                      ).discountedPrice
+                    ) -
+                      applyDiscount(
+                        item_grand_total,
+                        spDiscount == true ? special_discount.discount : 0
+                      ).discountedPrice
+                  )
+                }}
               </p>
               <p>
                 <span class="font-bold"
-                  >Special Discount({{ special_discount.discount }}%)</span
-                >
+                  >Special Discount({{
+                    spDiscount == true ? special_discount.discount : 0
+                  }}%):
+                </span>
+                {{
+                  form.products.length == 0 ? convert_money(0):
+                  convert_money(
+                    item_grand_total -
+                      applyDiscount(
+                        item_grand_total,
+                        spDiscount == true ? special_discount.discount : 0
+                      ).discountedPrice
+                  )
+                }}
               </p>
               <p>
                 <span class="font-bold">Sub-Total (Excluding VAT):</span>
-                {{ convert_money(item_grand_total) }}
+                {{ form.products.length == 0 ? convert_money(0):convert_money(item_grand_total) }}
               </p>
               <p>
                 <span class="font-bold">Sub-Total:</span>
                 {{
+                  form.products.length == 0 ? convert_money(0):
                   convert_money(
-                    applyDiscount(item_grand_total, special_discount.discount)
-                      .discountedPrice
+                    applyDiscount(
+                      item_grand_total,
+                      spDiscount == true ? special_discount.discount : 0
+                    ).discountedPrice
                   )
                 }}
               </p>
               <p>
                 <span class="font-bold">Grand Total:</span>
                 {{
+                  form.products.length == 0 ? convert_money(0):
                   convert_money(
                     applyTax(
-                      applyDiscount(item_grand_total, special_discount.discount)
-                        .discountedPrice
+                      applyDiscount(
+                        item_grand_total,
+                        spDiscount == true ? special_discount.discount : 0
+                      ).discountedPrice
                     )
                   )
                 }}
               </p>
               <div class="justify-end flex">
                 <button
-                  @click="check_out"
+                  @click="cash_input_modal = true"
                   type="button"
                   class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
                 >
-                  Charge
+                  Check out
                 </button>
               </div>
             </div>
@@ -695,7 +817,159 @@ const addQuantitytoPurchase = (add, subtract) => {
   </div>
 
   <!-- MODAL FOR DATA -->
-  <deleteAll :modalDelete="deleteAllModal" />
+  <!-- <deleteAll :modalDelete="deleteAllModal" /> -->
+  <div
+    v-if="deleteAllModal"
+    id="defaultModal"
+    tabindex="-1"
+    aria-hidden="true"
+    class="fixed top-0 left-0 right-0 backdrop-blur-sm z-50 pt-52 flex justify-center item-center w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full"
+  >
+    <div class="relative w-full max-w-2xl max-h-full">
+      <!-- Modal content -->
+      <div class="relative bg-white rounded-lg shadow">
+        <!-- Modal header -->
+        <div class="flex items-start justify-between p-4 border-b rounded-t">
+          <h3 class="text-xl font-semibold text-gray-900">Delete All?</h3>
+          <button
+            @click="deleteAllModal = false"
+            type="button"
+            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center"
+            data-modal-hide="defaultModal"
+          >
+            <svg
+              class="w-3 h-3"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 14 14"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+              />
+            </svg>
+            <span class="sr-only">Close modal</span>
+          </button>
+        </div>
+        <!-- Modal body -->
+        <div class="p-6 space-y-6">
+          <p class="text-base leading-relaxed text-gray-500">
+            Are you sure you want to delete all transactions?
+          </p>
+        </div>
+        <!-- Modal footer -->
+        <div
+          class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b"
+        >
+          <button
+            @click="
+              (form.products = []),
+                (scannedProductIMG = ''),
+                (deleteAllModal = false)
+            "
+            data-modal-hide="defaultModal"
+            type="button"
+            class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+          >
+            Delete All (CTRL + ALT + Y)
+          </button>
+          <button
+            @click="deleteAllModal = false"
+            data-modal-hide="defaultModal"
+            type="button"
+            class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10"
+          >
+            Decline (CTRL + ALT + N)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ConfirmDialogModal
+    :show="cash_input_modal"
+    @close="cash_input_modal = false"
+    maxWidth="2xl"
+  >
+    <template #title>
+      You are going to check out this trasaction, please input Amount
+      cash. Payable amount is {{ convert_money(applyTax(
+                      applyDiscount(
+                        item_grand_total,
+                        spDiscount == true ? special_discount.discount : 0
+                      ).discountedPrice
+                    )) }}</template
+    >
+    <template #content>
+      <input id="inputCash" class="rounded-lg w-full" type="number" v-model="form.cash" autofocus @keyup.enter="check_out" />
+    </template>
+    <template #footer>
+      <SecondaryButton @click="cash_input_modal = false" class="mr-2">
+        Cancel (CTRL + ALT + N)
+      </SecondaryButton>
+      <Button
+        :class="{ 'opacity-25': form.processing }"
+        :disabled="form.processing"
+        class="bg-green-200 hover:bg-green-400"
+        @click="check_out"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-auto"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+          /></svg
+        >&nbsp;Proceed (CTRL + ALT + Y)
+      </Button>
+    </template>
+  </ConfirmDialogModal>
   <SKU :SKULookup="SKULookup" :products="props.product" />
   <!-- </AppLayout> -->
+  <ConfirmDialogModal
+    :show="logoutlModal"
+    @close="logoutlModal = false"
+    maxWidth="2xl"
+  >
+    <template #title>
+      Are you sure you want to log-out?</template
+    >
+    <template #content>
+    </template>
+    <template #footer>
+      <SecondaryButton @click="logoutlModal = false" class="mr-2">
+        Cancel (CTRL + ALT + N)
+      </SecondaryButton>
+      <Button
+        :class="{ 'opacity-25': form.processing }"
+        :disabled="form.processing"
+        class="bg-green-200 hover:bg-green-400"
+        @click="logout_confirm"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-auto"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+          /></svg
+        >&nbsp;Proceed (CTRL + ALT + Y)
+      </Button>
+    </template>
+  </ConfirmDialogModal>
 </template>
