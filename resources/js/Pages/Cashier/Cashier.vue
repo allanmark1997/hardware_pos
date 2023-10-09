@@ -372,14 +372,16 @@ const function_activate_status = () => {
 };
 
 const check_out = () => {
-  if (form.cash < item_grand_total.value) {
+  let grand_payable = applyTax(applyDiscount(item_grand_total.value,spDiscount.value == true ? special_discount.discount : 0).discountedPrice);
+  // alert(grand_payable)
+  if (parseFloat(form.cash) < parseFloat(grand_payable)) {
     toast.error("Inputed cash is insuficient", {
       autoClose: 1000,
       transition: toast.TRANSITIONS.FLIP,
       position: toast.POSITION.TOP_RIGHT,
     });
   }
- else if (form.cash == 0 || form.cash == "" || form.cash == null) {
+ else if (parseFloat(form.cash)== 0 || form.cash == "" || form.cash == null) {
     toast.error("Please input cash first to proceed!", {
       autoClose: 1000,
       transition: toast.TRANSITIONS.FLIP,
@@ -732,6 +734,7 @@ const addQuantitytoPurchase = (add, subtract) => {
               <p>
                 <span class="font-bold">VAT({{ tax.tax }}%): </span>
                 {{
+                  form.products.length == 0 ? convert_money(0):
                   convert_money(
                     applyTax(
                       applyDiscount(
@@ -753,6 +756,7 @@ const addQuantitytoPurchase = (add, subtract) => {
                   }}%):
                 </span>
                 {{
+                  form.products.length == 0 ? convert_money(0):
                   convert_money(
                     item_grand_total -
                       applyDiscount(
@@ -764,11 +768,12 @@ const addQuantitytoPurchase = (add, subtract) => {
               </p>
               <p>
                 <span class="font-bold">Sub-Total (Excluding VAT):</span>
-                {{ convert_money(item_grand_total) }}
+                {{ form.products.length == 0 ? convert_money(0):convert_money(item_grand_total) }}
               </p>
               <p>
                 <span class="font-bold">Sub-Total:</span>
                 {{
+                  form.products.length == 0 ? convert_money(0):
                   convert_money(
                     applyDiscount(
                       item_grand_total,
@@ -780,6 +785,7 @@ const addQuantitytoPurchase = (add, subtract) => {
               <p>
                 <span class="font-bold">Grand Total:</span>
                 {{
+                  form.products.length == 0 ? convert_money(0):
                   convert_money(
                     applyTax(
                       applyDiscount(
@@ -792,7 +798,7 @@ const addQuantitytoPurchase = (add, subtract) => {
               </p>
               <div class="justify-end flex">
                 <button
-                  @click="check_out"
+                  @click="cash_input_modal = true"
                   type="button"
                   class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
                 >
@@ -886,10 +892,15 @@ const addQuantitytoPurchase = (add, subtract) => {
   >
     <template #title>
       You are going to check out this trasaction, please input Amount
-      cash. Payable amount is {{ convert_money(item_grand_total) }}</template
+      cash. Payable amount is {{ convert_money(applyTax(
+                      applyDiscount(
+                        item_grand_total,
+                        spDiscount == true ? special_discount.discount : 0
+                      ).discountedPrice
+                    )) }}</template
     >
     <template #content>
-      <input id="inputCash" class="rounded-lg w-full" type="text" v-model="form.cash" autofocus @keyup.enter="check_out" />
+      <input id="inputCash" class="rounded-lg w-full" type="number" v-model="form.cash" autofocus @keyup.enter="check_out" />
     </template>
     <template #footer>
       <SecondaryButton @click="cash_input_modal = false" class="mr-2">
