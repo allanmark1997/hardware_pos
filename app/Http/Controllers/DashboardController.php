@@ -22,42 +22,42 @@ class DashboardController extends Controller
         if (Auth::user()->type != 0) {
             return Redirect::route('cashier.index');
         } else {
-            $months_user = [
-                [1, 0],
-                [2, 0],
-                [3, 0],
-                [4, 0],
-                [5, 0],
-                [6, 0],
-                [7, 0],
-                [8, 0],
-                [9, 0],
-                [10, 0],
-                [11, 0],
-                [12, 0],
-            ];
-            $sale = TransactionDetail::when($no_date, function ($query) use (
-                $year_key
-            ) {
-                $query
-                    ->where("created_at", "like", "%$year_key%")
-                    ->select(
-                        DB::raw("YEAR(created_at) as year"),
-                        DB::raw("Month(created_at) as month"),
-                        DB::raw("count(*) as count")
+            // $months_user = [
+            //     [1, 0],
+            //     [2, 0],
+            //     [3, 0],
+            //     [4, 0],
+            //     [5, 0],
+            //     [6, 0],
+            //     [7, 0],
+            //     [8, 0],
+            //     [9, 0],
+            //     [10, 0],
+            //     [11, 0],
+            //     [12, 0],
+            // ];
+            // $sale = TransactionDetail::when($no_date, function ($query) use (
+            //     $year_key
+            // ) {
+            //     $query
+            //         ->where("created_at", "like", "%$year_key%")
+            //         ->select(
+            //             DB::raw("YEAR(created_at) as year"),
+            //             DB::raw("Month(created_at) as month"),
+            //             DB::raw("count(*) as count")
 
-                    )
-                    ->groupBy("year", "month")
-                    ->orderBy(DB::raw("Month(created_at)"));
-            })->get();
-            foreach ($months_user as $key => $months_value) {
-                foreach ($sale->groupBy("month") as $key2 => $value2) {
-                    if ($value2[0]["month"] == $months_value[0]) {
-                        $months_user[$key][1] = $value2[0]["count"];
-                    }
-                }
-                $months_user[$key][0] = $this->month($months_value[0]);
-            }
+            //         )
+            //         ->groupBy("year", "month")
+            //         ->orderBy(DB::raw("Month(created_at)"));
+            // })->get();
+            // foreach ($months_user as $key => $months_value) {
+            //     foreach ($sale->groupBy("month") as $key2 => $value2) {
+            //         if ($value2[0]["month"] == $months_value[0]) {
+            //             $months_user[$key][1] = $value2[0]["count"];
+            //         }
+            //     }
+            //     $months_user[$key][0] = $this->month($months_value[0]);
+            // }
             $sale_year = TransactionDetail::with("product")->get();
             $grouped_sales_raw = $sale_year->groupBy("product.name");
             $temp_array = [];
@@ -69,13 +69,13 @@ class DashboardController extends Controller
                         foreach ($temp_array[$key]["data"] as $key3 => $product_in_array) {
                             // dd(Carbon::parse($product->created_at)->format("Y-m") == $key3);
                             if (Carbon::parse($product->created_at)->format("Y-M") == $key3) {
-                                $temp_array[$key]["data"][Carbon::parse($product->created_at)->format("Y-M")][$key2] = $product;
-                            } else {
                                 $temp_array[$key]["data"][Carbon::parse($product->created_at)->format("Y-M")][$key2][] = $product;
+                            } else {
+                                $temp_array[$key]["data"][Carbon::parse($product->created_at)->format("Y-M")][$key2][][] = $product;
                             }
                         }
                     } else {
-                        $temp_array[$key]["data"][Carbon::parse($product->created_at)->format("Y-M")][$key2] = $product;
+                        $temp_array[$key]["data"][Carbon::parse($product->created_at)->format("Y-M")][$key2][] = $product;
                     }
                 }
             }
