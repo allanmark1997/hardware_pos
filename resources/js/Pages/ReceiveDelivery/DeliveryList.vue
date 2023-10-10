@@ -91,6 +91,23 @@ const count_total_unsuccess = (data) => {
 };
 
 const open_authorize = (data) => {
+  console.log(data);
+  let temp_counter = 0;
+  data.details.forEach((element) => {
+    if (element.status == 0) {
+      temp_counter++;
+    }
+  });
+  if (data.details.length == temp_counter) {
+    toast.warn(
+      "Accepting deliveries without selecting products may return as unsuccessful delivery transactions",
+      {
+        autoClose: 3000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      }
+    );
+  }
   form.delivery = data;
   condfirmationModal.value = !condfirmationModal.value;
 };

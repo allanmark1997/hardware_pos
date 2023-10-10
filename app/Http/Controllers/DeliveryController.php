@@ -225,12 +225,12 @@ class DeliveryController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->selected_product);
         $temp_array = [];
         foreach ($request->selected_product as $key => $supplier) {
             // dd($supplier['supplier_id']);
             if (array_search($supplier['supplier']['supplier_name'], $temp_array) <= 0) {
                 $temp_array[$supplier['supplier']['supplier_name']]["supplier_id"] = [$supplier['supplier_id']];
-
                 $temp_array[$supplier['supplier']['supplier_name']]["products"][] = [$supplier];
             } else {
                 $temp_array["products"][] = [$supplier];
@@ -297,7 +297,7 @@ class DeliveryController extends Controller
             $product_live = product::where("id", $product->product_id)->first();
             $quantity_added = $product_live->quantity + $product->quantity;
             $product_live->update([
-                "quantity"=>$quantity_added
+                "quantity" => $quantity_added
             ]);
         }
         $delivery->update([
