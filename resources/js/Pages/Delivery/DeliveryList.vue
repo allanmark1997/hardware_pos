@@ -251,7 +251,7 @@ const count_total_unsuccess = (data) => {
                               class="bg-red-400 rounded-md p-1 text-white flex gap-1"
                             >
                               <Icon icon="wrong" size="xs" />
-                              Unuccess
+                              Unsuccess
                             </small>
                           </td>
                           <td class="px-1 py-1">
