@@ -30,7 +30,7 @@ class DashboardController extends Controller
 
             foreach ($grouped_sales_raw as $key => $group) {
                 foreach ($group as $key2 => $product) {
-                    $temp_counter[$key][Carbon::parse($product->created_at)->format("Y-M")][] = array("quantity" => $product->quantity, "price" => $product->price->price, "discount" => $product->sale_discount->discount / 100);
+                    $temp_counter[$key][Carbon::parse($product->created_at)->format("F")][] = array("quantity" => $product->quantity, "price" => $product->price->price, "discount" => $product->sale_discount->discount / 100);
                 }
             }
             // dd($temp_counter);
@@ -62,6 +62,34 @@ class DashboardController extends Controller
         }
     }
 
+    public function month($val)
+    {
+        if ($val == 1) {
+            return "Januray";
+        } elseif ($val == 2) {
+            return "February";
+        } elseif ($val == 3) {
+            return "March";
+        } elseif ($val == 4) {
+            return "April";
+        } elseif ($val == 5) {
+            return "May";
+        } elseif ($val == 6) {
+            return "June";
+        } elseif ($val == 7) {
+            return "July";
+        } elseif ($val == 8) {
+            return "August";
+        } elseif ($val == 9) {
+            return "September";
+        } elseif ($val == 10) {
+            return "October";
+        } elseif ($val == 11) {
+            return "November";
+        } elseif ($val == 12) {
+            return "December";
+        }
+    }
 
     function sortByField($array, $field)
     {
