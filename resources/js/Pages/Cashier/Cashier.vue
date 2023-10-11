@@ -211,7 +211,8 @@ const keydownHandler = (event) => {
         e.keyCode == 89 &&
         router.page.component == "Cashier/Cashier"
       ) {
-        check_out();
+        // check_out();
+        partialCheckout();
       } else if (
         cash_input_modal.value == true &&
         e.ctrlKey &&
@@ -415,8 +416,9 @@ const check_out = () => {
           transition: toast.TRANSITIONS.FLIP,
           position: toast.POSITION.TOP_RIGHT,
         });
-        printModal.value = true
-        __cash.value = form.cash
+        // printModal.value = true
+        // __cash.value = form.cash
+        printModal.value = false
         form.reset();
         scannedProductIMG.value = "";
         cash_input_modal.value = false
@@ -431,6 +433,12 @@ const check_out = () => {
     });
   }
 };
+
+const partialCheckout = () =>{
+    cash_input_modal.value = false
+    printModal.value = true
+     __cash.value = form.cash
+}
 
 const log_out = () => {
   logoutlModal.value = !logoutlModal.value
@@ -804,14 +812,14 @@ const addQuantitytoPurchase = (add, subtract) => {
       )) }}</template>
     <template #content>
       <input id="inputCash" class="rounded-lg w-full" type="number" v-model="form.cash" autofocus
-        @keyup.enter="check_out" />
+        @keyup.enter="partialCheckout" />
     </template>
     <template #footer>
       <SecondaryButton @click="cash_input_modal = false" class="mr-2">
         Cancel (CTRL + ALT + N)
       </SecondaryButton>
       <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing"
-        class="bg-green-200 hover:bg-green-400" @click="check_out">
+        class="bg-green-200 hover:bg-green-400" @click="partialCheckout">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
           stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round"
@@ -830,7 +838,10 @@ const addQuantitytoPurchase = (add, subtract) => {
     :spDiscount="spDiscount == true ? special_discount.discount : 0" :vat__="tax.tax"
     :cashierName="usePage().props.auth.user.name"
     :grand_total="convert_money(applyTax(applyDiscount(item_grand_total, spDiscount == true ? special_discount.discount : 0).discountedPrice))"
-    @close_modal="printModal = false" />
+    :products="form.products"
+    @close_modal="printModal = false"
+    @checkout__="check_out()"
+    />
   <!-- </AppLayout> -->
   <ConfirmDialogModal :show="logoutlModal" @close="logoutlModal = false" maxWidth="2xl">
     <template #title>
