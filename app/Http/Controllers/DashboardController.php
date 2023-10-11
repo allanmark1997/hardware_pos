@@ -66,16 +66,18 @@ class DashboardController extends Controller
                 foreach ($group as $key2 => $product) {
                     // dd($key);
                     if (isset($temp_array[$key]["data"])) {
+                        $counter = 0;
                         foreach ($temp_array[$key]["data"] as $key3 => $product_in_array) {
                             // dd(Carbon::parse($product->created_at)->format("Y-m") == $key3);
                             if (Carbon::parse($product->created_at)->format("Y-M") == $key3) {
-                                $temp_array[$key]["data"][Carbon::parse($product->created_at)->format("Y-M")][$key2][] = $product;
+                                $temp_array[$key]["data"][Carbon::parse($product->created_at)->format("Y-M")][$counter] = $product;
                             } else {
-                                $temp_array[$key]["data"][Carbon::parse($product->created_at)->format("Y-M")][$key2][][] = $product;
+                                $temp_array[$key]["data"][Carbon::parse($product->created_at)->format("Y-M")][$counter] = $product;
                             }
+                            $counter++;
                         }
                     } else {
-                        $temp_array[$key]["data"][Carbon::parse($product->created_at)->format("Y-M")][$key2][] = $product;
+                        $temp_array[$key]["data"][Carbon::parse($product->created_at)->format("Y-M")][$key2] = $product;
                     }
                 }
             }
