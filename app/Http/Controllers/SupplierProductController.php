@@ -19,30 +19,34 @@ class SupplierProductController extends Controller
      */
     public function index(Request $request)
     {
-        $search = $request->search ?? "";
-        $category = $request->category ?? "";
-        $products = SupplierProduct::with("user")->with("product")->has("product")->with("supplier")->with("price")->when($search != null || $search != "", function ($query) use ($search) {
-            $query->whereHas("product", function ($query2) use ($search) {
-                $query2->where("name", "LIKE", "%{$search}%");
-            })->with(['product' => function ($query2) use ($search) {
-                $query2->where("name", "LIKE", "%{$search}%");
-            }]);
-        })->when($category != null || $category != "", function ($query) use ($category) {
-            $query->where('supplier_category_id', $category);
-        })->orderBy("created_at", "desc")->paginate(20);
-        // dd($products);
-        $categories = SupplierCategory::orderBy("name", 'asc')->get();
-        $suppliers = supplier::get();
-        $product_lists = Product::get();
+        if (Auth::user()->type != 0) {
+            return Redirect::route('cashier.index');
+        } else {
+            $search = $request->search ?? "";
+            $category = $request->category ?? "";
+            $products = SupplierProduct::with("user")->with("product")->has("product")->with("supplier")->with("price")->when($search != null || $search != "", function ($query) use ($search) {
+                $query->whereHas("product", function ($query2) use ($search) {
+                    $query2->where("name", "LIKE", "%{$search}%");
+                })->with(['product' => function ($query2) use ($search) {
+                    $query2->where("name", "LIKE", "%{$search}%");
+                }]);
+            })->when($category != null || $category != "", function ($query) use ($category) {
+                $query->where('supplier_category_id', $category);
+            })->orderBy("created_at", "desc")->paginate(20);
+            // dd($products);
+            $categories = SupplierCategory::orderBy("name", 'asc')->get();
+            $suppliers = supplier::get();
+            $product_lists = Product::get();
 
-        return Inertia::render('SupplierProducts/Product', [
-            "products" => $products,
-            "search" => $search,
-            "categories" => $categories,
-            "category" => $category,
-            "suppliers" => $suppliers,
-            "product_lists" => $product_lists,
-        ]);
+            return Inertia::render('SupplierProducts/Product', [
+                "products" => $products,
+                "search" => $search,
+                "categories" => $categories,
+                "category" => $category,
+                "suppliers" => $suppliers,
+                "product_lists" => $product_lists,
+            ]);
+        }
     }
 
     /**

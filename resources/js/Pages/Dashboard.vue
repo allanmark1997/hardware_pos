@@ -1,40 +1,11 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Welcome from "@/Components/Welcome.vue";
-const year_sales = [
-  {
-    name: "Niknaks",
-    data: {
-      January: 1,
-      February: 2,
-      April: 8,
-      May: 2,
-      June: 4,
-      July: 11,
-      August: 12,
-      September: 160,
-      October: 128,
-      November: 110,
-      December: 10,
-    },
-  },
-  {
-    name: "Call parents",
-    data: {
-      January: 2,
-      February: 4,
-      April: 10,
-      May: 20,
-      June: 40,
-      July: 110,
-      August: 120,
-      September: 160,
-      October: 128,
-      November: 110,
-      December: 10,
-    },
-  },
-];
+import Icon from "@/Components/Icon.vue";
+
+const props = defineProps(["sale_year"]);
+
+const year_sales = props.sale_year;
 
 const month_sales = [
   {
@@ -71,18 +42,16 @@ const month_sales = [
   },
 ];
 
-const top_ten = [
-  { name: "sample", sale: "sample" },
-  { name: "sample2", sale: "sample1" },
-  { name: "sample3", sale: "sample2" },
-  { name: "sample4", sale: "sample3" },
-  { name: "sample5", sale: "sample4" },
-  { name: "sample6", sale: "sample5" },
-  { name: "sample7", sale: "sample6" },
-  { name: "sample8", sale: "sample7" },
-  { name: "sample9", sale: "sample8" },
-  { name: "sample10", sale: "sample9" },
-];
+const top_ten = props.sale_year;
+
+const convert_money = (data) => {
+  const formatter = new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+  });
+  formatter.format(data);
+  return formatter.format(data);
+};
 </script>
 
 <template>
@@ -110,17 +79,27 @@ const top_ten = [
             </div>
             <div class="col-span-4 border bg-white rounded-lg">
               <p class="p-2 text-xl font-bold">This Week sales</p>
-              <area-chart :data="year_sales" />
+              <area-chart :data="month_sales" />
             </div>
             <div class="col-span-4 border bg-white rounded-lg">
-              <p class="p-2 text-xl font-bold">Top 10 Products</p>
+              <p class="p-2 text-xl font-bold">Top 10 Products in this year</p>
               <div class="grid grid-cols-12 gap-2 p-4">
                 <template v-for="(top, key) in top_ten" :key="key">
-                  <div class="col-span-6">
-                    <p>{{ top.name }}</p>
+                  <div class="col-span-6 text-sm flex">
+                    <Icon v-if="key + 1 == 1" icon="gold_medal" size="sm" />
+                    <Icon v-if="key + 1 == 2" icon="silver_medal" size="sm" />
+                    <Icon v-if="key + 1 == 3" icon="bronze_medal" size="sm" />
+                    <p>{{ key + 1 + ". " + top.name }}</p>
                   </div>
-                  <div class="col-span-6 text-right">
-                    <p>{{ top.sale }}</p>
+                  <div class="col-span-3 text-right text-xs break-words">
+                    <p>x{{ top.quantity }}</p>
+                  </div>
+                  <div
+                    class="col-span-3 text-left text-xs break-words bg-green-600 rounded-lg"
+                  >
+                    <p class="text-white ml-[2px] mr-[2px]">
+                      {{ convert_money(top.total_sale) }}
+                    </p>
                   </div>
                 </template>
               </div>

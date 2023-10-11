@@ -14,26 +14,30 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $orders = Order::with("supplier")->with("user")->with("product")->has("product")->with("price")->where("status", 0)->get();
-        $group_suppliers = $orders->groupBy('supplier_id');
-        // $temp_array = [];
-        // foreach ($group_suppliers as $key => $supplier) {
-        //     foreach ($supplier as $key2 => $data) {
-        //         // dd(array_search($data->supplier->supplier_name, $temp_array));
-        //         if (array_search($data->supplier->supplier_name, $temp_array) <= 0) {
-        //             $temp_array[$data->supplier->supplier_name][] = [$data];
-        //         } else {
-        //             $temp_array[] = [$data];
-        //         }
-        //     }
-        // }
-        $group_suppliers_2 = $orders->groupBy('supplier.supplier_name');
-        // dd($group_suppliers_2);
+        if (Auth::user()->type != 0) {
+            return Redirect::route('cashier.index');
+        } else {
+            $orders = Order::with("supplier")->with("user")->with("product")->has("product")->with("price")->where("status", 0)->get();
+            $group_suppliers = $orders->groupBy('supplier_id');
+            // $temp_array = [];
+            // foreach ($group_suppliers as $key => $supplier) {
+            //     foreach ($supplier as $key2 => $data) {
+            //         // dd(array_search($data->supplier->supplier_name, $temp_array));
+            //         if (array_search($data->supplier->supplier_name, $temp_array) <= 0) {
+            //             $temp_array[$data->supplier->supplier_name][] = [$data];
+            //         } else {
+            //             $temp_array[] = [$data];
+            //         }
+            //     }
+            // }
+            $group_suppliers_2 = $orders->groupBy('supplier.supplier_name');
+            // dd($group_suppliers_2);
 
-        return Inertia::render('Cart/Cart', [
-            "orders" => $orders,
-            "group_suppliers" => $group_suppliers_2,
-        ]);
+            return Inertia::render('Cart/Cart', [
+                "orders" => $orders,
+                "group_suppliers" => $group_suppliers_2,
+            ]);
+        }
     }
 
     /**
