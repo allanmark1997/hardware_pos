@@ -22,7 +22,7 @@ class DashboardController extends Controller
         if (Auth::user()->type != 0) {
             return Redirect::route('cashier.index');
         } else {
-            $sale_year = TransactionDetail::with("product")->with("price")->where("created_at", "LIKE", "%{$year_today}%")->get();
+            $sale_year = TransactionDetail::with("product")->with("price")->with("sale_discount")->where("created_at", "LIKE", "%{$year_today}%")->get();
             $grouped_sales_raw = $sale_year->groupBy("product.name");
             $temp_array = [];
             $temp_counter = [];
@@ -30,9 +30,10 @@ class DashboardController extends Controller
 
             foreach ($grouped_sales_raw as $key => $group) {
                 foreach ($group as $key2 => $product) {
-                    $temp_counter[$key][Carbon::parse($product->created_at)->format("Y-M")][] = array("quantity" => $product->quantity, "price" => $product->price->price);
+                    $temp_counter[$key][Carbon::parse($product->created_at)->format("Y-M")][] = array("quantity" => $product->quantity, "price" => $product->price->price, "discount" => $product->sale_discount->discount / 100);
                 }
             }
+            // dd($temp_counter);
             foreach ($temp_counter as $key1 => $group_products) {
                 $temp_all_quantity = 0;
                 $temp_all_price = 0;
@@ -41,7 +42,7 @@ class DashboardController extends Controller
                     foreach ($group_date as $key3 => $product_quantity_price) {
                         $temp_result_per_month += $product_quantity_price["quantity"];
                         $temp_all_quantity += $product_quantity_price["quantity"];
-                        $temp_all_price += $product_quantity_price["quantity"] * $product_quantity_price["price"];
+                        $temp_all_price += $product_quantity_price["quantity"] * ($product_quantity_price["price"] - ($product_quantity_price["price"] * $product_quantity_price["discount"]));
                     }
                     $temp_array[$key1]["name"] = $key1;
                     $temp_array[$key1]["data"][$key2] = $temp_result_per_month;
@@ -60,6 +61,7 @@ class DashboardController extends Controller
             ]);
         }
     }
+
 
     function sortByField($array, $field)
     {

@@ -89,7 +89,7 @@ const convert_money = (data) => {
                     <Icon v-if="key + 1 == 1" icon="gold_medal" size="sm" />
                     <Icon v-if="key + 1 == 2" icon="silver_medal" size="sm" />
                     <Icon v-if="key + 1 == 3" icon="bronze_medal" size="sm" />
-                    <p>{{ key + 1 + ". " + top.name }}</p>
+                    <p>{{ top.name }}</p>
                   </div>
                   <div class="col-span-3 text-right text-xs break-words">
                     <p>x{{ top.quantity }}</p>
