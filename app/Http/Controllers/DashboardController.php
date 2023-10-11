@@ -65,6 +65,8 @@ class DashboardController extends Controller
                 $temp_array[$key]["name"] = $key;
                 foreach ($group as $key2 => $product) {
                     // dd($key);
+                    $temp_array[$key]["data"][Carbon::parse($product->created_at)->format("Y-M")][$key2] = $product;
+
                     if (isset($temp_array[$key]["data"])) {
                         $counter = 0;
                         foreach ($temp_array[$key]["data"] as $key3 => $product_in_array) {
@@ -72,13 +74,24 @@ class DashboardController extends Controller
                             if (Carbon::parse($product->created_at)->format("Y-M") == $key3) {
                                 $temp_array[$key]["data"][Carbon::parse($product->created_at)->format("Y-M")][$counter] = $product;
                             } else {
-                                $temp_array[$key]["data"][Carbon::parse($product->created_at)->format("Y-M")][$counter] = $product;
+                                // if (isset($temp_array[$key]["data"][Carbon::parse($product->created_at)->format("Y-M")][$counter])){
+                                //     // dd($temp_array[$key]["data"][Carbon::parse($product->created_at)->format("Y-M")][$counter]->id);
+                                //     if ($temp_array[$key]["data"][Carbon::parse($product->created_at)->format("Y-M")][$counter]->id == $product->id) {
+                                //         $temp_array[$key]["data"][Carbon::parse($product->created_at)->format("Y-M")][$counter] = $product;
+                                //     }
+                                // }
+                                // else{
+                                    $temp_array[$key]["data"][Carbon::parse($product->created_at)->format("Y-M")][$counter] = $product;
+
+                                // }
+                               
                             }
                             $counter++;
                         }
-                    } else {
-                        $temp_array[$key]["data"][Carbon::parse($product->created_at)->format("Y-M")][$key2] = $product;
-                    }
+                    } 
+                    // else {
+                    //     $temp_array[$key]["data"][Carbon::parse($product->created_at)->format("Y-M")][$key2] = $product;
+                    // }
                 }
             }
             // $months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
