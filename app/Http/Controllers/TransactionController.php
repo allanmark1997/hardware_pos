@@ -15,24 +15,28 @@ class TransactionController extends Controller
      */
     public function index(Request $request)
     {
-        $date_from = $request->date_from ?? "";
-        $date_to = $request->date_to ?? "";
-        $search = $request->search ?? "";
-        $transactions = Transaction::with("accommodate_by")->has("accommodate_by")->with("tax")->with("special_discount")->with("transaction_details")->when($date_from !=  null || $date_from != "" && $date_to != null || $date_to != "", function ($query) use ($date_from, $date_to) {
-            $query->whereBetween('created_at', [$date_from, $date_to]);
-        })->when($search != null || $search != "", function ($query) use ($search) {
-            $query->whereHas("accommodate_by", function ($query2) use ($search) {
-                $query2->where("name", "LIKE", "%{$search}%");
-            })->with(['accommodate_by' => function ($query2) use ($search) {
-                $query2->where("name", "LIKE", "%{$search}%");
-            }]);
-        })->orderBy("created_at", "desc")->paginate(20);
-        return Inertia::render('Transactions/Transaction', [
-            "transactions" => $transactions,
-            "date_from" => $date_from,
-            "date_to" => $date_to,
-            "search" => $search
-        ]);
+        if (Auth::user()->type != 0) {
+            return Redirect::route('cashier.index');
+        } else {
+            $date_from = $request->date_from ?? "";
+            $date_to = $request->date_to ?? "";
+            $search = $request->search ?? "";
+            $transactions = Transaction::with("accommodate_by")->has("accommodate_by")->with("tax")->with("special_discount")->with("transaction_details")->when($date_from !=  null || $date_from != "" && $date_to != null || $date_to != "", function ($query) use ($date_from, $date_to) {
+                $query->whereBetween('created_at', [$date_from, $date_to]);
+            })->when($search != null || $search != "", function ($query) use ($search) {
+                $query->whereHas("accommodate_by", function ($query2) use ($search) {
+                    $query2->where("name", "LIKE", "%{$search}%");
+                })->with(['accommodate_by' => function ($query2) use ($search) {
+                    $query2->where("name", "LIKE", "%{$search}%");
+                }]);
+            })->orderBy("created_at", "desc")->paginate(20);
+            return Inertia::render('Transactions/Transaction', [
+                "transactions" => $transactions,
+                "date_from" => $date_from,
+                "date_to" => $date_to,
+                "search" => $search
+            ]);
+        }
     }
 
     public function export(Request $request)
@@ -69,7 +73,7 @@ class TransactionController extends Controller
                 $transaction->payment_method == 0 ? "Cash" : "Other",
                 $transaction->customer_type == 0 ? "Walk-in" : "Regular",
                 $transaction->tax->tax / 100,
-                $transaction->special_discount?->discount ? $transaction->special_discount->discount:0 / 100,
+                $transaction->special_discount?->discount ? $transaction->special_discount->discount : 0 / 100,
                 count($transaction->transaction_details) != 0 ? "Product name" : "--",
                 count($transaction->transaction_details) != 0 ? "Quantity" : "--",
                 count($transaction->transaction_details) != 0 ? "Price" : "--",
@@ -77,12 +81,12 @@ class TransactionController extends Controller
                 count($transaction->transaction_details) != 0 ? "Status" : "--",
                 count($transaction->transaction_details) != 0 ? "Total Discount" : "--",
                 count($transaction->transaction_details) != 0 ? "Sub-total" : "--",
-                "PHP " . number_format($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount:0, 0, $transaction->status), 2),
-                "PHP " . number_format($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount:0, 1, $transaction->status), 2),
-                "PHP " . number_format($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount:0, 2, $transaction->status), 2),
+                "PHP " . number_format($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount : 0, 0, $transaction->status), 2),
+                "PHP " . number_format($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount : 0, 1, $transaction->status), 2),
+                "PHP " . number_format($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount : 0, 2, $transaction->status), 2),
                 "PHP " . number_format($transaction->cash, 2),
-                "PHP " . number_format(($transaction->cash - $this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount:0, 2, $transaction->status)), 2),
-                "PHP " . number_format($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount:0, 3, $transaction->status), 2),
+                "PHP " . number_format(($transaction->cash - $this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount : 0, 2, $transaction->status)), 2),
+                "PHP " . number_format($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount : 0, 3, $transaction->status), 2),
 
                 Carbon::parse($transaction->created_at)->format('d-m-Y')
             ];
@@ -198,7 +202,7 @@ class TransactionController extends Controller
     {
         $grand_total = 0;
         foreach ($transactions as $key => $transaction) {
-            $grand_total += $this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount?->discount: 0, 2, $transaction->status);
+            $grand_total += $this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount?->discount : 0, 2, $transaction->status);
         }
         return $grand_total;
     }
@@ -207,7 +211,7 @@ class TransactionController extends Controller
     {
         $grand_total = 0;
         foreach ($transactions as $key => $transaction) {
-            $grand_total += $this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount?->discount: 0, 3, $transaction->status);
+            $grand_total += $this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount?->discount : 0, 3, $transaction->status);
         }
         return $grand_total;
     }

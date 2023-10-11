@@ -6,6 +6,8 @@ use App\Exports\BackOrderExport;
 use App\Models\BackOrder;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 
 class BackOrderController extends Controller
@@ -15,16 +17,20 @@ class BackOrderController extends Controller
      */
     public function index(Request $request)
     {
-        $date_from = $request->date_from ?? "";
-        $date_to = $request->date_to ?? "";
-        $back_orders = BackOrder::with("product")->with("price")->with("discount")->with("user")->when($date_from !=  null || $date_from != "" && $date_to != null || $date_to != "", function ($query) use ($date_from, $date_to) {
-            $query->whereBetween('created_at', [$date_from, $date_to]);
-        })->paginate(20);
-        return Inertia::render('BackOrder/BackOrder', [
-            "back_orders" => $back_orders,
-            "date_from" => $date_from,
-            "date_to" => $date_to
-        ]);
+        if (Auth::user()->type != 0) {
+            return Redirect::route('cashier.index');
+        } else {
+            $date_from = $request->date_from ?? "";
+            $date_to = $request->date_to ?? "";
+            $back_orders = BackOrder::with("product")->with("price")->with("discount")->with("user")->when($date_from !=  null || $date_from != "" && $date_to != null || $date_to != "", function ($query) use ($date_from, $date_to) {
+                $query->whereBetween('created_at', [$date_from, $date_to]);
+            })->paginate(20);
+            return Inertia::render('BackOrder/BackOrder', [
+                "back_orders" => $back_orders,
+                "date_from" => $date_from,
+                "date_to" => $date_to
+            ]);
+        }
     }
 
     public function export(Request $request)
