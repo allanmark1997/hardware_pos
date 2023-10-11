@@ -95,9 +95,9 @@ const convert_money = (data) => {
                     <p>x{{ top.quantity }}</p>
                   </div>
                   <div
-                    class="col-span-3 text-left text-xs break-words bg-green-600 rounded-lg"
+                    class="col-span-3 text-center text-xs break-words "
                   >
-                    <p class="text-white ml-[2px] mr-[2px]">
+                    <p class=" bg-green-600 rounded-lg text-white pl-1 pr-1">
                       {{ convert_money(top.total_sale) }}
                     </p>
                   </div>

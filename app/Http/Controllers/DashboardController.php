@@ -27,10 +27,12 @@ class DashboardController extends Controller
             $temp_array = [];
             $temp_counter = [];
             $temp_final = [];
-
+            $months=[
+                1,2,3,4,5,6,7,8,9,10,11,12
+            ];
             foreach ($grouped_sales_raw as $key => $group) {
                 foreach ($group as $key2 => $product) {
-                    $temp_counter[$key][Carbon::parse($product->created_at)->format("F")][] = array("quantity" => $product->quantity, "price" => $product->price->price, "discount" => $product->sale_discount->discount / 100);
+                    $temp_counter[$key][Carbon::parse($product->created_at)->format("m")][] = array("quantity" => $product->quantity, "price" => $product->price->price, "discount" => $product->sale_discount->discount / 100);
                 }
             }
             // dd($temp_counter);
@@ -56,6 +58,8 @@ class DashboardController extends Controller
             $sale_year_filtered = $this->sortByField($temp_final, 'quantity');
             $top_10_prod_year = array_slice($sale_year_filtered, 0, 10);
             // dd($top_10_prod_year);
+          
+
             return Inertia::render("Dashboard", [
                 "sale_year" => $top_10_prod_year
             ]);
@@ -95,7 +99,7 @@ class DashboardController extends Controller
     {
         $length = count($array);
         for ($i = 0; $i < $length; $i++) {
-            for ($j = $i + 1; $j > $length; $j++) {
+            for ($j = $i + 1; $j < $length; $j++) {
                 if ($array[$i]->$field < $array[$j]->$field) {
                     $temp = $array[$i];
                     $array[$i] = $array[$j];
