@@ -27,12 +27,29 @@ class DashboardController extends Controller
             $temp_array = [];
             $temp_counter = [];
             $temp_final = [];
-            $months=[
-                1,2,3,4,5,6,7,8,9,10,11,12
+            $months = [
+                "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+            ];
+            $months_prod = [
+                [1, 0],
+                [2, 0],
+                [3, 0],
+                [4, 0],
+                [5, 0],
+                [6, 0],
+                [7, 0],
+                [8, 0],
+                [9, 0],
+                [10, 0],
+                [11, 0],
+                [12, 0],
             ];
             foreach ($grouped_sales_raw as $key => $group) {
                 foreach ($group as $key2 => $product) {
-                    $temp_counter[$key][Carbon::parse($product->created_at)->format("m")][] = array("quantity" => $product->quantity, "price" => $product->price->price, "discount" => $product->sale_discount->discount / 100);
+                    // foreach ($months as $month_key => $month) {
+
+                    $temp_counter[$key][Carbon::parse($product->created_at)->format("F")][] = array("quantity" => $product->quantity, "price" => $product->price->price, "discount" => $product->sale_discount->discount / 100);
+                    // }
                 }
             }
             // dd($temp_counter);
@@ -57,11 +74,28 @@ class DashboardController extends Controller
             }
             $sale_year_filtered = $this->sortByField($temp_final, 'quantity');
             $top_10_prod_year = array_slice($sale_year_filtered, 0, 10);
-            // dd($top_10_prod_year);
-          
+
+            $sample_array_months_jan_to_dec = [];
+            foreach ($months as $key => $months_value) {
+                foreach ($top_10_prod_year as $key2 => $value2) {
+                    $sample_array_months_jan_to_dec[$key2]["name"] = $value2->name;
+                    $sample_array_months_jan_to_dec[$key2]["data"][$months_value] = 0;
+                    foreach ($value2->data as $key3 => $value3) {
+                        if ($key3 == $months_value) {
+                            $sample_array_months_jan_to_dec[$key2]["data"][$months_value] = $value3;
+                        }
+                    }
+                }
+            }
+            // dd($sample_array_months_jan_to_dec);
+
+            // foreach ($top_10_prod_year as $key2 => $value2) {
+            //     dd($top_10_prod_year[$key2]->name);
+            // }
 
             return Inertia::render("Dashboard", [
-                "sale_year" => $top_10_prod_year
+                "sale_year" => $top_10_prod_year,
+                "full_year_top_10_sales" => $sample_array_months_jan_to_dec
             ]);
         }
     }

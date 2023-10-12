@@ -3,9 +3,9 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import Welcome from "@/Components/Welcome.vue";
 import Icon from "@/Components/Icon.vue";
 
-const props = defineProps(["sale_year"]);
+const props = defineProps(["sale_year", "full_year_top_10_sales"]);
 
-const year_sales = props.sale_year;
+const year_sales = props.full_year_top_10_sales;
 
 const month_sales = [
   {
@@ -94,10 +94,8 @@ const convert_money = (data) => {
                   <div class="col-span-3 text-right text-xs break-words">
                     <p>x{{ top.quantity }}</p>
                   </div>
-                  <div
-                    class="col-span-3 text-center text-xs break-words "
-                  >
-                    <p class=" bg-green-600 rounded-lg text-white pl-1 pr-1">
+                  <div class="col-span-3 text-center text-xs break-words">
+                    <p class="bg-green-600 rounded-lg text-white pl-1 pr-1">
                       {{ convert_money(top.total_sale) }}
                     </p>
                   </div>
