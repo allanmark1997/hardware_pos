@@ -19,15 +19,19 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $year_today = date("Y");
+        $month_today = date("Y-m");
         $day = date('w');
         $week_start = date('m-d-Y', strtotime('-' . $day . ' days'));
         $week_end = date('m-d-Y', strtotime('+' . (6 - $day) . ' days'));
         $month_start = date('Y-m-01');
         $month_end = date('Y-m-t');
-        dd($month_end);
         if (Auth::user()->type != 0) {
             return Redirect::route('cashier.index');
         } else {
+            $sale_month = TransactionDetail::with("product")->with("price")->with("sale_discount")->where("created_at", "LIKE", "%{$month_today}%")->get();
+            $grouped_monthly_sales_raw = $sale_month->groupBy("product.name");
+
+            // dd($grouped_monthly_sales_raw);
             $sale_year = TransactionDetail::with("product")->with("price")->with("sale_discount")->where("created_at", "LIKE", "%{$year_today}%")->get();
             $grouped_sales_raw = $sale_year->groupBy("product.name");
             $temp_array = [];
@@ -75,6 +79,7 @@ class DashboardController extends Controller
                     }
                 }
             }
+            // dd($sample_array_months_jan_to_dec);
             return Inertia::render("Dashboard", [
                 "sale_year" => $top_10_prod_year,
                 "full_year_top_10_sales" => $sample_array_months_jan_to_dec,
