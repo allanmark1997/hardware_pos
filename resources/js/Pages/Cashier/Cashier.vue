@@ -40,6 +40,8 @@ const quantity = ref(1);
 const item_count = ref(0);
 const item_grand_total = ref(0);
 
+let temp_grand_total = ref(0)
+
 const __cash = ref(0)
 
 
@@ -245,6 +247,30 @@ const keydownHandler = (event) => {
   function_activate_status();
 };
 
+
+
+watch(() => form.products, (products, old_product) => {
+  deep: true
+  let temp_quantity = 0;
+  // let temp_grand_total = 0;
+  let temp_sub_total = 0;
+  products.forEach((product__) => {
+    item_grand_total.value = 0
+    item_count.value = 0
+    temp_sub_total = 0
+    temp_quantity = temp_quantity + product__.cashier_quantity;
+    temp_sub_total =
+      applyDiscount(
+        product__.current_price.price,
+        product__.current_discount.discount
+      ).discountedPrice * product__.cashier_quantity;
+    temp_grand_total.value = temp_grand_total.value + temp_sub_total;
+  });
+  item_count.value = temp_quantity;
+  item_grand_total.value = temp_grand_total.value;
+},{ deep: true });
+
+
 const domChecker = () => {
   let result = "";
   if ("keydown" in window) {
@@ -383,7 +409,7 @@ const function_activate_status = () => {
 };
 
 const check_out = () => {
-  let grand_payable = applyTax(applyDiscount(item_grand_total.value, spDiscount.value == true ? special_discount.discount : 0).discountedPrice);
+  let grand_payable = applyTax(applyDiscount(item_grand_total.value, spDiscount.value == true ? props.special_discount.discount : 0).discountedPrice);
   // alert(grand_payable)
   if (parseFloat(form.cash) < parseFloat(grand_payable)) {
     toast.error("Inputed cash is insuficient", {
@@ -418,10 +444,15 @@ const check_out = () => {
         });
         // printModal.value = true
         // __cash.value = form.cash
-        printModal.value = false
+
+       form.products = []
         form.reset();
+        
+        printModal.value = false
+        
         scannedProductIMG.value = "";
         cash_input_modal.value = false
+        
       },
       onError: () => {
         toast.error(form.errors.transaction_validation, {
@@ -449,22 +480,6 @@ const logout_confirm = () => {
 
 }
 
-watch(form.products, (products) => {
-  let temp_quantity = 0;
-  let temp_grand_total = 0;
-  let temp_sub_total = 0;
-  products.forEach((product) => {
-    temp_quantity = temp_quantity + product.cashier_quantity;
-    temp_sub_total =
-      applyDiscount(
-        product.current_price.price,
-        product.current_discount.discount
-      ).discountedPrice * product.cashier_quantity;
-    temp_grand_total = temp_grand_total + temp_sub_total;
-  });
-  item_count.value = temp_quantity;
-  item_grand_total.value = temp_grand_total;
-});
 
 const setFocusToTextBox = () => {
   document.querySelector("#prodBarcodeInput").focus();

@@ -2,25 +2,39 @@
 
 import { onMounted, ref } from "vue";
 import moment from "moment";
-const props = defineProps(['printModal', 'products', 'cashierName', 'cash__','grand_total','vat__','spDiscount','subtotal__','subtotal1__'])
+const props = defineProps(['printModal', 'products', 'cashierName', 'cash__', 'grand_total', 'vat__', 'spDiscount', 'subtotal__', 'subtotal1__'])
 const date = ref(Date.now())
 
 const emit = defineEmits(['checkout__', 'close_modal'])
 
-const printReceipt = () =>{
+const printReceipt = () => {
   var divContents = document.getElementById("toPrint").outerHTML; 
-            var a = window.open('', '', 'height=500, width=200'); 
+            var a = window.open('', '', 'height=500, width=400'); 
             a.document.write('<html>'); 
             a.document.write('<body><br>'); 
             a.document.write(divContents); 
-            a.document.write('</body></html>'); 
-            a.document.close(); 
-            a.print(); 
+            a.document.write('</body></html>');
+            a.print() 
+            // a.onload=function(){window.print(); window.close()} 
+              
+
+
+  // var contentToPrint = document.getElementById("toPrint");
+  // var newWin = window.open('', '_blank');
+
+  // // Open a new window and write the content to be printed
+  // // newWin.document.open();
+  // newWin.document.write('<html><body>' + contentToPrint.innerHTML + '</body></html>');
+  // document.getElementById("printButton").addEventListener("click", function () {
+  //   window.print();
+  // });
+
+
 }
-const closeModal = () =>{
+const closeModal = () => {
   emit('close_modal')
 }
-const print_checkout = () =>{
+const print_checkout = () => {
   printReceipt()
   emit('checkout__')
 }
@@ -33,12 +47,12 @@ const convert_money = (data) => {
   formatter.format(data);
   return formatter.format(data);
 };
-const customerChange = (total,cash) => {
-  
-let res_cash = parseFloat(cash.replace(/[^\d.]/g, ''));
-let res_total = parseFloat(total.replace(/[^\d.]/g, ''));
+const customerChange = (total, cash) => {
 
-return res_cash - res_total
+  let res_cash = parseFloat(cash.replace(/[^\d.]/g, ''));
+  let res_total = parseFloat(total.replace(/[^\d.]/g, ''));
+
+  return res_cash - res_total
 }
 const dateNow = () => {
   return moment(date).format("MM/DD/YYYY");
@@ -74,29 +88,28 @@ const applyTax = (subtotal) => {
   return result_grandtotal;
 };
 
-const totalAmount_ = () =>{
+const totalAmount_ = () => {
   let total = 0
   for (let index = 0; index < props.products.length; index++) {
     const element = props.products[index];
     total = total + parseFloat(applyDiscount(element.current_price.price, element.current_discount.discount).discountedPrice)
-    
   }
 
   return total
 }
-const stringTruncateFromCenter =(str, maxLength) => {
-    const midChar = "…";      // character to insert into the center of the result
-    var left, right;
+const stringTruncateFromCenter = (str, maxLength) => {
+  const midChar = "…";      // character to insert into the center of the result
+  var left, right;
 
-    if (str.length <= maxLength) return str;
+  if (str.length <= maxLength) return str;
 
-    // length of beginning part      
-    left = Math.ceil(maxLength / 2);
+  // length of beginning part      
+  left = Math.ceil(maxLength / 2);
 
-    // start index of ending part   
-    right = str.length - Math.floor(maxLength / 2) + 1;   
+  // start index of ending part   
+  right = str.length - Math.floor(maxLength / 2) + 1;
 
-    return str.substr(0, left) + midChar + str.substring(right);
+  return str.substr(0, left) + midChar + str.substring(right);
 }
 
 </script>
@@ -114,10 +127,10 @@ const stringTruncateFromCenter =(str, maxLength) => {
         <small>TIN: 487-279-975-00001</small><br>
         <small>Date: {{ dateNow() }} Time:{{ timeNow() }}</small><br>
         <small>Cashier: {{ cashierName }}</small><br>
-        <small>-----------------------------------------------------</small><br>
-        <small>Customer Name:</small><br>
-        <small>Address:</small><br>
-        <small>-----------------------------------------------------</small><br>
+        <small>-----------------------------------------------------</small>
+        <p><small>Customer Name:</small></p>
+        <p><small>Address:</small></p>
+        <small>-----------------------------------------------------</small>
         <table class="">
           <thead>
             <tr class="border mb-2">
@@ -130,10 +143,12 @@ const stringTruncateFromCenter =(str, maxLength) => {
           <tbody class="border">
             <tr v-for="items in props.products">
               <td><small>{{ stringTruncateFromCenter(items.name, 18) }} </small></td>
-              <td><small> {{ convert_money(applyDiscount(items.current_price.price, items.current_discount.discount).discountedPrice) }} </small></td>
-              <td><small>{{items.cashier_quantity}}</small></td>
-              <td><small id="totalPrice">{{convert_money(applyDiscount(items.current_price.price, items.current_discount.discount).discountedPrice * items.cashier_quantity)}} </small></td>
-             
+              <td><small> {{ convert_money(applyDiscount(items.current_price.price,
+                items.current_discount.discount).discountedPrice) }} </small></td>
+              <td><small>{{ items.cashier_quantity }}</small></td>
+              <td><small id="totalPrice">{{ convert_money(applyDiscount(items.current_price.price,
+                items.current_discount.discount).discountedPrice * items.cashier_quantity) }} </small></td>
+
             </tr>
           </tbody>
           <tfoot class="border">
@@ -141,7 +156,7 @@ const stringTruncateFromCenter =(str, maxLength) => {
               <td><small>{{ props.products.length }} </small></td>
               <td><small> --- </small></td>
               <td><small>---</small></td>
-              <td><small>{{convert_money(totalAmount_())}} </small></td>
+              <td><small>{{ props.grand_total }} </small></td>
             </tr>
           </tfoot>
         </table>
@@ -152,19 +167,31 @@ const stringTruncateFromCenter =(str, maxLength) => {
         <small>Special Discount({{ props.spDiscount }}%)</small><br>
         <small>------------------------------------------------------</small><br>
         <small>TOTAL AMOUNT: {{ props.grand_total }}</small><br>
-        <small>CASH: {{props.cash__}}</small><br>
-        <small>CHANGE: {{convert_money(customerChange(props.grand_total, props.cash__ ))}}</small><br>
+        <small>CASH: {{ props.cash__ }}</small><br>
+        <small>CHANGE: {{ convert_money(customerChange(props.grand_total, props.cash__)) }}</small><br>
 
 
         <small class="mt-5 text-center">This serve as an OFFICIAL RECEIPT</small><br>
         <small class="text-center">Thank You, Come Again</small><br>
       </div>
       <div class="flex justify-center mt-3">
-        <button type="button" @click="print_checkout()"
+        <button id="printButton" type="button" @click="print_checkout()"
           class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 ">Print</button>
-          <button type="button" @click="closeModal()"
+        <button type="button" @click="closeModal()"
           class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 ">Close</button>
       </div>
     </div>
   </div>
 </template>
+
+<style>
+@media print {
+  body * {
+    display: none;
+  }
+
+  #contentToPrint,
+  #contentToPrint * {
+    display: block;
+  }
+}</style>
