@@ -3,46 +3,11 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import Welcome from "@/Components/Welcome.vue";
 import Icon from "@/Components/Icon.vue";
 
-const props = defineProps(["sale_year", "full_year_top_10_sales"]);
-
-const year_sales = props.full_year_top_10_sales;
-
-const month_sales = [
-  {
-    name: "Niknaks",
-    data: {
-      January: 1,
-      February: 2,
-      April: 8,
-      May: 2,
-      June: 4,
-      July: 11,
-      August: 12,
-      September: 160,
-      October: 128,
-      November: 110,
-      December: 10,
-    },
-  },
-  {
-    name: "Call parents",
-    data: {
-      January: 2,
-      February: 4,
-      April: 10,
-      May: 20,
-      June: 40,
-      July: 110,
-      August: 120,
-      September: 160,
-      October: 128,
-      November: 110,
-      December: 10,
-    },
-  },
-];
-
-const top_ten = props.sale_year;
+const props = defineProps([
+  "sale_year",
+  "full_year_top_10_sales",
+  "current_year",
+]);
 
 const convert_money = (data) => {
   const formatter = new Intl.NumberFormat("en-PH", {
@@ -66,8 +31,10 @@ const convert_money = (data) => {
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
           <!-- <Welcome /> -->
-          <p class="p-2 text-xl font-bold">Year sales</p>
-          <line-chart :data="year_sales" />
+          <p class="p-2 text-xl font-bold">
+            This year({{ props.current_year }}) sales
+          </p>
+          <line-chart :data="props.full_year_top_10_sales" />
         </div>
         <div
           class="bg-transparent overflow-hidden shadow-xl sm:rounded-lg mt-4 mb-2"
@@ -75,16 +42,18 @@ const convert_money = (data) => {
           <div class="grid grid-cols-12 gap-2">
             <div class="col-span-4 border bg-white rounded-lg">
               <p class="p-2 text-xl font-bold">This Month sales</p>
-              <column-chart :data="year_sales" />
+              <column-chart :data="props.full_year_top_10_sales" />
             </div>
             <div class="col-span-4 border bg-white rounded-lg">
               <p class="p-2 text-xl font-bold">This Week sales</p>
-              <area-chart :data="month_sales" />
+              <area-chart :data="props.full_year_top_10_sales" />
             </div>
             <div class="col-span-4 border bg-white rounded-lg">
-              <p class="p-2 text-xl font-bold">Top 10 Products in this year</p>
+              <p class="p-2 text-xl font-bold">
+                Top 10 Products in this year({{ props.current_year }})
+              </p>
               <div class="grid grid-cols-12 gap-2 p-4">
-                <template v-for="(top, key) in top_ten" :key="key">
+                <template v-for="(top, key) in props.sale_year" :key="key">
                   <div class="col-span-6 text-sm flex">
                     <Icon v-if="key + 1 == 1" icon="gold_medal" size="sm" />
                     <Icon v-if="key + 1 == 2" icon="silver_medal" size="sm" />

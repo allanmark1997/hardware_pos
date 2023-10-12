@@ -19,6 +19,12 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $year_today = date("Y");
+        $day = date('w');
+        $week_start = date('m-d-Y', strtotime('-' . $day . ' days'));
+        $week_end = date('m-d-Y', strtotime('+' . (6 - $day) . ' days'));
+        $month_start = date('Y-m-01');
+        $month_end = date('Y-m-t');
+        dd($month_end);
         if (Auth::user()->type != 0) {
             return Redirect::route('cashier.index');
         } else {
@@ -30,29 +36,11 @@ class DashboardController extends Controller
             $months = [
                 "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
             ];
-            $months_prod = [
-                [1, 0],
-                [2, 0],
-                [3, 0],
-                [4, 0],
-                [5, 0],
-                [6, 0],
-                [7, 0],
-                [8, 0],
-                [9, 0],
-                [10, 0],
-                [11, 0],
-                [12, 0],
-            ];
             foreach ($grouped_sales_raw as $key => $group) {
                 foreach ($group as $key2 => $product) {
-                    // foreach ($months as $month_key => $month) {
-
                     $temp_counter[$key][Carbon::parse($product->created_at)->format("F")][] = array("quantity" => $product->quantity, "price" => $product->price->price, "discount" => $product->sale_discount->discount / 100);
-                    // }
                 }
             }
-            // dd($temp_counter);
             foreach ($temp_counter as $key1 => $group_products) {
                 $temp_all_quantity = 0;
                 $temp_all_price = 0;
@@ -87,47 +75,42 @@ class DashboardController extends Controller
                     }
                 }
             }
-            // dd($sample_array_months_jan_to_dec);
-
-            // foreach ($top_10_prod_year as $key2 => $value2) {
-            //     dd($top_10_prod_year[$key2]->name);
-            // }
-
             return Inertia::render("Dashboard", [
                 "sale_year" => $top_10_prod_year,
-                "full_year_top_10_sales" => $sample_array_months_jan_to_dec
+                "full_year_top_10_sales" => $sample_array_months_jan_to_dec,
+                "current_year" => $year_today
             ]);
         }
     }
 
-    public function month($val)
-    {
-        if ($val == 1) {
-            return "Januray";
-        } elseif ($val == 2) {
-            return "February";
-        } elseif ($val == 3) {
-            return "March";
-        } elseif ($val == 4) {
-            return "April";
-        } elseif ($val == 5) {
-            return "May";
-        } elseif ($val == 6) {
-            return "June";
-        } elseif ($val == 7) {
-            return "July";
-        } elseif ($val == 8) {
-            return "August";
-        } elseif ($val == 9) {
-            return "September";
-        } elseif ($val == 10) {
-            return "October";
-        } elseif ($val == 11) {
-            return "November";
-        } elseif ($val == 12) {
-            return "December";
-        }
-    }
+    // public function month($val)
+    // {
+    //     if ($val == 1) {
+    //         return "Januray";
+    //     } elseif ($val == 2) {
+    //         return "February";
+    //     } elseif ($val == 3) {
+    //         return "March";
+    //     } elseif ($val == 4) {
+    //         return "April";
+    //     } elseif ($val == 5) {
+    //         return "May";
+    //     } elseif ($val == 6) {
+    //         return "June";
+    //     } elseif ($val == 7) {
+    //         return "July";
+    //     } elseif ($val == 8) {
+    //         return "August";
+    //     } elseif ($val == 9) {
+    //         return "September";
+    //     } elseif ($val == 10) {
+    //         return "October";
+    //     } elseif ($val == 11) {
+    //         return "November";
+    //     } elseif ($val == 12) {
+    //         return "December";
+    //     }
+    // }
 
     function sortByField($array, $field)
     {
