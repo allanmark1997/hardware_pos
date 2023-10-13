@@ -8,14 +8,33 @@ const date = ref(Date.now())
 const emit = defineEmits(['checkout__', 'close_modal'])
 
 const printReceipt = () => {
-  var divContents = document.getElementById("toPrint").outerHTML; 
-            var a = window.open('', '', 'height=500, width=400'); 
-            a.document.write('<html>'); 
-            a.document.write('<body><br>'); 
-            a.document.write(divContents); 
-            a.document.write('</body></html>');
-            a.print() 
+  // var divContents = document.getElementById("toPrint").outerHTML; 
+  //           var a = window.open('', '', 'height=500, width=400'); 
+  //           a.document.write('<html>'); 
+  //           a.document.write('<body><br>'); 
+  //           a.document.write(divContents); 
+  //           a.document.write('</body></html>');
+  //           a.print() 
             // a.onload=function(){window.print(); window.close()} 
+
+    var iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    // Clone the content of the specified div
+    var content = document.getElementById("toPrint").cloneNode(true);
+
+    // Set the content of the iframe
+    var iframeDocument = iframe.contentWindow.document;
+    iframeDocument.open();
+    iframeDocument.appendChild(content);
+    iframeDocument.close();
+
+    // Print the iframe content
+    iframe.contentWindow.print();
+
+    // Remove the iframe
+    document.body.removeChild(iframe);
               
 
 
@@ -28,8 +47,6 @@ const printReceipt = () => {
   // document.getElementById("printButton").addEventListener("click", function () {
   //   window.print();
   // });
-
-
 }
 const closeModal = () => {
   emit('close_modal')
@@ -185,13 +202,9 @@ const stringTruncateFromCenter = (str, maxLength) => {
 </template>
 
 <style>
-@media print {
-  body * {
-    display: none;
-  }
-
-  #contentToPrint,
-  #contentToPrint * {
-    display: block;
-  }
-}</style>
+   @media print {
+        button {
+            display: none;
+        }
+    }
+</style>
