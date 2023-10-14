@@ -21,14 +21,76 @@ class DashboardController extends Controller
         $year_today = date("Y");
         $month_today = date("Y-m");
         $day = date('w');
-        $week_start = date('m-d-Y', strtotime('-' . $day . ' days'));
-        $week_end = date('m-d-Y', strtotime('+' . (6 - $day) . ' days'));
+        $week_start = date('Y-m-d', strtotime('-' . $day . ' days'));
+        $week_end = date('Y-m-d', strtotime('+' . (6 - $day) . ' days'));
+        $week_start_day = date('d', strtotime('-' . $day . ' days'));
+        $week_end_day = date('d', strtotime('+' . (6 - $day) . ' days'));
         $month_start = date('Y-m-01');
         $month_end = date('t');
-
+// dd($week_start);
         if (Auth::user()->type != 0) {
             return Redirect::route('cashier.index');
         } else {
+            $sale_week = TransactionDetail::with("product")->with("price")->with("sale_discount")->whereBetween("created_at",[$week_start, $week_end])->get();
+            $temp_week_by_day = [];
+            $week_day_data = [];
+            $week_day_with_quantity_price_total_data = [];
+            $week_day_with_quantity_price_total_data_object = [];
+            $week_day_with_quantity_price_total_data_pie = [];
+            $grouped_weekly_sales_raw = $sale_week->groupBy("product.name");
+            for ($i = $week_start_day; $i <= $week_end_day; $i++) {
+                $temp_week_by_day[] = (int)$i;
+            }
+            // dd($temp_week_by_day);
+            foreach ($temp_week_by_day as $day_index => $day) {
+                foreach ($grouped_weekly_sales_raw as $product_name => $group_product) {
+                    $week_day_data[$product_name]["name"] = $product_name;
+                    $week_day_data[$product_name]["data"][$day] = array("quantity" => 0);
+                    $week_day_data[$product_name]["data"][$day]["price"] = 0;
+                    $week_day_data[$product_name]["data"][$day]["discount"] = 0;
+                    $week_day_data[$product_name]["data"][$day]["subtotal"] = 0;
+                    $week_day_data[$product_name]["data"][$day]["total"] = 0;
+                    $week_day_quantity = 0;
+                    foreach ($group_product as $product_index => $product) {
+                        if ($day == Carbon::parse($product->created_at)->format("d")) {
+                            $week_day_quantity += $product->quantity;
+
+                            $week_day_data[$product_name]["data"][$day] = array("quantity" => $week_day_quantity);
+                            $week_day_data[$product_name]["data"][$day]["price"] = $product->price->price;
+                            $week_day_data[$product_name]["data"][$day]["discount"] = $product->sale_discount->discount / 100;
+                            $week_day_data[$product_name]["data"][$day]["subtotal"] = $product->price->price - ($product->price->price * $product->sale_discount->discount / 100);
+                            $week_day_data[$product_name]["data"][$day]["total"] = ($product->price->price - ($product->price->price * $product->sale_discount->discount / 100)) * $week_day_quantity;
+                        }
+                    }
+                }
+            }
+
+            $week_counter = 0;
+            foreach ($week_day_data as $key1 => $group_products) {
+                $week_quantity_all = 0;
+                $week_grand_total_sale = 0;
+                foreach ($group_products["data"] as $date => $date_value) {
+                    $week_quantity_all += $date_value["quantity"];
+                    $week_grand_total_sale += $date_value["total"];
+                    $week_day_with_quantity_price_total_data[$week_counter]["name"] = $key1;
+                    $week_day_with_quantity_price_total_data[$week_counter]["data"][$date] = $date_value["quantity"];
+                    $week_day_with_quantity_price_total_data[$week_counter]["data_transparency"][$date] = array("sold" => $date_value["quantity"], "price" => $date_value["price"], "discount" => $date_value["discount"], "subtotal" => $date_value["subtotal"], "total" => $date_value["total"]);
+                    $week_day_with_quantity_price_total_data[$week_counter]["total_quantity"] = $week_quantity_all;
+                    $week_day_with_quantity_price_total_data[$week_counter]["week_grand_total_sale"] = $week_grand_total_sale;
+                }
+                $week_counter++;
+            }
+
+            foreach ($week_day_with_quantity_price_total_data as $key => $value) {
+                $week_day_with_quantity_price_total_data_object[] = (object) array("name" => $value["name"],  "data" => (object) $value["data"], "data_transparency" => $value["data_transparency"], "total_quantity" => $value["total_quantity"], "grand_total_sale" => $value["week_grand_total_sale"]);
+            }
+            $sale_current_week_filtered = $this->sortByField($week_day_with_quantity_price_total_data_object, 'total_quantity');
+            $top_10_prod_current_week = array_slice($sale_current_week_filtered, 0, 10);
+            foreach ($top_10_prod_current_week as $key => $value) {
+                $week_day_with_quantity_price_total_data_pie[] = array($value->name, $value->grand_total_sale);
+            }
+
+// dd($sale_week);
             $sale_month = TransactionDetail::with("product")->with("price")->with("sale_discount")->where("created_at", "LIKE", "%{$month_today}%")->get();
             $temp_month_by_day = [];
             $month_day_data = [];
@@ -44,7 +106,6 @@ class DashboardController extends Controller
             foreach ($temp_month_by_day as $day_index => $day) {
                 foreach ($grouped_monthly_sales_raw as $product_name => $group_product) {
                     $month_day_data[$product_name]["name"] = $product_name;
-                    // $month_day_data[$product_name]["data"][$day] = 0;
                     $month_day_data[$product_name]["data"][$day] = array("quantity" => 0);
                     $month_day_data[$product_name]["data"][$day]["price"] = 0;
                     $month_day_data[$product_name]["data"][$day]["discount"] = 0;
@@ -64,13 +125,11 @@ class DashboardController extends Controller
                     }
                 }
             }
-            // dd($month_day_data);
             $counter = 0;
             foreach ($month_day_data as $key1 => $group_products) {
                 $month_quantity_all = 0;
                 $grand_total_sale = 0;
                 foreach ($group_products["data"] as $date => $date_value) {
-                    // dd($date_value);
                     $month_quantity_all += $date_value["quantity"];
                     $grand_total_sale += $date_value["total"];
                     $month_day_with_quantity_price_total_data[$counter]["name"] = $key1;
@@ -90,8 +149,6 @@ class DashboardController extends Controller
             foreach ($top_10_prod_current_month as $key => $value) {
                 $month_day_with_quantity_price_total_data_pie[] = array($value->name, $value->grand_total_sale);
             }
-            // dd($month_day_with_quantity_price_total_data_pie);
-
 
             // $sale_this_year = TransactionDetail::with("product")->with("price")->with("sale_discount")->where("created_at", "LIKE", "%{$year_today}%")->get();
             // $grouped_this_year_sales_raw = $sale_this_year->groupBy("product.name");
@@ -173,11 +230,14 @@ class DashboardController extends Controller
             // dd($top_10_prod_current_month);
             return Inertia::render("Dashboard", [
                 "sale_year" => $top_10_prod_year,
+                "top_10_prod_current_week" => $top_10_prod_current_week,
+                "week_day_with_quantity_price_total_data_pie" => $week_day_with_quantity_price_total_data_pie,
                 "top_10_current_month_sale" => $top_10_prod_current_month,
                 "top_10_current_month_sale_money" => $month_day_with_quantity_price_total_data_pie,
                 "full_year_top_10_sales" => $sample_array_months_jan_to_dec,
                 "current_year" => $year_today,
-                "current_month" => Carbon::parse($month_today)->format("F")
+                "current_month" => Carbon::parse($month_today)->format("F"),
+                "current_week"=>$week_start."/".$week_end
             ]);
         }
     }

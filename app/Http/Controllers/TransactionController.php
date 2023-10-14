@@ -7,6 +7,7 @@ use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
