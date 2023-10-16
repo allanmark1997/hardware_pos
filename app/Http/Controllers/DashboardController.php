@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -28,7 +29,6 @@ class DashboardController extends Controller
         $week_end_day = date('d', strtotime('+' . (6 - $day) . ' days'));
         $month_start = date('Y-m-01');
         $month_end = date('t');
-        // dd($day_today);
         if (Auth::user()->type != 0) {
             return Redirect::route('cashier.index');
         } else {
@@ -85,8 +85,6 @@ class DashboardController extends Controller
                 $day_with_quantity_price_total_data_pie[] = array($value->name, $value->grand_total_sale);
                 $day_with_quantity_price_total_data_column[] = array($value->name, $value->total_quantity);
             }
-
-            // dd($day_with_quantity_price_total_data_column);
 
             $sale_week = TransactionDetail::with("product")->with("price")->with("sale_discount")->whereBetween("created_at", [$week_start, $week_end])->where("status", 1)->get();
             $temp_week_by_day = [];
@@ -245,7 +243,6 @@ class DashboardController extends Controller
                 $year_quantity_all = 0;
                 $grand_total_sale = 0;
                 foreach ($group_products["data"] as $date => $date_value) {
-                    // dd($date);
                     $year_quantity_all += $date_value["quantity"];
                     $grand_total_sale += $date_value["total"];
                     $year_month_with_quantity_price_total_data[$counter]["name"] = $key1;
@@ -265,7 +262,11 @@ class DashboardController extends Controller
             foreach ($top_10_prod_current_year as $key => $value) {
                 $year_month_with_quantity_price_total_data_pie[] = array($value->name, $value->grand_total_sale);
             }
-            // dd($top_10_prod_current_year);
+
+
+            $current_transaction = Transaction::with("accommodate_by")->with("tax")->with("special_discount")->with("transaction_details")->where("status", 1)->orderBy("created_at", "desc")->limit(10)->get();
+
+            // dd($current_transaction);
 
             //
 
@@ -317,9 +318,7 @@ class DashboardController extends Controller
             //         }
             //     }
             // }
-            // dd($top_10_prod_current_month);
             return Inertia::render("Dashboard", [
-                // "sale_year" => $top_10_prod_year,
                 "top_10_prod_current_day" => $top_10_prod_current_day,
                 "day_with_quantity_price_total_data_pie" => $day_with_quantity_price_total_data_pie,
                 "day_with_quantity_price_total_data_column" => $day_with_quantity_price_total_data_column,
@@ -329,11 +328,11 @@ class DashboardController extends Controller
                 "top_10_current_month_sale_money" => $month_day_with_quantity_price_total_data_pie,
                 "top_10_current_year_sale" => $top_10_prod_current_year,
                 "top_10_current_year_sale_money" => $year_month_with_quantity_price_total_data_pie,
-                // "full_year_top_10_sales" => $sample_array_months_jan_to_dec,
                 "current_year" => $year_today,
                 "current_month" => Carbon::parse($month_today)->format("F"),
                 "current_week" => $week_start . "/" . $week_end,
-                "current_day" => Carbon::parse($day_today)->format("l")
+                "current_day" => Carbon::parse($day_today)->format("l"),
+                "current_transaction" => $current_transaction
             ]);
         }
     }

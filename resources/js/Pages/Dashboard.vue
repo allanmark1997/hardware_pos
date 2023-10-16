@@ -2,6 +2,7 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Welcome from "@/Components/Welcome.vue";
 import Icon from "@/Components/Icon.vue";
+import moment from "moment";
 
 const props = defineProps([
   // "sale_year",
@@ -19,6 +20,7 @@ const props = defineProps([
   "current_month",
   "current_week",
   "current_day",
+  "current_transaction",
 ]);
 
 const convert_money = (data) => {
@@ -28,6 +30,41 @@ const convert_money = (data) => {
   });
   formatter.format(data);
   return formatter.format(data);
+};
+const date_time = (data) => {
+  return moment(data).format("MM/DD/YYYY, h:mm:ss a");
+};
+const calculate_grand_total = (data, discount, vat, type) => {
+  let temp_data_total = 0;
+  let temp_data_sub_total = 0;
+  let temp_data_grand_total = 0;
+  let temp_discounted_total = 0;
+  let temp_vat_total = 0;
+  let temp_special_discounted = discount / 100;
+  let temp_vat = vat / 100;
+  data.forEach((element) => {
+    let temp_data_result = 0;
+    let temp_data_discounted = 0;
+    let convert_discount = element.sale_discount.discount / 100;
+    if (element.status == 1) {
+      for (let index = 0; index < element.quantity; index++) {
+        temp_data_discounted = element.price.price * convert_discount;
+        temp_data_result += element.price.price - temp_data_discounted;
+      }
+    }
+    temp_data_total += temp_data_result;
+  });
+  temp_discounted_total = temp_data_total * temp_special_discounted;
+  temp_data_sub_total = temp_data_total - temp_discounted_total;
+  temp_vat_total = temp_data_sub_total * temp_vat;
+  temp_data_grand_total = temp_data_sub_total + temp_vat_total;
+  if (type == 0) {
+    return temp_data_grand_total;
+  } else if (type == 1) {
+    return temp_vat_total;
+  } else if (type == 2) {
+    return temp_discounted_total;
+  }
 };
 </script>
 
@@ -336,8 +373,75 @@ const convert_money = (data) => {
           </div>
         </div>
 
-        <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-          <p class="p-2 text-xl font-bold">Transactions</p>
+        <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-4">
+          <p class="p-2 text-xl font-bold">Top 10 recent transactions</p>
+
+          <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+            <table class="w-full text-sm text-left text-gray-500">
+              <thead class="text-xs text-white uppercase bg-yellow-500">
+                <tr>
+                  <th scope="col" class="px-6 py-3">#</th>
+                  <th scope="col" class="px-6 py-3">Transaction</th>
+                  <th scope="col" class="px-6 py-3">Date & Time</th>
+                  <th scope="col" class="px-6 py-3">Amount</th>
+                  <th scope="col" class="px-6 py-3">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template
+                  v-for="(transaction, key) in props.current_transaction"
+                  :key="key"
+                >
+                  <tr class="bg-white border-b">
+                    <td class="px-6 py-4">
+                      {{ key + 1 }}
+                    </td>
+                    <th
+                      scope="row"
+                      class="px-6 py-4 font-medium text-yellow-900 whitespace-nowrap"
+                    >
+                      Processed by {{ transaction.accommodate_by.name }}
+                    </th>
+                    <td class="px-6 py-4">
+                      {{ date_time(transaction.created_at) }}
+                    </td>
+                    <td class="px-6 py-4">
+                      {{
+                        convert_money(
+                          calculate_grand_total(
+                            transaction.transaction_details,
+                            transaction.special_discount?.discount ?? 0,
+                            transaction.tax?.tax ?? 0,
+                            0
+                          )
+                        )
+                      }}
+                    </td>
+                    <td class="px-6 py-4">
+                      <span
+                        v-if="transaction.status == 1"
+                        class="inline-flex items-center bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full"
+                      >
+                        <span
+                          class="w-2 h-2 mr-1 bg-green-500 rounded-full"
+                        ></span>
+                        Success
+                      </span>
+                      <span
+                        v-else
+                        class="inline-flex items-center bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full"
+                      >
+                        <span
+                          class="w-2 h-2 mr-1 bg-red-500 rounded-full"
+                        ></span>
+                        Cancelled
+                      </span>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
