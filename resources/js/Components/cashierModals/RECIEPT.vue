@@ -140,6 +140,22 @@ const stringTruncateFromCenter = (str, maxLength) => {
 
   return str.substr(0, left) + midChar + str.substring(right);
 };
+
+const stringTruncateHeader = (str, maxLength) => {
+  let sample = "<br />";
+  const midChar =  sample.innerHTML; // character to insert into the center of the result
+  var left, right;
+
+  if (str.length <= maxLength) return str;
+
+  // length of beginning part
+  left = Math.ceil(maxLength / 2);
+
+  // start index of ending part
+  right = str.length - Math.floor(maxLength / 2) + 1;
+
+  return str.substr(0, left) + midChar + str.substring(right);
+};
 </script>
 
 
@@ -158,23 +174,82 @@ const stringTruncateFromCenter = (str, maxLength) => {
         id="toPrint"
         class="text-justify overflow-auto p-3 relative border bg-white flex-wrap"
       >
-        <small class="text-center"
+      <!-- <p class="text-center"> -->
+        <!-- <small class="text-center"
           ><strong
-            >CRISBODS HARDWARE AND <br />CONSTRUCTION SUPPLY</strong
+            >CRISBODS HARDWARE AND<br />&nbsp;&nbsp;&nbsp;&nbsp;CONSTRUCTION SUPPLY</strong
           ></small
         ><br />
         <small class="text-center mb-5"
-          >Dologon, Busco, Quezon Rd., <br />Maramag, Bukidnon, 8714</small
+          >&nbsp;&nbsp;&nbsp;Dologon, Busco, Quezon Rd., <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Maramag, Bukidnon, 8714</small
         ><br />
         <small>TIN: 487-279-975-00001</small><br />
-        <small>Date: {{ dateNow() }} Time:{{ timeNow() }}</small
-        ><br />
-        <small>Cashier: {{ cashierName }}</small
-        ><br />
-        <small>-----------------------------------------------------</small>
-        <small>Customer Name:</small>
-        <small>Address:</small>
-        <small>-----------------------------------------------------</small>
+        <small>Date: {{ dateNow() }} <br />Time:{{ timeNow() }}</small
+        >
+        </p>
+        <br /> -->
+        <!-- <small>Cashier: {{ cashierName }}<br />**************************************************</small -->
+        <!-- > -->
+        <!-- <small>Customer Name:</small>
+        <br /> -->
+        <!-- <small>Address: <br />**************************************************</small> -->
+        <table class="">
+          <thead>
+            <tr class="border mb-2">
+              <th><small>CRISBODS HARDWARE AND CONSTRUCTION SUPPLY</small></th>
+            </tr>
+            <tr class="border mb-2">
+              <th><small style="font-size: 10px;">Dologon, Busco, Quezon Rd., Maramag, Bukidnon, 8714</small></th>
+            </tr>
+          </thead>
+          <tbody class="border">
+            <tr>
+              <td>
+                <small>TIN: 487-279-975-00001</small>
+              </td>
+            </tr>
+            <tr>
+              <td>
+               <small>Date: {{ dateNow() }}</small>
+              </td>
+            </tr>
+            <tr>
+              <td>
+               <small>Time:{{ timeNow() }}</small>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <small>Cashier: {{ cashierName }}</small>
+              </td>
+            </tr>
+            <tr>
+              <td>
+               <small style="font-size: 10px;">*************************************</small>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <small>Customer Name:</small>
+                <small>Samsmallle Customer name
+                </small>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <small>Customer Address:</small>
+                <small>Purok-2, Poblacion, Malaybalay City, Bukidnon
+                </small>
+              </td>
+            </tr>
+            <tr>
+              <td>
+               <small style="font-size: 10px;">*************************************</small>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <br />
         <table class="">
           <thead>
             <tr class="border mb-2">
@@ -254,6 +329,7 @@ const stringTruncateFromCenter = (str, maxLength) => {
         <small class="mt-5 text-center">This serve as an OFFICIAL RECEIPT</small
         ><br />
         <small class="text-center">Thank You, Come Again</small><br />
+        <small>--------------------------------------------------</small>
       </div>
       <div class="flex justify-center mt-3">
         <button
