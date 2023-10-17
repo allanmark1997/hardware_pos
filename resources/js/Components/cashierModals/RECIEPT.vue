@@ -244,7 +244,7 @@ const stringTruncateFromCenter = (str, maxLength) => {
             </tr>
           </thead>
           <tbody class="border">
-            <tr v-for="(items, key) in props.products" :key="key">
+            <tr v-for="(items, key) in form.products" :key="key">
               <td>
                 <small>{{ stringTruncateFromCenter(items.name, 18) }} </small>
               </td>
@@ -280,7 +280,7 @@ const stringTruncateFromCenter = (str, maxLength) => {
           <tfoot class="border">
             <tr>
               <td>
-                <small>{{ props.products.length }} </small>
+                <small>{{ form.products.length }} </small>
               </td>
               <td><small> --- </small></td>
               <td><small>---</small></td>
@@ -304,8 +304,20 @@ const stringTruncateFromCenter = (str, maxLength) => {
                 <small>
                   Subtotal (Excluding VAT): {{ props.subtotal__ }}
                 </small>
+              </td>
+            </tr>
+            <tr>
+              <td>
                 <small>Subtotal Amount: {{ props.subtotal1__ }}</small>
+              </td>
+            </tr>
+            <tr>
+              <td>
                 <small>VAT ({{ props.vat__ }}%):{{ props.vat__ }}%</small>
+              </td>
+            </tr>
+            <tr>
+              <td>
                 <small>Special Discount({{ props.spDiscount }}%)</small>
               </td>
             </tr>
