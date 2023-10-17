@@ -1,6 +1,8 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { inject, onMounted, ref } from "vue";
 import moment from "moment";
+import { usePage } from "@inertiajs/vue3";
+
 const props = defineProps([
   "printModal",
   "products",
@@ -12,6 +14,9 @@ const props = defineProps([
   "subtotal__",
   "subtotal1__",
 ]);
+
+const form = inject("cashier_form");
+
 const date = ref(Date.now());
 
 const emit = defineEmits(["checkout__", "close_modal"]);
@@ -77,13 +82,6 @@ const customerChange = (total, cash) => {
 
   return res_cash - res_total;
 };
-const dateNow = () => {
-  return moment(date).format("MM/DD/YYYY");
-};
-
-const timeNow = () => {
-  return moment(date).format("h:mm:ss a");
-};
 
 const applyDiscount = (product, discountPercentage) => {
   if (discountPercentage < 0 || discountPercentage > 100) {
@@ -140,31 +138,11 @@ const stringTruncateFromCenter = (str, maxLength) => {
 
   return str.substr(0, left) + midChar + str.substring(right);
 };
-
-const stringTruncateHeader = (str, maxLength) => {
-  let sample = "<br />";
-  const midChar =  sample.innerHTML; // character to insert into the center of the result
-  var left, right;
-
-  if (str.length <= maxLength) return str;
-
-  // length of beginning part
-  left = Math.ceil(maxLength / 2);
-
-  // start index of ending part
-  right = str.length - Math.floor(maxLength / 2) + 1;
-
-  return str.substr(0, left) + midChar + str.substring(right);
-};
 </script>
-
-
-
-
 <template>
   <div
     id="defaultModal"
-    v-if="printModal"
+    v-if="form.print_show == true"
     tabindex="-1"
     aria-hidden="true"
     class="fixed top-0 left-0 right-0 backdrop-blur-sm z-50 flex justify-center item-center w-full p-4 overflow-x-hidden overflow-y-auto h-[calc(100%-1rem)]"
@@ -174,7 +152,7 @@ const stringTruncateHeader = (str, maxLength) => {
         id="toPrint"
         class="text-justify overflow-auto p-3 relative border bg-white flex-wrap"
       >
-      <!-- <p class="text-center"> -->
+        <!-- <p class="text-center"> -->
         <!-- <small class="text-center"
           ><strong
             >CRISBODS HARDWARE AND<br />&nbsp;&nbsp;&nbsp;&nbsp;CONSTRUCTION SUPPLY</strong
@@ -199,7 +177,11 @@ const stringTruncateHeader = (str, maxLength) => {
               <th><small>CRISBODS HARDWARE AND CONSTRUCTION SUPPLY</small></th>
             </tr>
             <tr class="border mb-2">
-              <th><small style="font-size: 10px;">Dologon, Busco, Quezon Rd., Maramag, Bukidnon, 8714</small></th>
+              <th>
+                <small style="font-size: 10px"
+                  >Dologon, Busco, Quezon Rd., Maramag, Bukidnon, 8714</small
+                >
+              </th>
             </tr>
           </thead>
           <tbody class="border">
@@ -210,41 +192,43 @@ const stringTruncateHeader = (str, maxLength) => {
             </tr>
             <tr>
               <td>
-               <small>Date: {{ dateNow() }}</small>
+                <small>Date: {{ moment().format("MMMM Do YYYY") }}</small>
               </td>
             </tr>
             <tr>
               <td>
-               <small>Time:{{ timeNow() }}</small>
+                <small>Time: {{ moment().format("h:mm:ss a") }}</small>
               </td>
             </tr>
             <tr>
               <td>
-                <small>Cashier: {{ cashierName }}</small>
+                <small>Cashier: {{ usePage().props.auth.user.name }}</small>
               </td>
             </tr>
             <tr>
               <td>
-               <small style="font-size: 10px;">*************************************</small>
+                <small style="font-size: 10px"
+                  >*************************************</small
+                >
               </td>
             </tr>
             <tr>
               <td>
                 <small>Customer Name:</small>
-                <small>Samsmallle Customer name
-                </small>
+                <small>{{ form.customer_name }}</small>
               </td>
             </tr>
             <tr>
               <td>
                 <small>Customer Address:</small>
-                <small>Purok-2, Poblacion, Malaybalay City, Bukidnon
-                </small>
+                <small>{{ form.customer_address }}</small>
               </td>
             </tr>
             <tr>
               <td>
-               <small style="font-size: 10px;">*************************************</small>
+                <small style="font-size: 10px"
+                  >*************************************</small
+                >
               </td>
             </tr>
           </tbody>
@@ -260,7 +244,7 @@ const stringTruncateHeader = (str, maxLength) => {
             </tr>
           </thead>
           <tbody class="border">
-            <tr v-for="items in props.products">
+            <tr v-for="(items, key) in props.products" :key="key">
               <td>
                 <small>{{ stringTruncateFromCenter(items.name, 18) }} </small>
               </td>
@@ -306,11 +290,98 @@ const stringTruncateHeader = (str, maxLength) => {
             </tr>
           </tfoot>
         </table>
-        <small>------------------------------------------------------</small
+        <table class="">
+          <tbody class="border">
+            <tr>
+              <td>
+                <small style="font-size: 10px"
+                  >*************************************</small
+                >
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <small>
+                  Subtotal (Excluding VAT): {{ props.subtotal__ }}
+                </small>
+                <small>Subtotal Amount: {{ props.subtotal1__ }}</small>
+                <small>VAT ({{ props.vat__ }}%):{{ props.vat__ }}%</small>
+                <small>Special Discount({{ props.spDiscount }}%)</small>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <small style="font-size: 10px"
+                  >*************************************</small
+                >
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="">
+          <thead>
+            <tr class="border mb-2">
+              <th>
+                <small>TOTAL AMOUNT: {{ props.grand_total }}</small>
+              </th>
+            </tr>
+            <tr class="border mb-2">
+              <th>
+                <small>CASH: {{ props.cash__ }}</small>
+              </th>
+            </tr>
+            <tr class="border mb-2">
+              <th>
+                <small
+                  >CHANGE:
+                  {{
+                    convert_money(
+                      customerChange(props.grand_total, props.cash__)
+                    )
+                  }}
+                </small>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="border">
+            <tr>
+              <td>
+                <small style="font-size: 10px"
+                  >*************************************</small
+                >
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <small> This serve as an OFFICIAL RECEIPT </small>
+                <small>Thank You, Come Again</small>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <svg
+                  class="barcode w-[20vmin] h-[10vmin] mx-auto"
+                  jsbarcode-format="CODE128"
+                  :jsbarcode-value="'123456789'"
+                  jsbarcode-textmargin="0"
+                  jsbarcode-fontoptions="bold"
+                ></svg>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <small style="font-size: 10px"
+                  >*************************************</small
+                >
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- <small>------------------------------------------------------</small
         ><br />
         <small>Subtotal (Excluding VAT): {{ props.subtotal__ }} </small><br />
-        <small>Subtotal Amount: {{ props.subtotal1__ }}</small
-        ><br />
+        <small>Subtotal Amount: {{ props.subtotal1__ }}</small>
+        <br />
         <small>VAT ({{ props.vat__ }}%):{{ props.vat__ }}%</small><br />
         <small>Special Discount({{ props.spDiscount }}%)</small><br />
         <small>------------------------------------------------------</small
@@ -329,7 +400,7 @@ const stringTruncateHeader = (str, maxLength) => {
         <small class="mt-5 text-center">This serve as an OFFICIAL RECEIPT</small
         ><br />
         <small class="text-center">Thank You, Come Again</small><br />
-        <small>--------------------------------------------------</small>
+        <small>--------------------------------------------------</small> -->
       </div>
       <div class="flex justify-center mt-3">
         <button
