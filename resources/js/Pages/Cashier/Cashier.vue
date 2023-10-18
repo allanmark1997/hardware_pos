@@ -981,14 +981,14 @@ provide("cashier_form", form);
       <input
         id="inputCustomerName"
         class="rounded-lg w-full"
-        type="number"
+        type="text"
         v-model="form.customer_name"
         autofocus
       />
       <input
         id="inputCustomerAddress"
         class="rounded-lg w-full"
-        type="number"
+        type="text"
         v-model="form.customer_address"
         autofocus
       />

@@ -61,7 +61,8 @@ const printReceipt = () => {
   // });
 };
 const closeModal = () => {
-  emit("close_modal");
+  // emit("close_modal");
+  form.print_show = false;
 };
 const print_checkout = () => {
   printReceipt();
@@ -233,14 +234,13 @@ const stringTruncateFromCenter = (str, maxLength) => {
             </tr>
           </tbody>
         </table>
-        <br />
         <table class="">
           <thead>
             <tr class="border mb-2">
-              <th><small>Retail </small></th>
-              <th><small>UPRICE </small></th>
-              <th><small>QTY </small></th>
-              <th><small>TOTAL </small></th>
+              <th><small>Retail</small></th>
+              <!-- <th><small>UPRICE</small></th> -->
+              <th><small>QTY</small></th>
+              <th><small>TOTAL</small></th>
             </tr>
           </thead>
           <tbody class="border">
@@ -248,7 +248,7 @@ const stringTruncateFromCenter = (str, maxLength) => {
               <td>
                 <small>{{ stringTruncateFromCenter(items.name, 18) }} </small>
               </td>
-              <td>
+              <!-- <td>
                 <small>
                   {{
                     convert_money(
@@ -259,7 +259,7 @@ const stringTruncateFromCenter = (str, maxLength) => {
                     )
                   }}
                 </small>
-              </td>
+              </td> -->
               <td>
                 <small>{{ items.cashier_quantity }}</small>
               </td>
@@ -277,7 +277,7 @@ const stringTruncateFromCenter = (str, maxLength) => {
               </td>
             </tr>
           </tbody>
-          <tfoot class="border">
+          <!-- <tfoot class="border">
             <tr>
               <td>
                 <small>{{ form.products.length }} </small>
@@ -288,7 +288,7 @@ const stringTruncateFromCenter = (str, maxLength) => {
                 <small>{{ props.grand_total }} </small>
               </td>
             </tr>
-          </tfoot>
+          </tfoot> -->
         </table>
         <table class="">
           <tbody class="border">
@@ -371,13 +371,6 @@ const stringTruncateFromCenter = (str, maxLength) => {
             </tr>
             <tr>
               <td>
-                <svg
-                  class="barcode w-[20vmin] h-[10vmin] mx-auto"
-                  jsbarcode-format="CODE128"
-                  :jsbarcode-value="'123456789'"
-                  jsbarcode-textmargin="0"
-                  jsbarcode-fontoptions="bold"
-                ></svg>
               </td>
             </tr>
             <tr>
