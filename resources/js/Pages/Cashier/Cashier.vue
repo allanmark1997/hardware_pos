@@ -1032,8 +1032,7 @@ provide("cashier_form", form);
   <SKU :SKULookup="SKULookup" :products="props.product" />
 
   <RECIEPT
-    :printModal="printModal"
-    :cash__="convert_money(__cash)"
+    :cash__="convert_money(form.cash)"
     :subtotal1__="
       convert_money(
         applyDiscount(
@@ -1044,19 +1043,42 @@ provide("cashier_form", form);
     "
     :subtotal__="convert_money(item_grand_total)"
     :spDiscount="spDiscount == true ? special_discount.discount : 0"
+    :spDiscount_value="
+      form.products.length == 0
+        ? convert_money(0)
+        : convert_money(
+            item_grand_total -
+              applyDiscount(
+                item_grand_total,
+                spDiscount == true ? special_discount.discount : 0
+              ).discountedPrice
+          )
+    "
     :vat__="tax.tax"
-    :cashierName="usePage().props.auth.user.name"
+    :vat_value="
+      form.products.length == 0
+        ? convert_money(0)
+        : convert_money(
+            applyTax(
+              applyDiscount(
+                item_grand_total,
+                spDiscount == true ? special_discount.discount : 0
+              ).discountedPrice
+            ) -
+              applyDiscount(
+                item_grand_total,
+                spDiscount == true ? special_discount.discount : 0
+              ).discountedPrice
+          )
+    "
     :grand_total="
-      convert_money(
-        applyTax(
-          applyDiscount(
-            item_grand_total,
-            spDiscount == true ? special_discount.discount : 0
-          ).discountedPrice
-        )
+      applyTax(
+        applyDiscount(
+          item_grand_total,
+          spDiscount == true ? special_discount.discount : 0
+        ).discountedPrice
       )
     "
-    :products="form.products"
     @close_modal="printModal = false"
     @checkout__="check_out()"
   />
