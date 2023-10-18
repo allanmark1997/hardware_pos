@@ -254,7 +254,7 @@ watch(
   (products, old_product) => {
     deep: true;
     let temp_quantity = 0;
-    // let temp_grand_total = 0;
+    let temp_grand_total = 0;
     let temp_sub_total = 0;
     products.forEach((product__) => {
       item_grand_total.value = 0;
@@ -266,10 +266,10 @@ watch(
           product__.current_price.price,
           product__.current_discount.discount
         ).discountedPrice * product__.cashier_quantity;
-      temp_grand_total.value = temp_grand_total.value + temp_sub_total;
+      temp_grand_total = temp_grand_total + temp_sub_total;
     });
     item_count.value = temp_quantity;
-    item_grand_total.value = temp_grand_total.value;
+    item_grand_total.value = temp_grand_total;
   },
   { deep: true }
 );
@@ -471,8 +471,9 @@ const check_out = () => {
           });
 
           form.reset();
+          form.products = [];
 
-          printModal.value = false;
+          // printModal.value = false;
 
           scannedProductIMG.value = "";
           cash_input_modal.value = false;
@@ -574,6 +575,7 @@ provide("cashier_form", form);
       </button> -->
     <!-- <input type="text" v-model="form.search" /> -->
     <!-- <button @click="search_()" class="bg-red-200">scan</button> -->
+    
     <div class="flex max-w-7xl mx-auto justify-end">
       <button
         @click="log_out"
@@ -589,6 +591,25 @@ provide("cashier_form", form);
         class="px-2 py-1.5 text-2xl font-semibold text-white bg-yellow-700 border rounded-lg"
         >Purchase Quantity: {{ quantity }}</kbd
       >
+    </div>
+    <div class="flex max-w-7xl mx-auto justify-start">
+      <p class="text-4xl text-gray-800">
+                <span class="font-bold">Grand Total:</span>
+                <span class="text-5xl font-bold">
+                {{
+                  form.products.length == 0
+                    ? convert_money(0)
+                    : convert_money(
+                        applyTax(
+                          applyDiscount(
+                            item_grand_total,
+                            spDiscount == true ? special_discount.discount : 0
+                          ).discountedPrice
+                        )
+                      )
+                }}
+                </span>
+              </p>
     </div>
     <div class="max-w-7xl mx-auto bg-white rounded mt-5 px-1">
       <div class="grid grid-cols-12 gap-2">
@@ -854,21 +875,7 @@ provide("cashier_form", form);
                       )
                 }}
               </p>
-              <p>
-                <span class="font-bold">Grand Total:</span>
-                {{
-                  form.products.length == 0
-                    ? convert_money(0)
-                    : convert_money(
-                        applyTax(
-                          applyDiscount(
-                            item_grand_total,
-                            spDiscount == true ? special_discount.discount : 0
-                          ).discountedPrice
-                        )
-                      )
-                }}
-              </p>
+              
               <div class="justify-end flex">
                 <button
                   @click="cash_input_modal = true"
@@ -1033,6 +1040,9 @@ provide("cashier_form", form);
 
   <RECIEPT
     :cash__="convert_money(form.cash)"
+    :subtotal_excluding_vat="form.products.length == 0
+                    ? convert_money(0)
+                    : convert_money(item_grand_total)"
     :subtotal1__="
       convert_money(
         applyDiscount(
@@ -1041,7 +1051,14 @@ provide("cashier_form", form);
         ).discountedPrice
       )
     "
-    :subtotal__="convert_money(item_grand_total)"
+    :subtotal__="form.products.length == 0
+                    ? convert_money(0)
+                    : convert_money(
+                        applyDiscount(
+                          item_grand_total,
+                          spDiscount == true ? special_discount.discount : 0
+                        ).discountedPrice
+                      )"
     :spDiscount="spDiscount == true ? special_discount.discount : 0"
     :spDiscount_value="
       form.products.length == 0

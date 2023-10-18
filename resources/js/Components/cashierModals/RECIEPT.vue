@@ -6,6 +6,7 @@ import { usePage } from "@inertiajs/vue3";
 const props = defineProps([
   "printModal",
   // "products",
+  "subtotal_excluding_vat",
   "cashierName",
   "cash__",
   "grand_total",
@@ -227,7 +228,7 @@ const stringTruncateFromCenter = (str, maxLength) => {
             <tr>
               <td>
                 <small>Customer Address:</small>
-                <small>{{ form.customer_address }}</small>
+                <small style="font-size: 10px;">{{ form.customer_address }}</small>
               </td>
             </tr>
             <tr>
@@ -266,14 +267,14 @@ const stringTruncateFromCenter = (str, maxLength) => {
                 </small>
               </td> -->
               <td style="width: 20px">
-                <small style="font-size: 15px">{{
+                <small style="font-size: 10px; word-break: break-all">{{
                   items.cashier_quantity
                 }}</small>
               </td>
-              <td style="width: 50px">
+              <td style="width: 60px">
                 <small
                   id="totalPrice"
-                  style="width: 20px; word-break: break-all"
+                  style="font-size:10px!important; word-break: break-all"
                   >{{
                     convert_money(
                       applyDiscount(
@@ -310,12 +311,10 @@ const stringTruncateFromCenter = (str, maxLength) => {
             </tr>
             <tr>
               <td>
-                <small> Subtotal (Excluding VAT): {{ props.vat_value }} </small>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <small>Subtotal Amount: {{ props.subtotal__ }}</small>
+                <small
+                  >Special Discount({{ props.spDiscount }}%):
+                  {{ props.spDiscount_value }}</small
+                >
               </td>
             </tr>
             <tr>
@@ -325,10 +324,12 @@ const stringTruncateFromCenter = (str, maxLength) => {
             </tr>
             <tr>
               <td>
-                <small
-                  >Special Discount({{ props.spDiscount }}%):
-                  {{ props.spDiscount_value }}</small
-                >
+                <small> Subtotal (Excluding VAT): {{ props.subtotal_excluding_vat }} </small>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <small>Subtotal Amount: {{ props.subtotal__ }}</small>
               </td>
             </tr>
             <tr>
@@ -343,22 +344,22 @@ const stringTruncateFromCenter = (str, maxLength) => {
         <table class="">
           <thead>
             <tr class="border mb-2">
-              <th>
-                <small>TOTAL AMOUNT: {{ props.grand_total }}</small>
-              </th>
+              <td>
+                <small>TOTAL AMOUNT: {{ convert_money(props.grand_total) }}</small>
+              </td>
             </tr>
             <tr class="border mb-2">
-              <th>
-                <small>CASH: {{ props.cash__ }}</small>
-              </th>
+              <td>
+                <small>CASH: {{ convert_money(form.cash) }}</small>
+              </td>
             </tr>
             <tr class="border mb-2">
-              <th>
+              <td>
                 <small
                   >CHANGE:
-                  {{ convert_money(props.grand_total - props.cash__) }}
+                  {{ convert_money(form.cash - props.grand_total ) }}
                 </small>
-              </th>
+              </td>
             </tr>
           </thead>
           <tbody class="border">
