@@ -61,6 +61,9 @@ const printReceipt = () => {
   // document.getElementById("printButton").addEventListener("click", function () {
   //   window.print();
   // });
+
+  form.print_status = true;
+  form.print_show = false;
 };
 const closeModal = () => {
   // emit("close_modal");
@@ -68,7 +71,7 @@ const closeModal = () => {
 };
 const print_checkout = () => {
   printReceipt();
-  emit("checkout__");
+  // emit("checkout__");
 };
 
 const convert_money = (data) => {
