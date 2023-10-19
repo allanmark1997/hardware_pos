@@ -67,7 +67,7 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => ["required", "unique:products", "max:255"],
-            'barcode' => ["required"],
+            'barcode' => ["required",  "unique:products"],
             'price' => ["required", "regex:/^[0-9]+(\.[0-9][0-9]?)?$/"],
             'category' => "required",
             'text_image' => "required",
