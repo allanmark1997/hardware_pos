@@ -62,9 +62,6 @@ const printReceipt = () => {
   // document.getElementById("printButton").addEventListener("click", function () {
   //   window.print();
   // });
-
-  form.print_status = true;
-  form.print_show = false;
 };
 const closeModal = () => {
   // emit("close_modal");
@@ -72,7 +69,9 @@ const closeModal = () => {
 };
 const print_checkout = () => {
   printReceipt();
-  // emit("checkout__");
+  form.print_status = true;
+  form.print_show = false;
+  emit("checkout__");
 };
 
 const convert_money = (data) => {
@@ -228,7 +227,9 @@ const stringTruncateFromCenter = (str, maxLength) => {
             <tr>
               <td>
                 <small>Customer Address:</small>
-                <small style="font-size: 10px;">{{ form.customer_address }}</small>
+                <small style="font-size: 10px">{{
+                  form.customer_address
+                }}</small>
               </td>
             </tr>
             <tr>
@@ -274,7 +275,7 @@ const stringTruncateFromCenter = (str, maxLength) => {
               <td style="width: 60px">
                 <small
                   id="totalPrice"
-                  style="font-size:10px!important; word-break: break-all"
+                  style="font-size: 10px !important; word-break: break-all"
                   >{{
                     convert_money(
                       applyDiscount(
@@ -324,7 +325,9 @@ const stringTruncateFromCenter = (str, maxLength) => {
             </tr>
             <tr>
               <td>
-                <small> Subtotal (Excluding VAT): {{ props.subtotal_excluding_vat }} </small>
+                <small>
+                  Subtotal (Excluding VAT): {{ props.subtotal_excluding_vat }}
+                </small>
               </td>
             </tr>
             <tr>
@@ -345,7 +348,9 @@ const stringTruncateFromCenter = (str, maxLength) => {
           <thead>
             <tr class="border mb-2">
               <td>
-                <small>TOTAL AMOUNT: {{ convert_money(props.grand_total) }}</small>
+                <small
+                  >TOTAL AMOUNT: {{ convert_money(props.grand_total) }}</small
+                >
               </td>
             </tr>
             <tr class="border mb-2">
@@ -357,7 +362,7 @@ const stringTruncateFromCenter = (str, maxLength) => {
               <td>
                 <small
                   >CHANGE:
-                  {{ convert_money(form.cash - props.grand_total ) }}
+                  {{ convert_money(form.cash - props.grand_total) }}
                 </small>
               </td>
             </tr>

@@ -458,7 +458,7 @@ const check_out = () => {
     });
   } else {
     cash_input_modal.value = false;
-    printModal.value = true;
+    // printModal.value = true;
     form.print_show = true;
     if (form.print_status == true) {
       form.post(route("cashier.store"), {
@@ -485,12 +485,6 @@ const check_out = () => {
             position: toast.POSITION.TOP_RIGHT,
           });
         },
-      });
-    } else {
-      toast.error("Cancel printing...", {
-        autoClose: 1000,
-        transition: toast.TRANSITIONS.FLIP,
-        position: toast.POSITION.TOP_RIGHT,
       });
     }
   }
@@ -575,7 +569,7 @@ provide("cashier_form", form);
       </button> -->
     <!-- <input type="text" v-model="form.search" /> -->
     <!-- <button @click="search_()" class="bg-red-200">scan</button> -->
-    
+
     <div class="flex max-w-7xl mx-auto justify-end">
       <button
         @click="log_out"
@@ -594,22 +588,22 @@ provide("cashier_form", form);
     </div>
     <div class="flex max-w-7xl mx-auto justify-start">
       <p class="text-4xl text-gray-800">
-                <span class="font-bold">Grand Total:</span>
-                <span class="text-5xl font-bold">
-                {{
-                  form.products.length == 0
-                    ? convert_money(0)
-                    : convert_money(
-                        applyTax(
-                          applyDiscount(
-                            item_grand_total,
-                            spDiscount == true ? special_discount.discount : 0
-                          ).discountedPrice
-                        )
-                      )
-                }}
-                </span>
-              </p>
+        <span class="font-bold">Grand Total:</span>
+        <span class="text-5xl font-bold">
+          {{
+            form.products.length == 0
+              ? convert_money(0)
+              : convert_money(
+                  applyTax(
+                    applyDiscount(
+                      item_grand_total,
+                      spDiscount == true ? special_discount.discount : 0
+                    ).discountedPrice
+                  )
+                )
+          }}
+        </span>
+      </p>
     </div>
     <div class="max-w-7xl mx-auto bg-white rounded mt-5 px-1">
       <div class="grid grid-cols-12 gap-2">
@@ -875,7 +869,7 @@ provide("cashier_form", form);
                       )
                 }}
               </p>
-              
+
               <div class="justify-end flex">
                 <button
                   @click="cash_input_modal = true"
@@ -985,26 +979,26 @@ provide("cashier_form", form);
       }}</template
     >
     <template #content>
-      <input
+      <Input
         id="inputCustomerName"
-        class="rounded-lg w-full"
+        class="rounded-lg w-full mb-2"
         type="text"
         v-model="form.customer_name"
         autofocus
+        label="Customer's Name"
       />
-      <input
+      <Input
         id="inputCustomerAddress"
-        class="rounded-lg w-full"
+        class="rounded-lg w-full mb-2"
         type="text"
+        label="Customer's Address"
         v-model="form.customer_address"
-        autofocus
       />
       <input
         id="inputCash"
-        class="rounded-lg w-full"
+        class="rounded-lg w-full mb-2"
         type="number"
         v-model="form.cash"
-        autofocus
         @keyup.enter="check_out"
       />
     </template>
@@ -1040,9 +1034,11 @@ provide("cashier_form", form);
 
   <RECIEPT
     :cash__="convert_money(form.cash)"
-    :subtotal_excluding_vat="form.products.length == 0
-                    ? convert_money(0)
-                    : convert_money(item_grand_total)"
+    :subtotal_excluding_vat="
+      form.products.length == 0
+        ? convert_money(0)
+        : convert_money(item_grand_total)
+    "
     :subtotal1__="
       convert_money(
         applyDiscount(
@@ -1051,14 +1047,16 @@ provide("cashier_form", form);
         ).discountedPrice
       )
     "
-    :subtotal__="form.products.length == 0
-                    ? convert_money(0)
-                    : convert_money(
-                        applyDiscount(
-                          item_grand_total,
-                          spDiscount == true ? special_discount.discount : 0
-                        ).discountedPrice
-                      )"
+    :subtotal__="
+      form.products.length == 0
+        ? convert_money(0)
+        : convert_money(
+            applyDiscount(
+              item_grand_total,
+              spDiscount == true ? special_discount.discount : 0
+            ).discountedPrice
+          )
+    "
     :spDiscount="spDiscount == true ? special_discount.discount : 0"
     :spDiscount_value="
       form.products.length == 0
