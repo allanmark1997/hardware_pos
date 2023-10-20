@@ -199,7 +199,7 @@ const authorize = (data) => {
                     class="bg-red-400 rounded-md p-1 text-white flex gap-1"
                   >
                     <Icon icon="wrong" size="sm" />
-                    In progress
+                    In-progress
                   </span>
                 </td>
 
