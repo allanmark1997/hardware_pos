@@ -202,11 +202,11 @@ class ProductController extends Controller
             'quantity' => ["required", "max:30", "integer"],
         ]);
 
-        $result = $product->quantity - $request->quantity;
+        // $result = $product->quantity - $request->quantity;
 
-        $product->update([
-            "quantity" => $result
-        ]);
+        // $product->update([
+        //     "quantity" => $result
+        // ]);
 
         $back_order = BackOrder::create([
             "product_id" => $product->id,

@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Exports\BackOrderExport;
 use App\Models\BackOrder;
+use App\Models\Product;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class BackOrderController extends Controller
@@ -24,7 +26,7 @@ class BackOrderController extends Controller
             $date_to = $request->date_to ?? "";
             $back_orders = BackOrder::with("product")->with("price")->with("discount")->with("user")->when($date_from !=  null || $date_from != "" && $date_to != null || $date_to != "", function ($query) use ($date_from, $date_to) {
                 $query->whereBetween('created_at', [$date_from, $date_to]);
-            })->paginate(20);
+            })->orderBy("created_at", "desc")->paginate(20);
             return Inertia::render('BackOrder/BackOrder', [
                 "back_orders" => $back_orders,
                 "date_from" => $date_from,
@@ -98,9 +100,25 @@ class BackOrderController extends Controller
 
     public function authorize_(Request $request, BackOrder $backOrder)
     {
-        $backOrder->update([
-            "status" => true
-        ]);
+        $product = Product::find($backOrder->product_id);
+        if ($backOrder->quantity > $product->quantity) {
+            throw ValidationException::withMessages([
+                'message' => "Sorry, quantity in back order is greater than the stocks... This back order request will be cancel. Please request new one to authorize back order"
+            ]);
+            $backOrder->update([
+                "status" => 2
+            ]);
+        } else {
+            $temp_quantity = $product->quantity - $backOrder->quantity;
+
+            $product->update([
+                "quantity" => $temp_quantity
+            ]);
+
+            $backOrder->update([
+                "status" => 1
+            ]);
+        }
         return back();
     }
 

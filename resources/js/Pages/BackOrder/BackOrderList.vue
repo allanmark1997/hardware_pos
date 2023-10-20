@@ -4,6 +4,8 @@ import { router, useForm } from "@inertiajs/vue3";
 import Icon from "@/Components/Icon.vue";
 import Pagination2 from "@/Components/Pagination2.vue";
 import TextInput from "@/Components/TextInput.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
+import ConfirmDialogModal from "@/Components/ConfirmationModal.vue";
 
 import moment from "moment";
 import { inject, onMounted, provide, ref } from "vue";
@@ -14,9 +16,11 @@ const props = defineProps(["back_orders", "date_from", "date_to"]);
 
 const date_from = ref(props.date_from);
 const date_to = ref(props.date_to);
+const ConfirmationModal = ref(false);
 
 const form = useForm({
   backorder: "",
+  password: "",
 });
 
 const notify = () => {
@@ -88,12 +92,38 @@ const count_total_unsuccess = (data) => {
   return temp_data;
 };
 
-const authorize = (data) => {
+const open_authorization = (data) => {
   form.backorder = data;
-  form.put(route("back_orders.authorize", form.backorder), {
+  ConfirmationModal.value = !ConfirmationModal.value;
+};
+
+const authorize = () => {
+  form.post(route("authenticate_user.authenticate_user"), {
     preserveScroll: true,
     onSuccess: () => {
-      toast.success("Successfully authorized back order as settled", {
+      form.put(route("back_orders.authorize", form.backorder), {
+        preserveScroll: true,
+        onSuccess: () => {
+          toast.success("Successfully authorized back order as settled", {
+            autoClose: true,
+            transition: toast.TRANSITIONS.FLIP,
+            position: toast.POSITION.BOTTOM_RIGHT,
+          });
+          form.reset();
+          ConfirmationModal.value = false;
+        },
+        onError: () => {
+          toast.error(form.errors.message, {
+            autoClose: true,
+            transition: toast.TRANSITIONS.FLIP,
+            position: toast.POSITION.BOTTOM_RIGHT,
+          });
+          ConfirmationModal.value = false;
+        },
+      });
+    },
+    onError: () => {
+      toast.error(form.errors.message, {
         autoClose: true,
         transition: toast.TRANSITIONS.FLIP,
         position: toast.POSITION.BOTTOM_RIGHT,
@@ -161,6 +191,7 @@ const authorize = (data) => {
               <th scope="col" class="px-6 py-3">Status</th>
               <th scope="col" class="px-6 py-3">Success Sub-total</th>
               <th scope="col" class="px-6 py-3">Inprogress Sub-total</th>
+              <th scope="col" class="px-6 py-3">Remarks</th>
               <th scope="col" class="px-6 py-3">Created at</th>
               <th scope="col" class="px-6 py-3">Action</th>
             </tr>
@@ -195,11 +226,18 @@ const authorize = (data) => {
                     Success
                   </span>
                   <span
+                    v-else-if="back_order.status == 0"
+                    class="bg-orange-400 rounded-md p-1 text-white flex gap-1"
+                  >
+                    <Icon icon="wrong" size="sm" />
+                    Pending
+                  </span>
+                  <span
                     v-else
                     class="bg-red-400 rounded-md p-1 text-white flex gap-1"
                   >
                     <Icon icon="wrong" size="sm" />
-                    In-progress
+                    Cancelled
                   </span>
                 </td>
 
@@ -221,6 +259,11 @@ const authorize = (data) => {
                     )
                   }}
                 </td>
+                <td class="px-6 py-4">
+                  <p class="w-full text-sm text-gray-900 break-words">
+                    {{ back_order.remarks }}
+                  </p>
+                </td>
                 <td class="px-6 py-4 flex gap-2">
                   <Icon icon="calendar" size="sm" />
                   {{ date_time(back_order.created_at) }}
@@ -228,7 +271,7 @@ const authorize = (data) => {
                 <td class="px-6 py-4 gap-2">
                   <Button
                     v-if="back_order.status == 0"
-                    @click="authorize(back_order)"
+                    @click="open_authorization(back_order)"
                     >Authorize</Button
                   >
                 </td>
@@ -249,4 +292,48 @@ const authorize = (data) => {
       </div>
     </div>
   </section>
+  <ConfirmDialogModal
+    :show="ConfirmationModal"
+    @close="ConfirmationModal = false"
+    maxWidth="2xl"
+  >
+    <template #title> Please input administrators pass code</template>
+    <template #content>
+      <p class="text-red-500">
+        Once approved, this action can update the system and this is not
+        reversible!
+      </p>
+      <Input
+        type="password"
+        label="Administrator's passcode"
+        v-model="form.password"
+      />
+    </template>
+    <template #footer>
+      <SecondaryButton @click="ConfirmationModal = false" class="mr-2">
+        nevermind
+      </SecondaryButton>
+      <Button
+        :class="{ 'opacity-25': form.processing }"
+        :disabled="form.processing"
+        class="bg-green-200 hover:bg-green-400"
+        @click="authorize"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-auto"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+          /></svg
+        >&nbsp;Submit
+      </Button>
+    </template>
+  </ConfirmDialogModal>
 </template>
