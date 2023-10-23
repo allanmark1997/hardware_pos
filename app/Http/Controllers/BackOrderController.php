@@ -102,8 +102,11 @@ class BackOrderController extends Controller
     {
         $product = Product::find($backOrder->product_id);
         if ($backOrder->quantity > $product->quantity) {
+            $new_remarks = $product->remarks . " - This request is cancelled due to requested quantity is beyond the stocks";
+
             $backOrder->update([
-                "status" => 2
+                "status" => 2,
+                "remarks" => $new_remarks
             ]);
             throw ValidationException::withMessages([
                 'message' => "Sorry, quantity in back order is greater than the stocks... This back order request will be cancel. Please request new one to authorize back order"

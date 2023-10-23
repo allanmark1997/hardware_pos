@@ -71,9 +71,9 @@ const add_product = () => {
       });
       open_modal_add();
     },
-    onError: (error) => {
-      toast.error("Something went wrong " + error, {
-        autoClose: 1000,
+    onError: () => {
+      toast.error(form.errors.message, {
+        autoClose: 5000,
         transition: toast.TRANSITIONS.FLIP,
         position: toast.POSITION.TOP_RIGHT,
       });
@@ -257,7 +257,7 @@ const open_search_product = () => {
               <span>Edit category</span>
             </a>
           </button>
-          
+
           <!-- <a
             :href="route('products.export')"
             class="bg-yellow-400 text-sm lg:text-xs font-bold rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center"
@@ -599,6 +599,5 @@ const open_search_product = () => {
         </SecondaryButton>
       </template>
     </JetDialogModal>
-    
   </AppLayout>
 </template>

@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class SupplierProductController extends Controller
@@ -69,6 +70,14 @@ class SupplierProductController extends Controller
             'price' => ["required", "regex:/^[0-9]+(\.[0-9][0-9]?)?$/"],
             'category' => "required",
         ]);
+
+        $supplierProduct = SupplierProduct::whereProductId($request->product_id)->whereSupplierId($request->supplier_id)->first();
+        if ($supplierProduct != null) {
+            throw ValidationException::withMessages([
+                'message' => "Sorry, the product you want to register has the same supplier, duplication of product and supplier is invalid"
+            ]);
+        }
+
         $product = SupplierProduct::create([
             "product_id" => $request->product_id,
             "user_id" => Auth::user()->id,
