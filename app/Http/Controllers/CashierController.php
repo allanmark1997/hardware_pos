@@ -23,6 +23,10 @@ class CashierController extends Controller
      */
     public function index(Request $request)
     {
+        return Inertia::render('Cashier/Welcome');
+    }
+    public function transaction(Request $request)
+    {
 
         $product = product::with('current_price')->with('current_discount')->get();
         $tax = Tax::orderBy('created_at', 'desc')->first();
