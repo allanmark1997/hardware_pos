@@ -118,6 +118,7 @@ const authorize = () => {
             transition: toast.TRANSITIONS.FLIP,
             position: toast.POSITION.BOTTOM_RIGHT,
           });
+          form.reset();
           ConfirmationModal.value = false;
         },
       });
