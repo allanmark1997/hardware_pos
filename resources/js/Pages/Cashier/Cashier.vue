@@ -480,7 +480,7 @@ const check_out = () => {
           form.products = [];
 
           // printModal.value = false;
-
+          print_show.value = false
           scannedProductIMG.value = "";
           cash_input_modal.value = false;
         },
@@ -545,7 +545,7 @@ const addQuantitytoPurchase = (add, subtract) => {
   }
 };
 
-provide("cashier_form", form);
+// provide("cashier_form", form);
 
 const printReceipt = () => {
   var iframe = document.createElement("iframe");
@@ -1038,7 +1038,7 @@ const stringTruncateFromCenter = (str, maxLength) => {
 
 
   <DialogModal :show="print_show == true" @close="print_show = false" maxWidth="2xl">
-    <template #title> Are you sure you want to log-out?</template>
+    <!-- <template #title> Are you sure you want to log-out?</template> -->
     <template #content>
       <div class="text-justify overflow-auto p-3 relative">
         <div id="toPrint" class="text-justify overflow-auto p-3 relative border bg-white flex-wrap">
@@ -1145,26 +1145,59 @@ const stringTruncateFromCenter = (str, maxLength) => {
               </tr>
               <tr>
                 <td>
-                  <small>Special Discount({{ props.spDiscount }}%):
-                    {{ props.spDiscount_value }}</small>
+                  <small>Special Discount({{ props.special_discount.discount }}%):
+                    {{ form.products.length == 0
+                      ? convert_money(0)
+                      : convert_money(
+                        item_grand_total -
+                        applyDiscount(
+                          item_grand_total,
+                          spDiscount == true ? props.special_discount.discount : 0
+                        ).discountedPrice
+                      ) }}</small>
                 </td>
               </tr>
               <tr>
                 <td>
-                  <small>VAT ({{ props.vat__ }}%): {{ props.vat_value }}</small>
+                  <small>VAT ({{ props.tax.tax }}%): {{
+                    form.products.length == 0
+                    ? convert_money(0)
+                    : convert_money(
+                      applyTax(
+                        applyDiscount(
+                          item_grand_total,
+                          spDiscount == true ? special_discount.discount : 0
+                        ).discountedPrice
+                      ) -
+                      applyDiscount(
+                        item_grand_total,
+                        spDiscount == true ? special_discount.discount : 0
+                      ).discountedPrice
+                    )
+                  }}
+                  </small>
                 </td>
               </tr>
               <tr>
                 <td>
                   <small>
                     Subtotal (Excluding VAT):
-                    {{ props.subtotal_excluding_vat }}
+                    {{ form.products.length == 0
+                      ? convert_money(0)
+                      : convert_money(item_grand_total) }}
                   </small>
                 </td>
               </tr>
               <tr>
                 <td>
-                  <small>Subtotal Amount: {{ props.subtotal__ }}</small>
+                  <small>Subtotal Amount: {{ form.products.length == 0
+                    ? convert_money(0)
+                    : convert_money(
+                      applyDiscount(
+                        item_grand_total,
+                        spDiscount == true ? special_discount.discount : 0
+                      ).discountedPrice
+                    ) }}</small>
                 </td>
               </tr>
               <tr>
@@ -1179,7 +1212,16 @@ const stringTruncateFromCenter = (str, maxLength) => {
               <tr class="border mb-2">
                 <td>
                   <small>TOTAL AMOUNT:
-                    {{ convert_money(props.grand_total) }}</small>
+                    {{ form.products.length == 0
+                      ? convert_money(0)
+                      : convert_money(
+                        applyTax(
+                          applyDiscount(
+                            item_grand_total,
+                            spDiscount == true ? special_discount.discount : 0
+                          ).discountedPrice
+                        )
+                      ) }}</small>
                 </td>
               </tr>
               <tr class="border mb-2">
@@ -1190,7 +1232,16 @@ const stringTruncateFromCenter = (str, maxLength) => {
               <tr class="border mb-2">
                 <td>
                   <small>CHANGE:
-                    {{ convert_money(form.cash - props.grand_total) }}
+                    {{ convert_money(form.cash - (form.products.length == 0
+                      ? 0
+                      :
+                      applyTax(
+                        applyDiscount(
+                          item_grand_total,
+                          spDiscount == true ? special_discount.discount : 0
+                        ).discountedPrice
+                      )
+                    )) }}
                   </small>
                 </td>
               </tr>
@@ -1207,7 +1258,7 @@ const stringTruncateFromCenter = (str, maxLength) => {
                   <small>Thank You, Come Again</small>
                   <!-- <svg class="barcode w-[20vmin] h-[10vmin] mx-auto" jsbarcode-format="CODE128" :jsbarcode-value="'12345'"
                     jsbarcode-textmargin="0" jsbarcode-fontoptions="bold"></svg> -->
-                  <Barcode style="width:200px; height: 100px;" />
+                  <Barcode style="width:50px; height: 20px;" />
                 </td>
               </tr>
               <tr>
