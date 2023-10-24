@@ -23,9 +23,12 @@ class CashierController extends Controller
      */
     public function index(Request $request)
     {
-        return Inertia::render('Cashier/Welcome');
+        $image_address = env("APP_URL") . "/storage/logo/wrenches.jpg";
+        return Inertia::render('Cashier/Welcome', [
+            "logo" => $image_address
+        ]);
     }
-    public function transaction(Request $request)
+    public function transaction_index(Request $request)
     {
 
         $product = product::with('current_price')->with('current_discount')->get();
@@ -38,6 +41,14 @@ class CashierController extends Controller
             "cashier_stat_id" => $cashier_stat->id,
             "tax" => $tax,
             "special_discount" => $special_discount
+        ]);
+    }
+
+    public function return_index(Request $request)
+    {
+        $transaction = transaction::get();
+        return Inertia::render('Cashier/ReturnProducts', [
+            "transaction" => $transaction
         ]);
     }
 

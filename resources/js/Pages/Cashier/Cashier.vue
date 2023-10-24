@@ -2,11 +2,13 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Icon from "@/Components/Icon.vue";
 import { onMounted, provide, ref, watch } from "vue";
-import { Head, router, useForm, usePage } from "@inertiajs/vue3";
+import { Head, Link, router, useForm, usePage } from "@inertiajs/vue3";
 import ConfirmDialogModal from "@/Components/ConfirmationModal.vue";
+import DialogModal from "@/Components/DialogModal.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import Input from "@/Components/Input.vue";
 import Button from "@/Components/Button.vue";
+import moment from "moment";
 
 import deleteAll from "@/Components/cashierModals/deleteAll.vue";
 import SKU from "@/Components/cashierModals/SKU.vue";
@@ -40,6 +42,8 @@ const quantity = ref(1);
 const item_count = ref(0);
 const item_grand_total = ref(0);
 
+const print_show = ref(false);
+
 let temp_grand_total = ref(0);
 
 const __cash = ref(0);
@@ -67,9 +71,7 @@ const form = useForm({
 onMounted(() => {
   keydownHandler();
 
-  onMounted(() => {
-    JsBarcode(".barcode").init();
-  });
+  JsBarcode(".barcode").init();
 });
 
 const keydownHandler = (event) => {
@@ -170,20 +172,23 @@ const keydownHandler = (event) => {
         router.page.component == "Cashier/Cashier"
       ) {
         addtoCart();
-      } else if (
-        e.ctrlKey &&
-        e.keyCode == 35 &&
-        router.page.component == "Cashier/Cashier"
-      ) {
-        log_out();
-      } else if (
-        logoutlModal.value == true &&
-        e.ctrlKey &&
-        e.keyCode == 89 &&
-        router.page.component == "Cashier/Cashier"
-      ) {
-        logout_confirm();
-      } else if (
+      }
+      // else if (
+      //   e.ctrlKey &&
+      //   e.keyCode == 35 &&
+      //   router.page.component == "Cashier/Cashier"
+      // ) {
+      //   log_out();
+      // }
+      //  else if (
+      //   logoutlModal.value == true &&
+      //   e.ctrlKey &&
+      //   e.keyCode == 89 &&
+      //   router.page.component == "Cashier/Cashier"
+      // ) {
+      //   logout_confirm();
+      // }
+      else if (
         logoutlModal.value == true &&
         e.ctrlKey &&
         e.keyCode == 78 &&
@@ -309,7 +314,7 @@ const nFormatter = (num) => {
 const search_ = () => {
   form.get(route("cashier.index"), {
     preserveScroll: true,
-    onSuccess: () => {},
+    onSuccess: () => { },
   });
 };
 const create_transaction = (active) => {
@@ -459,7 +464,7 @@ const check_out = () => {
   } else {
     cash_input_modal.value = false;
     // printModal.value = true;
-    form.print_show = true;
+    print_show.value = true;
     if (form.print_status == true) {
       form.post(route("cashier.store"), {
         preserveScroll: true,
@@ -496,13 +501,13 @@ const partialCheckout = () => {
   __cash.value = form.cash;
 };
 
-const log_out = () => {
-  logoutlModal.value = !logoutlModal.value;
-};
+// const log_out = () => {
+//   logoutlModal.value = !logoutlModal.value;
+// };
 
-const logout_confirm = () => {
-  form.post(route("logout"));
-};
+// const logout_confirm = () => {
+//   form.post(route("logout"));
+// };
 
 const setFocusToTextBox = () => {
   document.querySelector("#prodBarcodeInput").focus();
@@ -540,6 +545,50 @@ const addQuantitytoPurchase = (add, subtract) => {
 };
 
 provide("cashier_form", form);
+
+const printReceipt = () => {
+  var iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  document.body.appendChild(iframe);
+
+  // Clone the content of the specified div
+  var content = document.getElementById("toPrint").cloneNode(true);
+
+  // Set the content of the iframe
+  var iframeDocument = iframe.contentWindow.document;
+  iframeDocument.open();
+  iframeDocument.appendChild(content);
+  iframeDocument.close();
+
+  // Print the iframe content
+  iframe.contentWindow.print();
+
+  // Remove the iframe
+  document.body.removeChild(iframe);
+};
+const closeModal = () => {
+  form.print_show = false;
+};
+const print_checkout = () => {
+  printReceipt();
+  form.print_status = true;
+  form.print_show = false;
+  check_out()
+};
+const stringTruncateFromCenter = (str, maxLength) => {
+  const midChar = "…"; // character to insert into the center of the result
+  var left, right;
+
+  if (str.length <= maxLength) return str;
+
+  // length of beginning part
+  left = Math.ceil(maxLength / 2);
+
+  // start index of ending part
+  right = str.length - Math.floor(maxLength / 2) + 1;
+
+  return str.substr(0, left) + midChar + str.substring(right);
+};
 </script>
 <template>
   <Head :title="'Cashier'" />
@@ -552,11 +601,7 @@ provide("cashier_form", form);
   <div class="py-5">
     <div class="fixed m-[50%] z-[-1000]">
       <input id="prodBarcodeInput" v-model="prodScan" @change="addtoCart" />
-      <input
-        type="number"
-        class="border-0 bg-transparent w-11"
-        v-model="quantity"
-      />
+      <input type="number" class="border-0 bg-transparent w-11" v-model="quantity" />
     </div>
 
     <!-- <button type="button" @click="addtoCart()"
@@ -571,20 +616,24 @@ provide("cashier_form", form);
     <!-- <button @click="search_()" class="bg-red-200">scan</button> -->
 
     <div class="flex max-w-7xl mx-auto justify-end">
-      <button
+      <!-- <button
         @click="log_out"
         type="button"
         class="focus:outline-none text-white bg-red-600 hover:bg-red-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 flex"
       >
         <Icon icon="logout" size="sm" />
         Log out
-      </button>
+      </button> -->
+      <div class="sm:fixed sm:top-0 sm:left-0 p-6 text-right z-10">
+        <Link :href="route('cashier.index')"
+          class="font-semibold text-gray-600 hover:text-gray-900 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">
+        Dashboard
+        </Link>
+      </div>
     </div>
-    <div class="flex max-w-7xl mx-auto justify-end">
-      <kbd
-        class="px-2 py-1.5 text-2xl font-semibold text-white bg-yellow-700 border rounded-lg"
-        >Purchase Quantity: {{ quantity }}</kbd
-      >
+    <div class="flex max-w-7xl mx-auto justify-end mt-6">
+      <kbd class="px-2 py-1.5 text-2xl font-semibold text-white bg-yellow-700 border rounded-lg">Purchase Quantity: {{
+        quantity }}</kbd>
     </div>
     <div class="flex max-w-7xl mx-auto justify-start">
       <p class="text-4xl text-gray-800">
@@ -592,15 +641,15 @@ provide("cashier_form", form);
         <span class="text-5xl font-bold">
           {{
             form.products.length == 0
-              ? convert_money(0)
-              : convert_money(
-                  applyTax(
-                    applyDiscount(
-                      item_grand_total,
-                      spDiscount == true ? special_discount.discount : 0
-                    ).discountedPrice
-                  )
-                )
+            ? convert_money(0)
+            : convert_money(
+              applyTax(
+                applyDiscount(
+                  item_grand_total,
+                  spDiscount == true ? special_discount.discount : 0
+                ).discountedPrice
+              )
+            )
           }}
         </span>
       </p>
@@ -608,40 +657,26 @@ provide("cashier_form", form);
     <div class="max-w-7xl mx-auto bg-white rounded mt-5 px-1">
       <div class="grid grid-cols-12 gap-2">
         <div class="col-span-7 p-5">
-          <div
-            class="product_list bg-gray-50 p-1 rounded-lg mt-3 min-h-[60vmin] overflow-auto"
-          >
+          <div class="product_list bg-gray-50 p-1 rounded-lg mt-3 min-h-[60vmin] overflow-auto">
             <div class="mt-24 flex max-w-lg mx-auto max-h-lg justify-center">
-              <img
-                v-if="scannedProductIMG"
-                class="object-contain h-48 w-96"
-                :src="scannedProductIMG"
-              />
+              <img v-if="scannedProductIMG" class="object-contain h-48 w-96" :src="scannedProductIMG" />
             </div>
           </div>
         </div>
         <div class="col-span-5">
-          <div
-            class="bg-white rounded-b-xl shadow-md p-5 flex justify-between max-h-[63vmin]"
-          >
+          <div class="bg-white rounded-b-xl shadow-md p-5 flex justify-between max-h-[63vmin]">
             <div class="flex">
               <Icon icon="shopping_cart" size="sm"></Icon>
               <span class="font-bold">Cart</span>
-              <span v-if="spDiscount"
-                ><small
-                  class="italic ml-1 text-white flex bg-red-600 p-1 rounded-lg"
-                >
+              <span v-if="spDiscount"><small class="italic ml-1 text-white flex bg-red-600 p-1 rounded-lg">
                   <Icon class="text-white" size="xs" icon="wheelchair" />
                   (Special Discount)
-                </small></span
-              >
+                </small></span>
             </div>
 
             <div>
               <span class="font-bold"> Items: </span>
-              <span
-                class="bg-red-500 ml-1 px-2 text-white rounded-xl w-10 text-center"
-              >
+              <span class="bg-red-500 ml-1 px-2 text-white rounded-xl w-10 text-center">
                 <small>{{ item_count }}</small>
                 <!-- <small v-if="totalCart >= 1000">{{
                     nFormatter(totalCart)
@@ -675,9 +710,7 @@ provide("cashier_form", form);
               <Icon class="mr-5" icon="search_icon" size="xs" />
             </button>
           </form> -->
-          <div
-            class="relative mt-5 px-2 overflow-x-auto min-h-[45vmin] shadow-md"
-          >
+          <div class="relative mt-5 px-2 overflow-x-auto min-h-[45vmin] shadow-md">
             <table class="w-full text-sm text-left text-gray-500">
               <tbody>
                 <tr v-for="data in totalCart" class="bg-white border-b">
@@ -688,53 +721,27 @@ provide("cashier_form", form);
                         <div class="flex items-center space-x-3">
                           <button
                             class="inline-flex items-center justify-center p-1 text-sm font-medium h-6 w-6 text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200"
-                            type="button"
-                          >
+                            type="button">
                             <span class="sr-only">Quantity button</span>
-                            <svg
-                              class="w-3 h-3"
-                              aria-hidden="true"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 18 2"
-                            >
-                              <path
-                                stroke="currentColor"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M1 1h16"
-                              />
+                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                              viewBox="0 0 18 2">
+                              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M1 1h16" />
                             </svg>
                           </button>
                           <div>
-                            <input
-                              type="number"
-                              id="first_product"
+                            <input type="number" id="first_product"
                               class="bg-gray-50 w-14 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-2.5 py-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                              placeholder="1"
-                              required
-                            />
+                              placeholder="1" required />
                           </div>
                           <button
                             class="inline-flex items-center justify-center h-6 w-6 p-1 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200"
-                            type="button"
-                          >
+                            type="button">
                             <span class="sr-only">Quantity button</span>
-                            <svg
-                              class="w-3 h-3"
-                              aria-hidden="true"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 18 18"
-                            >
-                              <path
-                                stroke="currentColor"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M9 1v16M1 9h16"
-                              />
+                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                              viewBox="0 0 18 18">
+                              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 1v16M1 9h16" />
                             </svg>
                           </button>
                         </div>
@@ -750,50 +757,30 @@ provide("cashier_form", form);
                 </tr>
               </tbody>
             </table>
-            <div
-              v-if="form.products.length === 0"
-              class="mx-auto text-center text-xs"
-            >
+            <div v-if="form.products.length === 0" class="mx-auto text-center text-xs">
               Scan a product
             </div>
 
             <div v-else class="w-full">
-              <div
-                class="flow-root max-h-[50vmin] overflow-auto p-2"
-                id="addedCartScrll"
-              >
-                <ul
-                  role="addedlist"
-                  v-for="items in form.products"
-                  class="divide-y divide-gray-200"
-                >
+              <div class="flow-root max-h-[50vmin] overflow-auto p-2" id="addedCartScrll">
+                <ul role="addedlist" v-for="items in form.products" class="divide-y divide-gray-200">
                   <li class="py-3 sm:py-4">
                     <div class="flex items-center space-x-4">
                       <div class="flex-shrink-0">
-                        <img
-                          class="w-8 h-8 rounded-full"
-                          :src="items.product_image"
-                          alt="Neil image"
-                        />
+                        <img class="w-8 h-8 rounded-full" :src="items.product_image" alt="Neil image" />
                       </div>
                       <div class="flex-1 min-w-0">
                         <p class="text-sm font-medium text-gray-900 truncate">
                           {{ items.name }}
                         </p>
                       </div>
-                      <div
-                        class="inline-flex items-center text-base font-semibold text-gray-900"
-                      >
+                      <div class="inline-flex items-center text-base font-semibold text-gray-900">
                         {{ convert_money(items.current_price.price) }}
                       </div>
-                      <div
-                        class="inline-flex items-center text-base font-semibold text-gray-900"
-                      >
+                      <div class="inline-flex items-center text-base font-semibold text-gray-900">
                         <small>x{{ items.cashier_quantity }}</small>
                       </div>
-                      <div
-                        class="inline-flex items-center text-base font-semibold text-gray-900"
-                      >
+                      <div class="inline-flex items-center text-base font-semibold text-gray-900">
                         {{
                           convert_money(
                             applyDiscount(
@@ -815,67 +802,63 @@ provide("cashier_form", form);
                 <span class="font-bold">VAT({{ tax.tax }}%): </span>
                 {{
                   form.products.length == 0
-                    ? convert_money(0)
-                    : convert_money(
-                        applyTax(
-                          applyDiscount(
-                            item_grand_total,
-                            spDiscount == true ? special_discount.discount : 0
-                          ).discountedPrice
-                        ) -
-                          applyDiscount(
-                            item_grand_total,
-                            spDiscount == true ? special_discount.discount : 0
-                          ).discountedPrice
-                      )
+                  ? convert_money(0)
+                  : convert_money(
+                    applyTax(
+                      applyDiscount(
+                        item_grand_total,
+                        spDiscount == true ? special_discount.discount : 0
+                      ).discountedPrice
+                    ) -
+                    applyDiscount(
+                      item_grand_total,
+                      spDiscount == true ? special_discount.discount : 0
+                    ).discountedPrice
+                  )
                 }}
               </p>
               <p>
-                <span class="font-bold"
-                  >Special Discount({{
-                    spDiscount == true ? special_discount.discount : 0
-                  }}%):
+                <span class="font-bold">Special Discount({{
+                  spDiscount == true ? special_discount.discount : 0
+                }}%):
                 </span>
                 {{
                   form.products.length == 0
-                    ? convert_money(0)
-                    : convert_money(
-                        item_grand_total -
-                          applyDiscount(
-                            item_grand_total,
-                            spDiscount == true ? special_discount.discount : 0
-                          ).discountedPrice
-                      )
+                  ? convert_money(0)
+                  : convert_money(
+                    item_grand_total -
+                    applyDiscount(
+                      item_grand_total,
+                      spDiscount == true ? special_discount.discount : 0
+                    ).discountedPrice
+                  )
                 }}
               </p>
               <p>
                 <span class="font-bold">Sub-Total (Excluding VAT):</span>
                 {{
                   form.products.length == 0
-                    ? convert_money(0)
-                    : convert_money(item_grand_total)
+                  ? convert_money(0)
+                  : convert_money(item_grand_total)
                 }}
               </p>
               <p>
                 <span class="font-bold">Sub-Total:</span>
                 {{
                   form.products.length == 0
-                    ? convert_money(0)
-                    : convert_money(
-                        applyDiscount(
-                          item_grand_total,
-                          spDiscount == true ? special_discount.discount : 0
-                        ).discountedPrice
-                      )
+                  ? convert_money(0)
+                  : convert_money(
+                    applyDiscount(
+                      item_grand_total,
+                      spDiscount == true ? special_discount.discount : 0
+                    ).discountedPrice
+                  )
                 }}
               </p>
 
               <div class="justify-end flex">
-                <button
-                  @click="cash_input_modal = true"
-                  type="button"
-                  class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
-                >
+                <button @click="cash_input_modal = true" type="button"
+                  class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2">
                   Check out
                 </button>
               </div>
@@ -888,39 +871,20 @@ provide("cashier_form", form);
 
   <!-- MODAL FOR DATA -->
   <!-- <deleteAll :modalDelete="deleteAllModal" /> -->
-  <div
-    v-if="deleteAllModal"
-    id="defaultModal"
-    tabindex="-1"
-    aria-hidden="true"
-    class="fixed top-0 left-0 right-0 backdrop-blur-sm z-50 pt-52 flex justify-center item-center w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full"
-  >
+  <div v-if="deleteAllModal" id="defaultModal" tabindex="-1" aria-hidden="true"
+    class="fixed top-0 left-0 right-0 backdrop-blur-sm z-50 pt-52 flex justify-center item-center w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative w-full max-w-2xl max-h-full">
       <!-- Modal content -->
       <div class="relative bg-white rounded-lg shadow">
         <!-- Modal header -->
         <div class="flex items-start justify-between p-4 border-b rounded-t">
           <h3 class="text-xl font-semibold text-gray-900">Delete All?</h3>
-          <button
-            @click="deleteAllModal = false"
-            type="button"
+          <button @click="deleteAllModal = false" type="button"
             class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center"
-            data-modal-hide="defaultModal"
-          >
-            <svg
-              class="w-3 h-3"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 14 14"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-              />
+            data-modal-hide="defaultModal">
+            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
             </svg>
             <span class="sr-only">Close modal</span>
           </button>
@@ -932,38 +896,24 @@ provide("cashier_form", form);
           </p>
         </div>
         <!-- Modal footer -->
-        <div
-          class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b"
-        >
-          <button
-            @click="
-              (form.products = []),
-                (scannedProductIMG = ''),
-                (deleteAllModal = false)
-            "
-            data-modal-hide="defaultModal"
-            type="button"
-            class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-          >
+        <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b">
+          <button @click="
+            (form.products = []),
+            (scannedProductIMG = ''),
+            (deleteAllModal = false)
+            " data-modal-hide="defaultModal" type="button"
+            class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
             Delete All (CTRL + ALT + Y)
           </button>
-          <button
-            @click="deleteAllModal = false"
-            data-modal-hide="defaultModal"
-            type="button"
-            class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10"
-          >
+          <button @click="deleteAllModal = false" data-modal-hide="defaultModal" type="button"
+            class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10">
             Decline (CTRL + ALT + N)
           </button>
         </div>
       </div>
     </div>
   </div>
-  <ConfirmDialogModal
-    :show="cash_input_modal"
-    @close="cash_input_modal = false"
-    maxWidth="2xl"
-  >
+  <ConfirmDialogModal :show="cash_input_modal" @close="cash_input_modal = false" maxWidth="2xl">
     <template #title>
       You are going to check out this trasaction, please input Amount cash.
       Payable amount is
@@ -976,55 +926,24 @@ provide("cashier_form", form);
             ).discountedPrice
           )
         )
-      }}</template
-    >
+      }}</template>
     <template #content>
-      <Input
-        id="inputCustomerName"
-        class="rounded-lg w-full mb-2"
-        type="text"
-        v-model="form.customer_name"
-        autofocus
-        label="Customer's Name"
-      />
-      <Input
-        id="inputCustomerAddress"
-        class="rounded-lg w-full mb-2"
-        type="text"
-        label="Customer's Address"
-        v-model="form.customer_address"
-      />
-      <input
-        id="inputCash"
-        class="rounded-lg w-full mb-2"
-        type="number"
-        v-model="form.cash"
-        @keyup.enter="check_out"
-      />
+      <Input id="inputCustomerName" class="rounded-lg w-full mb-2" type="text" v-model="form.customer_name" autofocus
+        label="Customer's Name" />
+      <Input id="inputCustomerAddress" class="rounded-lg w-full mb-2" type="text" label="Customer's Address"
+        v-model="form.customer_address" />
+      <input id="inputCash" class="rounded-lg w-full mb-2" type="number" v-model="form.cash" @keyup.enter="check_out" />
     </template>
     <template #footer>
       <SecondaryButton @click="cash_input_modal = false" class="mr-2">
         Cancel (CTRL + ALT + N)
       </SecondaryButton>
-      <Button
-        :class="{ 'opacity-25': form.processing }"
-        :disabled="form.processing"
-        class="bg-green-200 hover:bg-green-400"
-        @click="check_out"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-auto"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-          />
+      <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing"
+        class="bg-green-200 hover:bg-green-400" @click="check_out">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
         </svg>
         &nbsp; Proceed (CTRL + ALT + Y)
       </Button>
@@ -1032,7 +951,7 @@ provide("cashier_form", form);
   </ConfirmDialogModal>
   <SKU :SKULookup="SKULookup" :products="props.product" />
 
-  <RECIEPT
+  <!-- <RECIEPT
     :cash__="convert_money(form.cash)"
     :subtotal_excluding_vat="
       form.products.length == 0
@@ -1096,40 +1015,224 @@ provide("cashier_form", form);
     "
     @close_modal="printModal = false"
     @checkout__="check_out()"
-  />
-  <!-- </AppLayout> -->
-  <ConfirmDialogModal
-    :show="logoutlModal"
-    @close="logoutlModal = false"
-    maxWidth="2xl"
-  >
+  /> -->
+
+  <ConfirmDialogModal :show="logoutlModal" @close="logoutlModal = false" maxWidth="2xl">
     <template #title> Are you sure you want to log-out?</template>
     <template #content> </template>
     <template #footer>
       <SecondaryButton @click="logoutlModal = false" class="mr-2">
         Cancel (CTRL + ALT + N)
       </SecondaryButton>
-      <Button
-        :class="{ 'opacity-25': form.processing }"
-        :disabled="form.processing"
-        class="bg-green-200 hover:bg-green-400"
-        @click="logout_confirm"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-auto"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-          /></svg
-        >&nbsp;Proceed (CTRL + ALT + Y)
+      <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing"
+        class="bg-green-200 hover:bg-green-400" @click="logout_confirm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+        </svg>&nbsp;Proceed (CTRL + ALT + Y)
       </Button>
     </template>
   </ConfirmDialogModal>
+
+
+  <DialogModal :show="print_show == true" @close="print_show = false" maxWidth="2xl">
+    <template #title> Are you sure you want to log-out?</template>
+    <template #content>
+      <div class="text-justify overflow-auto p-3 relative">
+        <div id="toPrint" class="text-justify overflow-auto p-3 relative border bg-white flex-wrap">
+          <table class="">
+            <thead>
+              <tr class="border mb-2">
+                <th>
+                  <small>CRISBODS HARDWARE AND CONSTRUCTION SUPPLY</small>
+                </th>
+              </tr>
+              <tr class="border mb-2">
+                <th>
+                  <small style="font-size: 10px">Dologon, Busco, Quezon Rd., Maramag, Bukidnon,
+                    8714</small>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="border">
+              <tr>
+                <td>
+                  <small>TIN: 487-279-975-00001</small>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <small>Date: {{ moment().format("MMMM Do YYYY") }}</small>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <small>Time: {{ moment().format("h:mm:ss a") }}</small>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <small>Cashier: {{ usePage().props.auth.user.name }}</small>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <small style="font-size: 10px">*************************************</small>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <small>Customer Name:</small>
+                  <small>{{ form.customer_name }}</small>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <small>Customer Address:</small>
+                  <small style="font-size: 10px">{{
+                    form.customer_address
+                  }}</small>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <small style="font-size: 10px">*************************************</small>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="">
+            <thead>
+              <tr class="border mb-2">
+                <th><small>Retail</small></th>
+                <th><small>QTY</small></th>
+                <th><small>TOTAL</small></th>
+              </tr>
+            </thead>
+            <tbody class="border">
+              <tr v-for="(items, key) in form.products" :key="key">
+                <td>
+                  <small>{{ stringTruncateFromCenter(items.name, 18) }}
+                  </small>
+                </td>
+                <td style="width: 20px">
+                  <small style="font-size: 10px; word-break: break-all">{{
+                    items.cashier_quantity
+                  }}</small>
+                </td>
+                <td style="width: 60px">
+                  <small id="totalPrice" style="font-size: 10px !important; word-break: break-all">{{
+                    convert_money(
+                      applyDiscount(
+                        items.current_price.price,
+                        items.current_discount.discount
+                      ).discountedPrice * items.cashier_quantity
+                    )
+                  }}
+                  </small>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="">
+            <tbody class="border">
+              <tr>
+                <td>
+                  <small style="font-size: 10px">*************************************</small>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <small>Special Discount({{ props.spDiscount }}%):
+                    {{ props.spDiscount_value }}</small>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <small>VAT ({{ props.vat__ }}%): {{ props.vat_value }}</small>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <small>
+                    Subtotal (Excluding VAT):
+                    {{ props.subtotal_excluding_vat }}
+                  </small>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <small>Subtotal Amount: {{ props.subtotal__ }}</small>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <small style="font-size: 10px">*************************************</small>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="">
+            <thead>
+              <tr class="border mb-2">
+                <td>
+                  <small>TOTAL AMOUNT:
+                    {{ convert_money(props.grand_total) }}</small>
+                </td>
+              </tr>
+              <tr class="border mb-2">
+                <td>
+                  <small>CASH: {{ convert_money(form.cash) }}</small>
+                </td>
+              </tr>
+              <tr class="border mb-2">
+                <td>
+                  <small>CHANGE:
+                    {{ convert_money(form.cash - props.grand_total) }}
+                  </small>
+                </td>
+              </tr>
+            </thead>
+            <tbody class="border">
+              <tr>
+                <td>
+                  <small style="font-size: 10px">*************************************</small>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <small> This serve as an OFFICIAL RECEIPT </small>
+                  <small>Thank You, Come Again</small>
+                  <svg class="barcode w-[20vmin] h-[10vmin] mx-auto" jsbarcode-format="CODE128" :jsbarcode-value="'12345'"
+                    jsbarcode-textmargin="0" jsbarcode-fontoptions="bold"></svg>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+              </tr>
+              <tr>
+                <td>
+                  <small style="font-size: 10px">*************************************</small>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </template>
+    <template #footer>
+      <SecondaryButton @click="print_show = false" class="mr-2">
+        Cancel (CTRL + ALT + N)
+      </SecondaryButton>
+      <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing"
+        class="bg-green-200 hover:bg-green-400" @click="print_checkout()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+        </svg>&nbsp;Proceed (CTRL + ALT + Y)
+      </Button>
+    </template>
+  </DialogModal>
 </template>

@@ -130,8 +130,9 @@ Route::middleware([
     });
 
     Route::prefix('cashier')->name('cashier.')->group(function () {
-        Route::get('/cashier', [CashierController::class, 'index'])->name('index');
-        Route::get('/cashier/transaction', [CashierController::class, 'transaction'])->name('index_transaction');
+        Route::get('/index', [CashierController::class, 'index'])->name('index');
+        Route::get('/transaction', [CashierController::class, 'transaction_index'])->name('index_transaction');
+        Route::get('/return', [CashierController::class, 'return_index'])->name('index_return');
         Route::post('/store', [CashierController::class, 'store'])->name('store');
         Route::post('/logout', [CashierController::class, 'logout'])->name('logout');
     });
