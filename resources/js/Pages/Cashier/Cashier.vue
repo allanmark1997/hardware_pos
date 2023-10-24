@@ -8,6 +8,7 @@ import DialogModal from "@/Components/DialogModal.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import Input from "@/Components/Input.vue";
 import Button from "@/Components/Button.vue";
+import Barcode from "@/Pages/Cashier/Barcode.vue";
 import moment from "moment";
 
 import deleteAll from "@/Components/cashierModals/deleteAll.vue";
@@ -1204,8 +1205,9 @@ const stringTruncateFromCenter = (str, maxLength) => {
                 <td>
                   <small> This serve as an OFFICIAL RECEIPT </small>
                   <small>Thank You, Come Again</small>
-                  <svg class="barcode w-[20vmin] h-[10vmin] mx-auto" jsbarcode-format="CODE128" :jsbarcode-value="'12345'"
-                    jsbarcode-textmargin="0" jsbarcode-fontoptions="bold"></svg>
+                  <!-- <svg class="barcode w-[20vmin] h-[10vmin] mx-auto" jsbarcode-format="CODE128" :jsbarcode-value="'12345'"
+                    jsbarcode-textmargin="0" jsbarcode-fontoptions="bold"></svg> -->
+                  <Barcode style="width:200px; height: 100px;" />
                 </td>
               </tr>
               <tr>
