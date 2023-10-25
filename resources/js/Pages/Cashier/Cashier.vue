@@ -8,6 +8,8 @@ import DialogModal from "@/Components/DialogModal.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import Input from "@/Components/Input.vue";
 import Button from "@/Components/Button.vue";
+import Switch from "@/Components/Switch.vue";
+
 import Barcode from "@/Pages/Cashier/Barcode.vue";
 import moment from "moment";
 
@@ -23,6 +25,7 @@ const props = defineProps([
   "cashier_stat_id",
   "tax",
   "special_discount",
+  "code"
 ]);
 
 const totalCart = ref(0);
@@ -50,6 +53,9 @@ let temp_grand_total = ref(0);
 const __cash = ref(0);
 
 const printModal = ref(false);
+
+const walk_in = ref(false);
+
 const secretout = ref({
   exe: false,
   pass: 0,
@@ -67,6 +73,7 @@ const form = useForm({
   print_status: false,
   customer_name: "",
   customer_address: "",
+  code_generator: props.code,
 });
 
 onMounted(() => {
@@ -280,6 +287,18 @@ watch(
   { deep: true }
 );
 
+watch(
+  () => walk_in.value,
+  (walk_in) => {
+    deep: true;
+    if (walk_in == true) {
+      form.customer_name = "Walk-in Customer";
+      form.customer_address = "Walk-in Customer";
+    }
+  },
+  { deep: true }
+);
+
 const domChecker = () => {
   let result = "";
   if ("keydown" in window) {
@@ -483,6 +502,8 @@ const check_out = () => {
           print_show.value = false
           scannedProductIMG.value = "";
           cash_input_modal.value = false;
+
+          location.reload();
         },
         onError: () => {
           toast.error(form.errors.transaction_validation, {
@@ -929,10 +950,11 @@ const stringTruncateFromCenter = (str, maxLength) => {
         )
       }}</template>
     <template #content>
+      <Switch v-model:checked="walk_in">Walk-in</Switch>
       <Input id="inputCustomerName" class="rounded-lg w-full mb-2" type="text" v-model="form.customer_name" autofocus
-        label="Customer's Name" />
+        label="Customer's Name" :disabled="walk_in == true" />
       <Input id="inputCustomerAddress" class="rounded-lg w-full mb-2" type="text" label="Customer's Address"
-        v-model="form.customer_address" />
+        v-model="form.customer_address" :disabled="walk_in == true" />
       <input id="inputCash" class="rounded-lg w-full mb-2" type="number" v-model="form.cash" @keyup.enter="check_out" />
     </template>
     <template #footer>
@@ -1041,7 +1063,7 @@ const stringTruncateFromCenter = (str, maxLength) => {
     <!-- <template #title> Are you sure you want to log-out?</template> -->
     <template #content>
       <div class="text-justify overflow-auto p-3 relative">
-        <div id="toPrint" class="text-justify overflow-auto p-3 relative border bg-white flex-wrap">
+        <div id="toPrint" class="text-justify overflow-auto p-3 relative border bg-white flex-wrap hidden">
           <table class="">
             <thead>
               <tr class="border mb-2">
@@ -1258,11 +1280,13 @@ const stringTruncateFromCenter = (str, maxLength) => {
                   <small>Thank You, Come Again</small>
                   <!-- <svg class="barcode w-[20vmin] h-[10vmin] mx-auto" jsbarcode-format="CODE128" :jsbarcode-value="'12345'"
                     jsbarcode-textmargin="0" jsbarcode-fontoptions="bold"></svg> -->
-                  <Barcode style="width:50px; height: 20px;" />
+
                 </td>
               </tr>
               <tr>
-                <td></td>
+                <td>
+                  <Barcode :code="props.code" style="width:50px; height: 20px;" />
+                </td>
               </tr>
               <tr>
                 <td>
@@ -1271,6 +1295,31 @@ const stringTruncateFromCenter = (str, maxLength) => {
               </tr>
             </tbody>
           </table>
+        </div>
+        <div class="grid grid-cols-12 gap-2">
+          <div class="col-span-full">
+            <p class="text-2xl">Change: <span class="text-4xl font-bold">{{ convert_money(form.cash -
+              (form.products.length == 0
+                ? 0
+                :
+                applyTax(
+                  applyDiscount(
+                    item_grand_total,
+                    spDiscount == true ? special_discount.discount : 0
+                  ).discountedPrice
+                )
+              )) }}</span>
+            </p>
+          </div>
+          <div class="col-span-full">
+            <p class="text-sm">Customer name: <span class="font-bold">{{ form.customer_name }}</span>
+            </p>
+          </div>
+          <div class="col-span-full">
+            <p class="text-sm">Customer Address: <span class="font-bold">{{ form.customer_address
+            }}</span>
+            </p>
+          </div>
         </div>
       </div>
     </template>

@@ -1,12 +1,21 @@
 <script setup>
-import { onMounted } from "vue"
+import { router } from "@inertiajs/vue3";
+import { nextTick, onMounted, ref } from "vue"
+import axios from 'axios';
+import BarcodeSVG from "./BarcodeSVG.vue";
 
-const props = defineProps(["data"])
-onMounted(() => {
-    JsBarcode(".barcode").init();
-})
+const props = defineProps(["code"]);
+
+// const code = ref(null)
+// axios.get(route('cashier.generateCode')).then((res) => {
+//     code.value = res.data.code;
+// })
+// onMounted(async () => {
+//     const res = await axios.get(route('cashier.generateCode'));
+//     code.value = res.data.code;
+//     // console.log(code.value);
+// });
 </script>
 <template>
-    <svg class="barcode w-[50vmin] h-[20vmin] mx-auto" jsbarcode-format="CODE128" :jsbarcode-value="'12345'"
-        jsbarcode-textmargin="0" jsbarcode-fontoptions="bold"></svg>
+    <BarcodeSVG :code="props.code" />
 </template>

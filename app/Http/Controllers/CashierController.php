@@ -15,6 +15,8 @@ use App\Models\transaction;
 use App\Models\TransactionDetail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Str;
+
 
 class CashierController extends Controller
 {
@@ -30,17 +32,25 @@ class CashierController extends Controller
     }
     public function transaction_index(Request $request)
     {
-
+        // $code_generator = $request->code_generator ?? false;
+        // $code = "";
+        // if ($code_generator == true) {
+        $code = $this->codeGenerator();
+        // }
         $product = product::with('current_price')->with('current_discount')->get();
         $tax = Tax::orderBy('created_at', 'desc')->first();
         $special_discount = SpecialDiscount::orderBy('created_at', 'desc')->first();
         $cashier_stat = CashierStatus::where("user_id", Auth::user()->id)->first();
+        if ($request->code === true) {
+            $code = $this->generateCode();
+        }
         return Inertia::render('Cashier/Cashier', [
             "product" => $product,
             "cashier_status" => $cashier_stat->status == 0 ? "false" : "true",
             "cashier_stat_id" => $cashier_stat->id,
             "tax" => $tax,
-            "special_discount" => $special_discount
+            "special_discount" => $special_discount,
+            "code" => $code
         ]);
     }
 
@@ -86,6 +96,7 @@ class CashierController extends Controller
             "tax_id" => $request->tax_id,
             "special_discount_id" => $request->special_discount_id,
             "cash" => $request->cash,
+            "code" => $request->code_generator
         ]);
 
         foreach ($request->products as $key => $product) {
@@ -136,5 +147,28 @@ class CashierController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function generateCode()
+    {
+        do {
+            $code = Str::random(5);
+            $exists = transaction::where('code', $code)->exists();
+        } while ($exists);
+
+        return response()->json([
+            'status' => true,
+            'code' => $code
+        ], 200);
+    }
+
+    public function codeGenerator()
+    {
+        do {
+            $code = Str::random(5);
+            $exists = transaction::where('code', $code)->exists();
+        } while ($exists);
+
+        return $code;
     }
 }
