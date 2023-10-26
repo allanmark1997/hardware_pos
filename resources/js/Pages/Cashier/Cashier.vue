@@ -73,13 +73,11 @@ const form = useForm({
   print_status: false,
   customer_name: "",
   customer_address: "",
-  code_generator: props.code,
+  code_generator: "",
 });
 
 onMounted(() => {
   keydownHandler();
-
-  JsBarcode(".barcode").init();
 });
 
 const keydownHandler = (event) => {
@@ -494,7 +492,7 @@ const check_out = () => {
             transition: toast.TRANSITIONS.FLIP,
             position: toast.POSITION.TOP_RIGHT,
           });
-
+          walk_in.value = false
           form.reset();
           form.products = [];
 
@@ -503,7 +501,6 @@ const check_out = () => {
           scannedProductIMG.value = "";
           cash_input_modal.value = false;
 
-          location.reload();
         },
         onError: () => {
           toast.error(form.errors.transaction_validation, {
@@ -566,7 +563,7 @@ const addQuantitytoPurchase = (add, subtract) => {
   }
 };
 
-// provide("cashier_form", form);
+provide("barcode", form);
 
 const printReceipt = () => {
   var iframe = document.createElement("iframe");
@@ -1297,6 +1294,10 @@ const stringTruncateFromCenter = (str, maxLength) => {
           </table>
         </div>
         <div class="grid grid-cols-12 gap-2">
+          <div class="col-span-full">
+            <p class="text-2xl">Money Rendered: <span class="text-4xl font-bold">{{ convert_money(form.cash) }}</span>
+            </p>
+          </div>
           <div class="col-span-full">
             <p class="text-2xl">Change: <span class="text-4xl font-bold">{{ convert_money(form.cash -
               (form.products.length == 0

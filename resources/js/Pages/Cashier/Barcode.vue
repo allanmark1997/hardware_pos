@@ -1,21 +1,16 @@
 <script setup>
 import { router } from "@inertiajs/vue3";
-import { nextTick, onMounted, ref } from "vue"
+import { inject, nextTick, onMounted, ref } from "vue"
 import axios from 'axios';
 import BarcodeSVG from "./BarcodeSVG.vue";
 
-const props = defineProps(["code"]);
+const form = inject("barcode");
 
-// const code = ref(null)
-// axios.get(route('cashier.generateCode')).then((res) => {
-//     code.value = res.data.code;
-// })
-// onMounted(async () => {
-//     const res = await axios.get(route('cashier.generateCode'));
-//     code.value = res.data.code;
-//     // console.log(code.value);
-// });
+onMounted(async () => {
+    const res = await axios.get(route('cashier.generateCode'));
+    form.code_generator = res.data.code
+});
 </script>
 <template>
-    <BarcodeSVG :code="props.code" />
+    <BarcodeSVG v-if="form.code_generator != ''" />
 </template>

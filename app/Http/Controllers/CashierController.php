@@ -25,40 +25,37 @@ class CashierController extends Controller
      */
     public function index(Request $request)
     {
-        $image_address = env("APP_URL") . "/storage/logo/wrenches.jpg";
+        $domain = env("APP_URL");
+
         return Inertia::render('Cashier/Welcome', [
-            "logo" => $image_address
+            "domain" => $domain,
         ]);
     }
     public function transaction_index(Request $request)
     {
-        // $code_generator = $request->code_generator ?? false;
-        // $code = "";
-        // if ($code_generator == true) {
-        $code = $this->codeGenerator();
-        // }
         $product = product::with('current_price')->with('current_discount')->get();
         $tax = Tax::orderBy('created_at', 'desc')->first();
         $special_discount = SpecialDiscount::orderBy('created_at', 'desc')->first();
         $cashier_stat = CashierStatus::where("user_id", Auth::user()->id)->first();
-        if ($request->code === true) {
-            $code = $this->generateCode();
-        }
+
         return Inertia::render('Cashier/Cashier', [
             "product" => $product,
             "cashier_status" => $cashier_stat->status == 0 ? "false" : "true",
             "cashier_stat_id" => $cashier_stat->id,
             "tax" => $tax,
             "special_discount" => $special_discount,
-            "code" => $code
         ]);
     }
 
     public function return_index(Request $request)
     {
-        $transaction = transaction::get();
+        $search = $request->search ?? "";
+        $transaction = transaction::with("accommodate_by")->has("accommodate_by")->with("tax")->with("special_discount")->with("transaction_details")->when($search != null || $search != "", function ($query) use ($search) {
+            $query->where("code", $search);
+        })->first();
         return Inertia::render('Cashier/ReturnProducts', [
-            "transaction" => $transaction
+            "transaction" => $search == null ? null : $transaction,
+            "search" => $search,
         ]);
     }
 
@@ -96,6 +93,8 @@ class CashierController extends Controller
             "tax_id" => $request->tax_id,
             "special_discount_id" => $request->special_discount_id,
             "cash" => $request->cash,
+            "name" => $request->customer_name,
+            "address" => $request->customer_address,
             "code" => $request->code_generator
         ]);
 

@@ -1,16 +1,16 @@
 <script setup>
-import { onMounted } from "vue";
+import { inject, onMounted } from "vue";
 
+const form = inject("barcode")
 
-const props = defineProps(["code"]);
 onMounted(() => {
-    // console.log(props.code + " Hello")
+    console.log(form.code_generator + " Hello")
     JsBarcode(".barcode").init();
 })
 
 </script>
 
 <template>
-    <svg class="barcode w-[50vmin] h-[20vmin] mx-auto" jsbarcode-format="CODE128" :jsbarcode-value="props.code"
+    <svg class="barcode w-[50vmin] h-[20vmin] mx-auto" jsbarcode-format="CODE128" :jsbarcode-value="form.code_generator"
         jsbarcode-textmargin="0" jsbarcode-fontoptions="bold"></svg>
 </template>
