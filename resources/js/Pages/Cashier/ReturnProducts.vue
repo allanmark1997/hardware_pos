@@ -51,16 +51,18 @@ const calculate_subtotal = (price, discount, quantity) => {
 const calculate_grandtotal = () => {
   let grandTotal = 0;
   let subtotal = 0;
+  let subtotal_2 = 0;
   let discount_val = 0;
   let price_discount = 0;
   props.transaction?.transaction_details.forEach(detail => {
     discount_val = detail.sale_discount.discount / 100;
     price_discount = (detail.price.price * discount_val) * detail.quantity;
-    subtotal = (detail.price - price_discount) * detail.quantity;
-    grandTotal += subtotal;
+    subtotal = detail.price - price_discount;
+    subtotal_2 = subtotal;
+
   });
 
-  return grandTotal;
+  return subtotal_2;
 }
 </script>
 <template>
