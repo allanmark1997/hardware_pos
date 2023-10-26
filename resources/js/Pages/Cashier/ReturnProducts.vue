@@ -35,6 +35,33 @@ const convert_money = (data) => {
   formatter.format(data);
   return formatter.format(data);
 };
+
+const calculate_discounted_total = (price, discount, quantity) => {
+  let discount_val = discount / 100;
+  let total = (price * discount_val) * quantity;
+  return total;
+}
+
+const calculate_subtotal = (price, discount, quantity) => {
+  let discounted_total = calculate_discounted_total(price, discount, quantity);
+  let total = (price - discounted_total) * quantity;
+  return total;
+}
+
+const calculate_grandtotal = () => {
+  let grandTotal = 0;
+  let subtotal = 0;
+  let discount_val = 0;
+  let price_discount = 0;
+  props.transaction?.transaction_details.forEach(detail => {
+    discount_val = detail.sale_discount.discount / 100;
+    price_discount = (detail.price.price * discount_val) * detail.quantity;
+    subtotal = (detail.price - price_discount) * detail.quantity;
+    grandTotal += subtotal;
+  });
+
+  return grandTotal;
+}
 </script>
 <template>
   <Head :title="'Return'" />
@@ -94,7 +121,7 @@ const convert_money = (data) => {
                     </p>
                     <p class="text-sm text-gray-500 hover:text-gray-600 leading-6 text-left">
                       <span>
-                        Payment Method: {{ transaction?.payment_method }}
+                        Payment Method: {{ transaction?.payment_method == 0 ? "Cash" : "Others" }}
                       </span>
                     </p>
                     <p class="text-sm text-gray-500 hover:text-gray-600 leading-6 text-left">
@@ -108,8 +135,23 @@ const convert_money = (data) => {
                       </span>
                     </p>
                     <p class="text-sm text-gray-500 hover:text-gray-600 leading-6 text-left">
-                      <span>
+                      <span class="font-bold">
                         Cash Rendered: {{ convert_money(transaction?.cash) }}
+                      </span>
+                    </p>
+                    <p class="text-sm text-gray-500 hover:text-gray-600 leading-6 text-left">
+                      <span class="font-bold">
+                        Customer Change: {{ convert_money(transaction?.cash) }}
+                      </span>
+                    </p>
+                    <p class="text-sm text-gray-500 hover:text-gray-600 leading-6 text-left">
+                      <span class="font-bold">
+                        Success Grand Total: {{ calculate_grandtotal() }}
+                      </span>
+                    </p>
+                    <p class="text-sm text-gray-500 hover:text-gray-600 leading-6 text-left">
+                      <span class="font-bold">
+                        Cancelled Grand Total: {{ convert_money(transaction?.cash) }}
                       </span>
                     </p>
                     <ul
@@ -137,10 +179,10 @@ const convert_money = (data) => {
                   <!-- End of profile card -->
                 </div>
                 <!-- Right Side -->
-                <div class="w-full md:w-9/12 mx-2 h-64">
+                <div class="w-full md:w-9/12 mx-2 h-70">
                   <!-- Profile tab -->
                   <!-- About Section -->
-                  <div class="bg-white p-3 shadow-sm rounded-sm">
+                  <div class="bg-white p-3 shadow-sm rounded-sm h-full">
                     <div class="flex items-center space-x-2 font-semibold text-gray-900 leading-8">
                       <span clas="text-green-500">
                         <svg class="h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -152,41 +194,84 @@ const convert_money = (data) => {
                       <span class="tracking-wide">About</span>
                     </div>
                     <div class="text-gray-700">
-                      <div class="grid md:grid-cols-2 text-sm">
-                        <div class="grid grid-cols-2">
-                          <div class="px-4 py-2 font-semibold">First Name</div>
-                          <div class="px-4 py-2">Jane</div>
-                        </div>
-                        <div class="grid grid-cols-2">
-                          <div class="px-4 py-2 font-semibold">Last Name</div>
-                          <div class="px-4 py-2">Doe</div>
-                        </div>
-                        <div class="grid grid-cols-2">
-                          <div class="px-4 py-2 font-semibold">Gender</div>
-                          <div class="px-4 py-2">Female</div>
-                        </div>
-                        <div class="grid grid-cols-2">
-                          <div class="px-4 py-2 font-semibold">Contact No.</div>
-                          <div class="px-4 py-2">+11 998001001</div>
-                        </div>
-                        <div class="grid grid-cols-2">
-                          <div class="px-4 py-2 font-semibold">Current Address</div>
-                          <div class="px-4 py-2">Beech Creek, PA, Pennsylvania</div>
-                        </div>
-                        <div class="grid grid-cols-2">
-                          <div class="px-4 py-2 font-semibold">Permanant Address</div>
-                          <div class="px-4 py-2">Arlington Heights, IL, Illinois</div>
-                        </div>
-                        <div class="grid grid-cols-2">
-                          <div class="px-4 py-2 font-semibold">Email.</div>
-                          <div class="px-4 py-2">
-                            <a class="text-blue-800" href="mailto:jane@example.com">jane@example.com</a>
+                      <div class="grid grid-cols-12 text-sm gap-2 break-words">
+                        <template v-for="(detail, key) in transaction?.transaction_details " :key="key">
+                          <div class="col-span-2 flex mx-auto ">
+                            <Icon icon="cart" size="sm" class="mx-auto" />
+                            <div>
+                              <p class="font-semibold">
+                                {{ detail.product.name }}
+                              </p>
+                              <span class="text-xs font-normal w-full">
+                                Product Name
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                        <div class="grid grid-cols-2">
-                          <div class="px-4 py-2 font-semibold">Birthday</div>
-                          <div class="px-4 py-2">Feb 06, 1998</div>
-                        </div>
+                          <div class="col-span-1">
+                            <p class="font-semibold">
+                              {{ detail.quantity }}
+                            </p>
+                            <span class="text-xs font-normal w-full">
+                              Quantity
+                            </span>
+                          </div>
+                          <div class="col-span-2">
+                            <p class="font-semibold">
+                              {{ convert_money(detail.price.price) }}
+                            </p>
+                            <span class="text-xs font-normal w-full">
+                              Price
+                            </span>
+                          </div>
+                          <div class="col-span-1">
+                            <p class="font-semibold">
+                              {{ detail.sale_discount.discount }}%
+                            </p>
+                            <span class="text-xs font-normal w-full">
+                              Discount
+                            </span>
+                          </div>
+
+                          <div class="col-span-2">
+                            <p class="font-semibold">
+                              {{ convert_money(calculate_discounted_total(detail.price.price,
+                                detail.sale_discount.discount,
+                                detail.quantity)) }}
+                            </p>
+                            <span class="text-xs font-normal w-full">
+                              Discounted Total
+                            </span>
+                          </div>
+                          <div class="col-span-2">
+                            <p class="font-semibold">
+                              {{ convert_money(calculate_subtotal(detail.price.price,
+                                detail.sale_discount.discount,
+                                detail.quantity)) }}
+                            </p>
+                            <span class="text-xs font-normal w-full">
+                              Subtotal
+                            </span>
+                          </div>
+                          <div class="col-span-2">
+                            <p class="font-semibold">
+                              <span class="ml-auto">
+                                <span v-if="detail?.status == 1"
+                                  class="bg-green-500 py-1 px-1 rounded text-white text-xs">
+                                  Active
+                                </span>
+                                <span v-else class="bg-red-500 py-1 px-1 rounded text-white text-xs">
+                                  Cancelled
+                                </span>
+                              </span>
+                            </p>
+                            <span class="text-xs font-normal w-full">
+                              Status
+                            </span>
+                          </div>
+                          <hr class="col-span-12 w-full">
+
+                        </template>
+
                       </div>
                     </div>
                   </div>
