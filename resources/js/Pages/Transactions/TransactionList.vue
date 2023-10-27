@@ -96,7 +96,7 @@ const calculate_sub_total = (data) => {
   let temp_data_result = 0;
   let temp_data_discounted = 0;
   let convert_discount = data.sale_discount.discount / 100;
-  if (data.status == 1) {
+  if (data.status == 1 || data.status == 2) {
     for (let index = 0; index < data.quantity; index++) {
       temp_data_discounted = data.price.price * convert_discount;
       temp_data_result += data.price.price - temp_data_discounted;
@@ -120,7 +120,7 @@ const calculate_grand_total = (data, discount, vat, type) => {
     let temp_data_result = 0;
     let temp_data_discounted = 0;
     let convert_discount = element.sale_discount.discount / 100;
-    if (element.status == 1) {
+    if (element.status == 1 || element.status == 2) {
       for (let index = 0; index < element.quantity; index++) {
         temp_data_discounted = element.price.price * convert_discount;
         temp_data_result += element.price.price - temp_data_discounted;
@@ -145,7 +145,7 @@ const calculate_grand_total_unsuccess = (data) => {
   let temp_data_total = 0;
   data.forEach((element) => {
     if (element.status == 0) {
-      temp_data_total = element.price.price * element.quantity;
+      temp_data_total += element.price.price * element.quantity;
     }
   });
   return temp_data_total;
@@ -157,52 +157,28 @@ const calculate_grand_total_unsuccess = (data) => {
       <div class="flex gap-2">
         <div class="flex">
           <span class="text-md mt-2 mr-2">From</span>
-          <TextInput
-            id="date_from"
-            v-model="date_from"
-            type="date"
-            class="mt-1 block w-full"
-          />
+          <TextInput id="date_from" v-model="date_from" type="date" class="mt-1 block w-full" />
         </div>
         <div class="flex">
           <span class="text-md mt-2 mr-2">To</span>
-          <TextInput
-            id="date_to"
-            v-model="date_to"
-            type="date"
-            class="mt-1 block w-full"
-            @keyup.enter="function_filter_range"
-          />
+          <TextInput id="date_to" v-model="date_to" type="date" class="mt-1 block w-full"
+            @keyup.enter="function_filter_range" />
         </div>
         <div class="flex">
-          <Input
-            v-model="search"
-            class="rounded-lg w-[30vmin]"
-            type="text"
-            label="Search transaction"
-            @keyup.enter="search_"
-          />
+          <Input v-model="search" class="rounded-lg w-[30vmin]" type="text" label="Search transaction"
+            @keyup.enter="search_" />
         </div>
-        <button
-          v-if="date_from || date_to || search"
-          class="h-10 my-auto mt-5"
-          @click="function_filter_remove"
-        >
+        <button v-if="date_from || date_to || search" class="h-10 my-auto mt-5" @click="function_filter_remove">
           <Icon icon="close_icon" size="sm" />
         </button>
       </div>
     </div>
-    <a
-      :href="
-        route('transactions.export', {
-          date_from: date_from,
-          date_to: date_to,
-          search: search,
-        })
-      "
-      class="bg-green-400 hover:bg-green-600 hover:text-white rounded-lg my-auto p-2"
-      >Export Transaction</a
-    >
+    <a :href="route('transactions.export', {
+      date_from: date_from,
+      date_to: date_to,
+      search: search,
+    })
+      " class="bg-green-400 hover:bg-green-600 hover:text-white rounded-lg my-auto p-2">Export Transaction</a>
   </div>
 
   <section class="text-gray-600 bg-white rounded-lg py-5 px-3 mb-5 mt-2">
@@ -228,19 +204,13 @@ const calculate_grand_total_unsuccess = (data) => {
             </tr>
           </thead>
           <tbody>
-            <template
-              v-for="(transaction, key) in transactions.data"
-              :key="key"
-            >
+            <template v-for="(transaction, key) in transactions.data" :key="key">
               <tr class="bg-white border-">
                 <td class="px-6 py-4">{{ transaction.id }}</td>
                 <td class="px-6 py-4">
                   <small class="flex gap-2">
-                    <img
-                      class="h-8 w-8 rounded-full object-cover"
-                      :src="transaction.accommodate_by.profile_photo_url"
-                      :alt="transaction.accommodate_by.name"
-                    />
+                    <img class="h-8 w-8 rounded-full object-cover" :src="transaction.accommodate_by.profile_photo_url"
+                      :alt="transaction.accommodate_by.name" />
                     {{ transaction.accommodate_by?.name ?? "Pending" }}
                   </small>
                 </td>
@@ -260,15 +230,10 @@ const calculate_grand_total_unsuccess = (data) => {
                 </td>
                 <td class="px-6 py-4">
                   <div class="flex p-1 w-[8vmin]">
-                    <div
-                      v-if="transaction.customer_type == 0"
-                      class="flex gap-1"
-                    >
+                    <div v-if="transaction.customer_type == 0" class="flex gap-1">
                       <Icon icon="user" size="md" />
 
-                      <small
-                        class="bg-green-400 rounded-md p-1 text-white w-full"
-                      >
+                      <small class="bg-green-400 rounded-md p-1 text-white w-full">
                         Walk-in
                       </small>
                     </div>
@@ -281,10 +246,8 @@ const calculate_grand_total_unsuccess = (data) => {
                     </div>
                   </div>
                   <div class="flex">
-                    <small
-                      class="flex gap-1"
-                      v-if="transaction.payment_method == 0"
-                      ><Icon icon="cash" size="sm" /> Cash
+                    <small class="flex gap-1" v-if="transaction.payment_method == 0">
+                      <Icon icon="cash" size="sm" /> Cash
                     </small>
                     <small v-else>Other</small>
                   </div>
@@ -295,22 +258,15 @@ const calculate_grand_total_unsuccess = (data) => {
                     <small>VAT: </small>
                     <small> {{ transaction.tax?.tax }}% </small>
                   </div>
-                  <div
-                    class="flex rounded-lg bg-orange-400 p-[3px] text-white mt-1"
-                  >
+                  <div class="flex rounded-lg bg-orange-400 p-[3px] text-white mt-1">
                     <Icon icon="wheelchair" size="sm" />
                     <small>SD: </small>
-                    <small
-                      >{{
-                        transaction.special_discount?.discount ?? "0"
-                      }}%</small
-                    >
+                    <small>{{
+                      transaction.special_discount?.discount ?? "0"
+                    }}%</small>
                   </div>
                 </td>
-                <td
-                  scope="row"
-                  class="px-2 py-1 text-gray-900 whitespace-nowrap"
-                >
+                <td scope="row" class="px-2 py-1 text-gray-900 whitespace-nowrap">
                   <table class="w-full text-xs text-left text-gray-500">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-100">
                       <tr>
@@ -324,12 +280,9 @@ const calculate_grand_total_unsuccess = (data) => {
                       </tr>
                     </thead>
                     <tbody>
-                      <template
-                        v-for="(
+                      <template v-for="(
                           transaction_detail, key2
-                        ) in transaction.transaction_details"
-                        :key="key2"
-                      >
+                        ) in transaction.transaction_details" :key="key2">
                         <tr class="bg-white border-">
                           <td class="px-1 py-1 flex">
                             <Icon icon="shopping_cart" size="xs" />
@@ -345,17 +298,21 @@ const calculate_grand_total_unsuccess = (data) => {
                             {{ transaction_detail.sale_discount.discount }}%
                           </td>
                           <td class="px-1 py-1">
-                            <small
-                              v-if="transaction_detail.status == 0"
-                              class="bg-orange-400 rounded-sm p-[1px] text-white"
-                            >
+                            <small v-if="transaction_detail.status == 0"
+                              class="bg-orange-400 rounded-sm p-[1px] text-white">
                               Unsuccess
                             </small>
-                            <small
-                              v-else
-                              class="bg-green-400 rounded-sm p-[1px] text-white"
-                            >
+                            <small v-else-if="transaction_detail.status == 1"
+                              class="bg-green-400 rounded-sm p-[1px] text-white">
                               Success
+                            </small>
+                            <small v-else-if="transaction_detail.status == 2"
+                              class="bg-orange-400 rounded-sm p-[1px] text-white">
+                              Pending Return
+                            </small>
+                            <small v-else-if="transaction_detail.status == 3"
+                              class="bg-red-400 rounded-sm p-[1px] text-white">
+                              Returned
                             </small>
                           </td>
                           <td class="px-1 py-1">
@@ -379,8 +336,8 @@ const calculate_grand_total_unsuccess = (data) => {
                 </td>
                 <td class="px-6 py-4">
                   <div class="flex rounded-lg bg-red-400 p-[3px] text-white">
-                    <small class="flex"
-                      ><Icon icon="tax" size="sm" />VAT:
+                    <small class="flex">
+                      <Icon icon="tax" size="sm" />VAT:
                     </small>
                     <small>
                       {{
@@ -395,11 +352,9 @@ const calculate_grand_total_unsuccess = (data) => {
                       }}
                     </small>
                   </div>
-                  <div
-                    class="flex rounded-lg bg-orange-400 p-[3px] text-white mt-1"
-                  >
-                    <small class="flex"
-                      ><Icon icon="wheelchair" size="sm" />SD:
+                  <div class="flex rounded-lg bg-orange-400 p-[3px] text-white mt-1">
+                    <small class="flex">
+                      <Icon icon="wheelchair" size="sm" />SD:
                     </small>
                     <small>{{
                       convert_money(
@@ -436,13 +391,13 @@ const calculate_grand_total_unsuccess = (data) => {
                   {{
                     convert_money(
                       transaction.cash
--
+                      -
                       calculate_grand_total(
                         transaction.transaction_details,
                         transaction.special_discount?.discount ?? 0,
                         transaction.tax?.tax ?? 0,
                         0
-                      ) 
+                      )
                     )
                   }}
                 </td>
@@ -469,12 +424,7 @@ const calculate_grand_total_unsuccess = (data) => {
         </table>
       </div>
       <div class="flex items-center justify-between">
-        <Pagination2
-          :links="props.transactions.links"
-          :date_from="date_from"
-          :date_to="date_to"
-          :search="search"
-        />
+        <Pagination2 :links="props.transactions.links" :date_from="date_from" :date_to="date_to" :search="search" />
         <p class="mt-6 text-sm text-gray-500">
           Showing {{ transactions.data.length }} Transactions
         </p>

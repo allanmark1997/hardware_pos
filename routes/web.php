@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ReturnProductController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SpecialDiscountController;
 use App\Http\Controllers\SupplierCategoryController;
@@ -136,6 +137,11 @@ Route::middleware([
         Route::get('/generate_code', [CashierController::class, 'generateCode'])->name('generateCode');
         Route::post('/store', [CashierController::class, 'store'])->name('store');
         Route::post('/logout', [CashierController::class, 'logout'])->name('logout');
+    });
+
+    Route::prefix('return')->name('return.')->group(function () {
+        Route::get('/index', [ReturnProductController::class, 'index'])->name('index');
+        Route::post('/store/{transaction_detail}', [ReturnProductController::class, 'store'])->name('store');
     });
 
     Route::prefix('cashier')->name('cashier_stat.')->group(function () {
