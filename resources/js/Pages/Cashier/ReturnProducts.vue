@@ -12,9 +12,11 @@ import ReturnItem from "@/Pages/Cashier/ReturnItem.vue";
 
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+import { list } from "postcss";
 
 const props = defineProps(["search", "transaction"])
 
+const lists = ref(false);
 const confirmation_modal = ref(false);
 const product_object = ref({});
 
@@ -226,6 +228,10 @@ const validate_input_qty = (id) => {
   }
 }
 
+
+const view_list = () => {
+  lists.value = !lists.value
+}
 provide("form_return", form)
 </script>
 <template>
@@ -260,8 +266,13 @@ provide("form_return", form)
             </p>
             <div v-else class="container mx-auto my-5 p-5">
               <div class="text-right p-2">
-                <Button class="mr-2 bg-green-200 text-white">Result</Button>
-                <Button>Lists</Button>
+                <button
+                  class="mr-2 bg-green-500 text-white p-2 pl-6 pr-6 rounded-lg hover:bg-green-400 hover:text-gray-200"
+                  @click="lists = true">Result</button>
+
+                <button
+                  class="mr-2 bg-orange-500 text-white p-2 pl-6 pr-6 rounded-lg hover:bg-orange-400 hover:text-gray-200"
+                  @click="lists = false">Lists</button>
               </div>
 
               <div class="md:flex no-wrap md:-mx-2 ">
@@ -344,7 +355,154 @@ provide("form_return", form)
                 <div class="w-full md:w-9/12 mx-2 h-100">
                   <!-- Profile tab -->
                   <!-- About Section -->
-                  <div class="bg-white p-3 shadow-sm rounded-sm h-full">
+                  <div class="bg-white p-3 shadow-sm rounded-sm h-full" v-if="lists == false">
+                    <div class="bg-gray-100 ">
+                      <div class="flex items-center space-x-2 font-semibold text-gray-900 leading-8">
+                        <span clas="text-green-500">
+                          <svg class="h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        </span>
+                        <span class="tracking-wide">Lists</span>
+                      </div>
+                      <div class="grid grid-cols-12 gap-2">
+                        <p class="col-span-6 text-lg text-green-500 hover:text-gray-600 leading-6 w-full">
+                          <span class="font-bold break-words">
+                            Success Grand Total: {{
+                              convert_money(calculate_grandtotal_with_vat())
+                            }}
+                          </span>
+                        </p>
+                        <p class="col-span-6 text-lg text-red-500 hover:text-gray-600 leading-6 w-full">
+                          <span class="font-bold break-words">
+                            Cancelled Grand Total: {{ convert_money(calculate_overall_sub_total_unsuccess()) }}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="text-gray-700 p-2 h-[60vmin] lg:h-[38vmin] sm:h-[145vmin] overflow-x-auto">
+                      <div class="grid grid-cols-12 text-sm gap-2 break-words">
+                        <template v-for="(detail, key) in form.products" :key="key">
+                          <div class="col-span-2 flex mx-auto ">
+                            <Icon icon="cart" size="sm" class="mx-auto" />
+                            <div class="text-xs">
+                              <p class="font-semibold text-left">
+                                {{ detail.product?.name }}
+                              </p>
+                              <span
+                                class="lg:text-[1vmin] md:text-[2.5vmin] sm:text-[1vmin] xs:text-[2vmin] font-normal w-full">
+                                Product Name
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-span-1 text-xs">
+                            <div>
+                              <p class="font-semibold">
+                                {{ detail.quantity }}
+                              </p>
+                              <span
+                                class="lg:text-[1vmin] md:text-[2.5vmin] sm:text-[1vmin] xs:text-[2vmin] font-normal w-full">
+                                Qty
+                              </span>
+                            </div>
+                            <hr>
+                            <div>
+                              <p class="font-semibold">
+                                {{ detail.sale_discount.discount }}%
+                              </p>
+                              <span
+                                class="lg:text-[1vmin] md:text-[2.5vmin] sm:text-[1vmin] xs:text-[2vmin] font-normal w-full">
+                                Discount
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-span-2 text-xs">
+                            <div>
+                              <p class="font-semibold">
+                                {{ convert_money(detail.price.price) }}
+                              </p>
+                              <span
+                                class="lg:text-[1vmin] md:text-[2.5vmin] sm:text-[1vmin] xs:text-[2vmin]  font-normal w-full">
+                                Price
+                              </span>
+                            </div>
+                            <hr>
+                            <div>
+                              <p class="font-semibold">
+                                {{ convert_money(detail.status == 1 || detail.status == 2 ?
+                                  calculate_discounted_total(detail.price.price,
+                                    detail.sale_discount.discount,
+                                    detail.quantity) : 0) }}
+                              </p>
+                              <span
+                                class="lg:text-[1vmin] md:text-[2.5vmin] sm:text-[1vmin] xs:text-[2vmin]  font-normal w-full">
+                                Discounted Total
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-span-3 text-xs">
+                            <p class="font-semibold">
+                              {{ convert_money(detail.status == 1 || detail.status == 2 ?
+                                calculate_subtotal(detail.price.price,
+                                  detail.sale_discount.discount,
+                                  detail.quantity) : detail.price.price * detail.quantity) }}
+                            </p>
+                            <span
+                              class="lg:text-[1vmin] md:text-[2.5vmin] sm:text-[1vmin] xs:text-[2vmin]  font-normal w-full">
+                              Subtotal
+                            </span>
+                          </div>
+                          <div class="col-span-2 text-xs">
+                            <p class="font-semibold">
+                              <span class="ml-auto">
+                                <span v-if="detail?.status == 1"
+                                  class="bg-green-500 py-1 px-1 rounded text-white text-xs">
+                                  Success
+                                </span>
+                                <span v-else-if="detail?.status == 2"
+                                  class="bg-orange-500 py-1 px-1 rounded text-white text-xs">
+                                  Pending return
+                                </span>
+                                <span v-else-if="detail?.status == 3"
+                                  class="bg-red-500 py-1 px-1 rounded text-white text-xs">
+                                  Return
+                                </span>
+                                <span v-else class="bg-red-500 py-1 px-1 rounded text-white text-xs">
+                                  Cancelled
+                                </span>
+                              </span>
+                            </p>
+                            <span
+                              class="lg:text-[1vmin] md:text-[2.5vmin] sm:text-[1vmin] xs:text-[2vmin] font-normal w-full">
+                              Status
+                            </span>
+                          </div>
+                          <div class="col-span-2 text-xs">
+                            <Button v-if="detail?.status == 1" size="sm" @click="function_open_modal_return(detail)">
+                              Return
+                            </Button>
+                            <!-- <div class="items-center mb-4"> -->
+                            <!-- <input id="default-checkbox" type="checkbox" :value="detail" v-model="selected_products"
+                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">
+                              <label for="default-checkbox" class="ml-2 text-xs font-medium text-gray-900">
+                                Return
+                              </label> -->
+                            <!-- <Input type="number" label="Qty" :disabled="validate_input_qty(detail.id)" /> -->
+                            <!-- <ReturnItem /> -->
+                            <!-- </div> -->
+
+                          </div>
+                          <hr class="col-span-12 w-full">
+
+                        </template>
+
+                      </div>
+                    </div>
+                  </div>
+                  <div class="bg-white p-3 shadow-sm rounded-sm h-full" v-if="lists">
                     <div class="bg-gray-100 ">
                       <div class="flex items-center space-x-2 font-semibold text-gray-900 leading-8">
                         <span clas="text-green-500">
