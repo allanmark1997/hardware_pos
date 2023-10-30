@@ -2,12 +2,13 @@
 import Icon from "@/Components/Icon.vue";
 import Input from "@/Components/Input.vue"
 import { Head, Link, useForm, usePage } from "@inertiajs/vue3";
-import { onMounted, ref } from "vue";
+import { onMounted, provide, ref } from "vue";
 import moment from "moment";
 import Button from "@/Components/Button.vue";
 import ConfirmDialogModal from "@/Components/ConfirmationModal.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import JetInputError from "@/Components/InputError.vue";
+import ReturnItem from "@/Pages/Cashier/ReturnItem.vue";
 
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -15,13 +16,13 @@ import "vue3-toastify/dist/index.css";
 const props = defineProps(["search", "transaction"])
 
 const confirmation_modal = ref(false);
-const selected_products = ref([]);
+const product_object = ref({});
+
+// const selected_products = ref([]);
 
 const form = useForm({
   search: props.search ?? "",
   products: [],
-  quantity: 0,
-  remarks: ""
 })
 
 onMounted(() => {
@@ -133,51 +134,90 @@ const calculate_customer_change = () => {
 
 
 const function_open_modal_return = (product) => {
-  form.product = product
+  product_object.value = {
+    product: {},
+    quantity: 1,
+    reamrks: ""
+  }
+  product_object.value.product = product
   confirmation_modal.value = !confirmation_modal.value
 }
 
-const return_product = () => {
-  if (form.quantity < form.product.quantity) {
-    toast.error("You inputed quantity which is beyond in the transaction details. This is invalid", {
-      autoClose: 2000,
-      transition: toast.TRANSITIONS.FLIP,
-      position: toast.POSITION.TOP_RIGHT,
-    });
-  }
-  else if (form.quantity == null || form.quantity == 0 || form.remarks == null || form.remarks == "") {
-    toast.error("Please fill-out all fields!", {
-      autoClose: 2000,
-      transition: toast.TRANSITIONS.FLIP,
-      position: toast.POSITION.TOP_RIGHT,
-    });
+const add_return_product = () => {
+  let find_product = form.products.find(
+    (products) => products.product.id == product_object.value.product.id
+  );
+  console.log(find_product)
+  if (find_product == undefined) {
+    if (product_object.value.quantity > product_object.value.product.quantity) {
+      toast.error("You inputed quantity which is beyond in the transaction details. This is invalid", {
+        autoClose: 2000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+    else if (product_object.value.quantity <= 0) {
+      toast.error("Looks like the inputed quantity is equal to zero or below zero, this is invalid!", {
+        autoClose: 2000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+    else if (product_object.value.quantity == null || product_object.value.quantity == 0 || product_object.value.remarks == null || product_object.value.remarks == "") {
+      toast.error("Please fill-out all fields!", {
+        autoClose: 2000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+    else {
+      form.products.push(product_object.value)
+      confirmation_modal.value = !confirmation_modal.value
+      toast.success("Success! Added in the list", {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
   }
   else {
-    form.post(route("return.store", { transaction_detail: form.product }), {
-      preserveScroll: true,
-      preserveState: true,
-      onSuccess: () => {
-        toast.success("Success! Please wait for the administrator to approved this request or please notify the administrator that you have a request", {
-          autoClose: 2000,
-          transition: toast.TRANSITIONS.FLIP,
-          position: toast.POSITION.TOP_RIGHT,
-        });
-      },
-      onError: () => {
-        toast.error(form.errors.transaction_validation, {
-          autoClose: 2000,
-          transition: toast.TRANSITIONS.FLIP,
-          position: toast.POSITION.TOP_RIGHT,
-        });
-      }
+    toast.error("This item(" + find_product.product.product.name + ") is already in the list, please update the quantity in the list.", {
+      autoClose: 2000,
+      transition: toast.TRANSITIONS.FLIP,
+      position: toast.POSITION.TOP_RIGHT,
     });
   }
+
+
+}
+
+const return_product = () => {
+  form.post(route("return.store", { transaction_detail: form.product }), {
+    preserveScroll: true,
+    preserveState: true,
+    onSuccess: () => {
+      toast.success("Success! Please wait for the administrator to approved this request or please notify the administrator that you have a request", {
+        autoClose: 2000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    },
+    onError: () => {
+      toast.error(form.errors.transaction_validation, {
+        autoClose: 2000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+  });
+
 }
 
 const validate_input_qty = (id) => {
   let validate = selected_products.value.find(
     (product) => product.id == id
   );
+  console.log(selected_products.value)
   if (validate == undefined) {
     return true;
   }
@@ -185,6 +225,8 @@ const validate_input_qty = (id) => {
     return false;
   }
 }
+
+provide("form_return", form)
 </script>
 <template>
   <Head :title="'Return'" />
@@ -217,6 +259,11 @@ const validate_input_qty = (id) => {
               No Results
             </p>
             <div v-else class="container mx-auto my-5 p-5">
+              <div class="text-right p-2">
+                <Button class="mr-2 bg-green-200 text-white">Result</Button>
+                <Button>Lists</Button>
+              </div>
+
               <div class="md:flex no-wrap md:-mx-2 ">
                 <!-- Left Side -->
                 <div class="w-full md:w-3/12 md:mx-2">
@@ -423,17 +470,18 @@ const validate_input_qty = (id) => {
                             </span>
                           </div>
                           <div class="col-span-2 text-xs">
-                            <!-- <Button v-if="detail?.status == 1" size="sm" @click="function_open_modal_return(detail)">
+                            <Button v-if="detail?.status == 1" size="sm" @click="function_open_modal_return(detail)">
                               Return
-                            </Button> -->
-                            <div class="items-center mb-4">
-                              <input id="default-checkbox" type="checkbox" :value="detail" v-model="selected_products"
+                            </Button>
+                            <!-- <div class="items-center mb-4"> -->
+                            <!-- <input id="default-checkbox" type="checkbox" :value="detail" v-model="selected_products"
                                 class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">
                               <label for="default-checkbox" class="ml-2 text-xs font-medium text-gray-900">
                                 Return
-                              </label>
-                              <Input type="number" label="Qty" :disabled="validate_input_qty(detail.id)" />
-                            </div>
+                              </label> -->
+                            <!-- <Input type="number" label="Qty" :disabled="validate_input_qty(detail.id)" /> -->
+                            <!-- <ReturnItem /> -->
+                            <!-- </div> -->
 
                           </div>
                           <hr class="col-span-12 w-full">
@@ -454,20 +502,22 @@ const validate_input_qty = (id) => {
     </div>
   </div>
   <ConfirmDialogModal :show="confirmation_modal" @close="confirmation_modal = false" maxWidth="2xl">
-    <template #title>You are going to return a product ({{ form.product.product.name }}). <br> Please input returning
+    <template #title>You are going to return a product ({{ product_object.product.product.name }}). <br> Please input
+      returning
       quantity and reasons...</template>
     <template #content>
-      <Input type="number" label="Quantity" size="md" v-model="form.quantity" />
-      <JetInputError :message="form.errors.quantity" class="mt-2" />
-      <Input type="text" label="Remarks" size="md" v-model="form.remarks" />
-      <JetInputError :message="form.errors.remarks" class="mt-2" />
+      <div class="">
+        <Input type="number" label="Quantity" size="md" v-model="product_object.quantity" />
+        <Input type="text" label="Remarks" size="md" v-model="product_object.remarks" />
+      </div>
+
     </template>
     <template #footer>
       <SecondaryButton @click="confirmation_modal = false" class="mr-2">
         Cancel
       </SecondaryButton>
       <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing"
-        class="bg-green-200 hover:bg-green-400" @click="return_product">
+        class="bg-green-200 hover:bg-green-400" @click="add_return_product">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
           stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round"
