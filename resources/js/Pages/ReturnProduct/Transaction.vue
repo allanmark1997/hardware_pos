@@ -18,7 +18,7 @@ const props = defineProps(["transactions", "date_from", "date_to", "search"]);
     </template>
     <div class="py-">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <TransactionList :transactions="transactions" :date_from="date_from" :date_to="date_to" :search="search" />
+        <!-- <TransactionList :transactions="transactions" :date_from="date_from" :date_to="date_to" :search="search" /> -->
       </div>
     </div>
   </AppLayout>
