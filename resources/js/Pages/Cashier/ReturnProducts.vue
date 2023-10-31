@@ -16,8 +16,9 @@ import { list } from "postcss";
 
 const props = defineProps(["search", "transaction"])
 
-const lists = ref(false);
+const lists = ref(true);
 const confirmation_modal = ref(false);
+const confirmation_modal_return = ref(false);
 const product_object = ref({});
 
 // const selected_products = ref([]);
@@ -28,6 +29,7 @@ const form = useForm({
 })
 
 onMounted(() => {
+  form.reset()
 });
 
 const search_transaction = () => {
@@ -40,8 +42,14 @@ const search_remove = () => {
   form.search = ''
   form.get(route("cashier.index_return"), {
     preserveScroll: true,
-    preserveState: true
+    preserveState: true,
+    onSuccess: () => {
+      form.reset()
+      form.search = ''
+      lists.value = true
+    }
   })
+
 }
 
 const convert_money = (data) => {
@@ -72,7 +80,7 @@ const calculate_overall_sub_total_success = () => {
   let price_discount = 0;
 
   props.transaction?.transaction_details.forEach(detail => {
-    if (detail.status == 1 || detail.status == 2) {
+    if (detail.status == 1 || detail.status == 2 || detail.status == 3) {
       discount_val = detail.sale_discount.discount / 100;
       price_discount = (detail.price.price * discount_val) * detail.quantity;
       subtotal = detail.price.price - price_discount;
@@ -134,12 +142,36 @@ const calculate_customer_change = () => {
   return customerChange;
 }
 
+const calculate_overall_sub_total_return = () => {
+  let subtotal = 0;
+  let overall_subtotal = 0;
+  let discount_val = 0;
+  let price_discount = 0;
+
+  form.products.forEach(detail => {
+    discount_val = detail.product.sale_discount.discount / 100;
+    price_discount = (detail.product.price.price * discount_val) * detail.quantity;
+    subtotal = detail.product.price.price - price_discount;
+    overall_subtotal += subtotal * detail.quantity;
+  });
+
+  return overall_subtotal;
+}
+
+const count_item = (data) => {
+  let total = 0
+  form.products.forEach(detail => {
+    total += detail.quantity;
+  });
+  return total
+}
+
 
 const function_open_modal_return = (product) => {
   product_object.value = {
     product: {},
     quantity: 1,
-    reamrks: ""
+    remarks: ""
   }
   product_object.value.product = product
   confirmation_modal.value = !confirmation_modal.value
@@ -193,6 +225,20 @@ const add_return_product = () => {
 
 }
 
+const open_confirm_modal = () => {
+  if (form.products.length == 0) {
+    toast.error("There's no item/s in the list", {
+      autoClose: 2000,
+      transition: toast.TRANSITIONS.FLIP,
+      position: toast.POSITION.TOP_RIGHT,
+    });
+  }
+  else {
+    confirmation_modal_return.value = !confirmation_modal_return.value
+
+  }
+}
+
 const return_product = () => {
   form.post(route("return.store", { transaction_detail: form.product }), {
     preserveScroll: true,
@@ -215,19 +261,49 @@ const return_product = () => {
 
 }
 
-const validate_input_qty = (id) => {
-  let validate = selected_products.value.find(
-    (product) => product.id == id
-  );
-  console.log(selected_products.value)
-  if (validate == undefined) {
-    return true;
-  }
-  else {
-    return false;
+const remove_return_item = (index) => {
+  if (index > -1) { // only splice array when item is found
+    form.products.splice(index, 1); // 2nd parameter means remove one item only
   }
 }
 
+const add_quantity = (index) => {
+  let total = 0
+  if (index > -1) {
+    console.log(form.products[index].quantity)
+    total = form.products[index].quantity + 1
+    if (total > form.products[index].product.quantity) {
+      toast.error("Looks like you are adding beyond transaction detail, this is invalid.", {
+        autoClose: 2000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+    else {
+      form.products[index].quantity = total
+
+    }
+  }
+}
+
+const deduct_quantity = (index) => {
+  let total = 0
+  if (index > -1) {
+    console.log(form.products[index].quantity)
+    total = form.products[index].quantity - 1
+    if (total < form.products[index].product.quantity || total == 0) {
+      toast.error("Looks like you are deducting below or zero transaction detail, this is invalid.", {
+        autoClose: 2000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+    else {
+      form.products[index].quantity = total
+
+    }
+  }
+}
 
 const view_list = () => {
   lists.value = !lists.value
@@ -273,6 +349,9 @@ provide("form_return", form)
                 <button
                   class="mr-2 bg-orange-500 text-white p-2 pl-6 pr-6 rounded-lg hover:bg-orange-400 hover:text-gray-200"
                   @click="lists = false">Lists</button>
+                <button v-if="lists == false"
+                  class="mr-2 bg-red-500 text-white p-2 pl-6 pr-6 rounded-lg hover:bg-orange-400 hover:text-gray-200"
+                  @click="open_confirm_modal">Confirm</button>
               </div>
 
               <div class="md:flex no-wrap md:-mx-2 ">
@@ -370,27 +449,30 @@ provide("form_return", form)
                       <div class="grid grid-cols-12 gap-2">
                         <p class="col-span-6 text-lg text-green-500 hover:text-gray-600 leading-6 w-full">
                           <span class="font-bold break-words">
-                            Success Grand Total: {{
-                              convert_money(calculate_grandtotal_with_vat())
+                            Return Total with Sale Discount: {{
+                              convert_money(calculate_overall_sub_total_return())
                             }}
                           </span>
                         </p>
-                        <p class="col-span-6 text-lg text-red-500 hover:text-gray-600 leading-6 w-full">
+                        <p class="col-span-6">
                           <span class="font-bold break-words">
-                            Cancelled Grand Total: {{ convert_money(calculate_overall_sub_total_unsuccess()) }}
+                            Item/s:
+                            {{ count_item() }}
                           </span>
                         </p>
+
                       </div>
+
                     </div>
 
                     <div class="text-gray-700 p-2 h-[60vmin] lg:h-[38vmin] sm:h-[145vmin] overflow-x-auto">
                       <div class="grid grid-cols-12 text-sm gap-2 break-words">
-                        <template v-for="(detail, key) in form.products" :key="key">
+                        <template v-for="(product, key) in form.products" :key="key">
                           <div class="col-span-2 flex mx-auto ">
                             <Icon icon="cart" size="sm" class="mx-auto" />
                             <div class="text-xs">
                               <p class="font-semibold text-left">
-                                {{ detail.product?.name }}
+                                {{ product.product?.product?.name }}
                               </p>
                               <span
                                 class="lg:text-[1vmin] md:text-[2.5vmin] sm:text-[1vmin] xs:text-[2vmin] font-normal w-full">
@@ -401,17 +483,7 @@ provide("form_return", form)
                           <div class="col-span-1 text-xs">
                             <div>
                               <p class="font-semibold">
-                                {{ detail.quantity }}
-                              </p>
-                              <span
-                                class="lg:text-[1vmin] md:text-[2.5vmin] sm:text-[1vmin] xs:text-[2vmin] font-normal w-full">
-                                Qty
-                              </span>
-                            </div>
-                            <hr>
-                            <div>
-                              <p class="font-semibold">
-                                {{ detail.sale_discount.discount }}%
+                                {{ product.product.sale_discount.discount }}%
                               </p>
                               <span
                                 class="lg:text-[1vmin] md:text-[2.5vmin] sm:text-[1vmin] xs:text-[2vmin] font-normal w-full">
@@ -422,7 +494,7 @@ provide("form_return", form)
                           <div class="col-span-2 text-xs">
                             <div>
                               <p class="font-semibold">
-                                {{ convert_money(detail.price.price) }}
+                                {{ convert_money(product.product.price.price) }}
                               </p>
                               <span
                                 class="lg:text-[1vmin] md:text-[2.5vmin] sm:text-[1vmin] xs:text-[2vmin]  font-normal w-full">
@@ -432,10 +504,11 @@ provide("form_return", form)
                             <hr>
                             <div>
                               <p class="font-semibold">
-                                {{ convert_money(detail.status == 1 || detail.status == 2 ?
-                                  calculate_discounted_total(detail.price.price,
-                                    detail.sale_discount.discount,
-                                    detail.quantity) : 0) }}
+                                {{ convert_money(product.product.status == 1 || product.product.status == 2 ||
+                                  product.product.status == 3 ?
+                                  calculate_discounted_total(product.product.price.price,
+                                    product.product.sale_discount.discount,
+                                    product.quantity) : 0) }}
                               </p>
                               <span
                                 class="lg:text-[1vmin] md:text-[2.5vmin] sm:text-[1vmin] xs:text-[2vmin]  font-normal w-full">
@@ -443,57 +516,57 @@ provide("form_return", form)
                               </span>
                             </div>
                           </div>
-                          <div class="col-span-3 text-xs">
+                          <div class="col-span-2 text-xs">
                             <p class="font-semibold">
-                              {{ convert_money(detail.status == 1 || detail.status == 2 ?
-                                calculate_subtotal(detail.price.price,
-                                  detail.sale_discount.discount,
-                                  detail.quantity) : detail.price.price * detail.quantity) }}
+                              {{ convert_money(product.product.status == 1 || product.product.status == 2 ||
+                                product.product.status == 3 ?
+                                calculate_subtotal(product.product.price.price,
+                                  product.product.sale_discount.discount,
+                                  product.quantity) : product.product.price.price * product.quantity) }}
                             </p>
                             <span
                               class="lg:text-[1vmin] md:text-[2.5vmin] sm:text-[1vmin] xs:text-[2vmin]  font-normal w-full">
                               Subtotal
                             </span>
                           </div>
+
                           <div class="col-span-2 text-xs">
-                            <p class="font-semibold">
-                              <span class="ml-auto">
-                                <span v-if="detail?.status == 1"
-                                  class="bg-green-500 py-1 px-1 rounded text-white text-xs">
-                                  Success
-                                </span>
-                                <span v-else-if="detail?.status == 2"
-                                  class="bg-orange-500 py-1 px-1 rounded text-white text-xs">
-                                  Pending return
-                                </span>
-                                <span v-else-if="detail?.status == 3"
-                                  class="bg-red-500 py-1 px-1 rounded text-white text-xs">
-                                  Return
-                                </span>
-                                <span v-else class="bg-red-500 py-1 px-1 rounded text-white text-xs">
-                                  Cancelled
-                                </span>
-                              </span>
+                            <p
+                              class="font-normal lg:text-[1vmin] md:text-[2.5vmin] sm:text-[1vmin] xs:text-[2vmin] break-words">
+                              {{ product.remarks }}
                             </p>
                             <span
                               class="lg:text-[1vmin] md:text-[2.5vmin] sm:text-[1vmin] xs:text-[2vmin] font-normal w-full">
-                              Status
+                              Reason
                             </span>
                           </div>
-                          <div class="col-span-2 text-xs">
-                            <Button v-if="detail?.status == 1" size="sm" @click="function_open_modal_return(detail)">
-                              Return
-                            </Button>
-                            <!-- <div class="items-center mb-4"> -->
-                            <!-- <input id="default-checkbox" type="checkbox" :value="detail" v-model="selected_products"
-                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">
-                              <label for="default-checkbox" class="ml-2 text-xs font-medium text-gray-900">
-                                Return
-                              </label> -->
-                            <!-- <Input type="number" label="Qty" :disabled="validate_input_qty(detail.id)" /> -->
-                            <!-- <ReturnItem /> -->
-                            <!-- </div> -->
 
+                          <div class="col-span-2 text-xs">
+                            <div>
+                              <div class="flex item-center text-center ">
+                                <button class="p-1 bg-red-500 text-white rounded-l-lg mr-2 mx-auto"
+                                  @click="deduct_quantity(key)">-</button>
+                                <p class="font-semibold">
+                                  {{ product.quantity }}
+                                </p>
+                                <button class="p-1 bg-green-500 text-white rounded-r-lg ml-2 mx-auto"
+                                  @click="add_quantity(key)">+</button>
+                              </div>
+
+                              <span
+                                class="lg:text-[1vmin] md:text-[2.5vmin] sm:text-[1vmin] xs:text-[2vmin] font-normal w-full">
+                                Qty
+                              </span>
+                            </div>
+
+                          </div>
+                          <div class="col-span-1 text-xs">
+                            <div>
+                              <button @click="remove_return_item(key)"
+                                class="p-1 bg-red-500 text-white rounded-lg mx-auto">
+                                <Icon icon="trash" size="xs" />
+                              </button>
+                            </div>
                           </div>
                           <hr class="col-span-12 w-full">
 
@@ -502,7 +575,7 @@ provide("form_return", form)
                       </div>
                     </div>
                   </div>
-                  <div class="bg-white p-3 shadow-sm rounded-sm h-full" v-if="lists">
+                  <div class="bg-white p-3 shadow-sm rounded-sm h-full" v-if="lists == true">
                     <div class="bg-gray-100 ">
                       <div class="flex items-center space-x-2 font-semibold text-gray-900 leading-8">
                         <span clas="text-green-500">
@@ -579,7 +652,7 @@ provide("form_return", form)
                             <hr>
                             <div>
                               <p class="font-semibold">
-                                {{ convert_money(detail.status == 1 || detail.status == 2 ?
+                                {{ convert_money(detail.status == 1 || detail.status == 2 || detail.status == 3 ?
                                   calculate_discounted_total(detail.price.price,
                                     detail.sale_discount.discount,
                                     detail.quantity) : 0) }}
@@ -592,7 +665,7 @@ provide("form_return", form)
                           </div>
                           <div class="col-span-3 text-xs">
                             <p class="font-semibold">
-                              {{ convert_money(detail.status == 1 || detail.status == 2 ?
+                              {{ convert_money(detail.status == 1 || detail.status == 2 || detail.status == 3 ?
                                 calculate_subtotal(detail.price.price,
                                   detail.sale_discount.discount,
                                   detail.quantity) : detail.price.price * detail.quantity) }}
@@ -614,8 +687,8 @@ provide("form_return", form)
                                   Pending return
                                 </span>
                                 <span v-else-if="detail?.status == 3"
-                                  class="bg-red-500 py-1 px-1 rounded text-white text-xs">
-                                  Return
+                                  class="bg-orange-500 py-1 px-1 rounded text-white text-xs">
+                                  Replaced
                                 </span>
                                 <span v-else class="bg-red-500 py-1 px-1 rounded text-white text-xs">
                                   Cancelled
@@ -672,6 +745,26 @@ provide("form_return", form)
     </template>
     <template #footer>
       <SecondaryButton @click="confirmation_modal = false" class="mr-2">
+        Cancel
+      </SecondaryButton>
+      <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing"
+        class="bg-green-200 hover:bg-green-400" @click="add_return_product">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+        </svg>&nbsp;Proceed
+      </Button>
+    </template>
+  </ConfirmDialogModal>
+  <ConfirmDialogModal :show="confirmation_modal_return" @close="confirmation_modal_return = false" maxWidth="2xl">
+    <template #title>You are going to return a products in the list, please review it first before confirming. <br>
+      <span class="text-xs text-red-400"> Confirmation this action is not reversible.</span>
+    </template>
+    <template #content>
+    </template>
+    <template #footer>
+      <SecondaryButton @click="confirmation_modal_return = false" class="mr-2">
         Cancel
       </SecondaryButton>
       <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing"

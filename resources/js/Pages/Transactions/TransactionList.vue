@@ -120,7 +120,7 @@ const calculate_grand_total = (data, discount, vat, type) => {
     let temp_data_result = 0;
     let temp_data_discounted = 0;
     let convert_discount = element.sale_discount.discount / 100;
-    if (element.status == 1 || element.status == 2) {
+    if (element.status == 1 || element.status == 2 || element.status == 3) {
       for (let index = 0; index < element.quantity; index++) {
         temp_data_discounted = element.price.price * convert_discount;
         temp_data_result += element.price.price - temp_data_discounted;

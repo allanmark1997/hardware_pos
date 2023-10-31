@@ -105,7 +105,7 @@ class TransactionController extends Controller
                     $transaction_detail->quantity,
                     "PHP " . number_format($transaction_detail->price->price),
                     $transaction_detail->sale_discount->discount / 100,
-                    $transaction_detail->status == 1 || $transaction_detail->status == 2 ? "Success" : "Unsuccess",
+                    $transaction_detail->status == 1 || $transaction_detail->status == 2 || $transaction_detail->status == 3 ? "Success" : "Unsuccess",
                     "PHP " . number_format($this->calculate_sub_total_discounted_amount($transaction_detail->price->price, $transaction_detail->sale_discount->discount, $transaction_detail->quantity, $transaction_detail->status), 2),
                     "PHP " . number_format($this->calculate_sub_total_discounted($transaction_detail->price->price, $transaction_detail->sale_discount->discount, $transaction_detail->quantity, $transaction_detail->status), 2),
                     "",
@@ -125,7 +125,7 @@ class TransactionController extends Controller
         $temp_result = 0;
         $temp_discount = $discount / 100;
         $temp_ammount_discounted = $price * $temp_discount;
-        if ($status == 1 || $status == 2) {
+        if ($status == 1 || $status == 2 || $status == 3) {
             for ($i = 0; $i < $quantity; $i++) {
                 $temp_result += $price - $temp_ammount_discounted;
             }
@@ -143,7 +143,7 @@ class TransactionController extends Controller
         $temp_result = 0;
         $temp_discount = $discount / 100;
         $temp_amount_discounted = $price * $temp_discount;
-        if ($status == 1 || $status == 2) {
+        if ($status == 1 || $status == 2 || $status == 3) {
             for ($i = 0; $i < $quantity; $i++) {
                 $temp_result += $temp_amount_discounted;
             }
@@ -172,7 +172,7 @@ class TransactionController extends Controller
         foreach ($details as $key => $detail) {
             $temp_discount = $detail->sale_discount->discount / 100;
 
-            if ($detail->status == 1 || $status == 2) {
+            if ($detail->status == 1 || $status == 2 || $status == 3) {
                 for ($i = 0; $i < $detail->quantity; $i++) {
                     $temp_amount_discounted = $detail->price->price * $temp_discount;
                     $temp_result += $detail->price->price - $temp_amount_discounted;
