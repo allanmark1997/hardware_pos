@@ -8,7 +8,7 @@ import { inject, provide, ref } from "vue";
 const props = defineProps(["transactions", "date_from", "date_to", "search"]);
 </script>
 <template>
-  <AppLayout title="Transaction">
+  <AppLayout title="Return Products">
     <template #header>
       <div class="flex justify-between">
         <h2 class="font-semibold text-lg text-gray-800 leading-tight">
