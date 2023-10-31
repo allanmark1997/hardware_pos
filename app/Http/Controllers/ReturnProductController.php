@@ -49,6 +49,7 @@ class ReturnProductController extends Controller
 
         foreach ($request->products as $key => $product) {
             ReturnProduct::create([
+                "transaction_id" => $product["product"]["transaction_id"],
                 "transaction_detail_id" => $product["product"]["id"],
                 "product_id" => $product["product"]["product"]["id"],
                 "quantity" => $product["quantity"],
