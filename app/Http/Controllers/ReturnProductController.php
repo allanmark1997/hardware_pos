@@ -7,16 +7,31 @@ use App\Models\ReturnProduct;
 use App\Models\TransactionDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 
 class ReturnProductController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        if (Auth::user()->type != 0) {
+            return Redirect::route('cashier.index');
+        } else {
+            $date_from = $request->date_from ?? "";
+            $date_to = $request->date_to ?? "";
+            $search = $request->search ?? "";
+            $transactions = ReturnProduct::paginate(20);
+            return Inertia::render('ReturnProduct/Transaction', [
+                "transactions" => $transactions,
+                "date_from" => $date_from,
+                "date_to" => $date_to,
+                "search" => $search
+            ]);
+        }
     }
 
     /**
