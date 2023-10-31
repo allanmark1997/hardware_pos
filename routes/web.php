@@ -141,7 +141,7 @@ Route::middleware([
 
     Route::prefix('return')->name('return.')->group(function () {
         Route::get('/index', [ReturnProductController::class, 'index'])->name('index');
-        Route::post('/store/{transaction_detail}', [ReturnProductController::class, 'store'])->name('store');
+        Route::post('/store', [ReturnProductController::class, 'store'])->name('store');
     });
 
     Route::prefix('cashier')->name('cashier_stat.')->group(function () {

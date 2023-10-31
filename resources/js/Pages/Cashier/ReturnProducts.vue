@@ -13,6 +13,7 @@ import ReturnItem from "@/Pages/Cashier/ReturnItem.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import { list } from "postcss";
+import BarcodeReturn from "./BarcodeReturn.vue";
 
 const props = defineProps(["search", "transaction"])
 
@@ -29,7 +30,7 @@ const form = useForm({
 })
 
 onMounted(() => {
-  form.reset()
+
 });
 
 const search_transaction = () => {
@@ -240,15 +241,19 @@ const open_confirm_modal = () => {
 }
 
 const return_product = () => {
-  form.post(route("return.store", { transaction_detail: form.product }), {
+  form.post(route("return.store"), {
     preserveScroll: true,
     preserveState: true,
     onSuccess: () => {
-      toast.success("Success! Please wait for the administrator to approved this request or please notify the administrator that you have a request", {
+      toast.success("Success!", {
         autoClose: 2000,
         transition: toast.TRANSITIONS.FLIP,
         position: toast.POSITION.TOP_RIGHT,
       });
+      printReceipt();
+      form.reset()
+      confirmation_modal_return.value = false
+      lists.value = true
     },
     onError: () => {
       toast.error(form.errors.transaction_validation, {
@@ -258,7 +263,6 @@ const return_product = () => {
       });
     }
   });
-
 }
 
 const remove_return_item = (index) => {
@@ -305,10 +309,46 @@ const deduct_quantity = (index) => {
   }
 }
 
-const view_list = () => {
-  lists.value = !lists.value
-}
 provide("form_return", form)
+
+const printReceipt = () => {
+  var iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  document.body.appendChild(iframe);
+
+  // Clone the content of the specified div
+  var content = document.getElementById("toPrint").cloneNode(true);
+
+  // Set the content of the iframe
+  var iframeDocument = iframe.contentWindow.document;
+  iframeDocument.open();
+  iframeDocument.appendChild(content);
+  iframeDocument.close();
+
+  // Print the iframe content
+  iframe.contentWindow.print();
+
+  // Remove the iframe
+  document.body.removeChild(iframe);
+};
+
+const print_checkout = () => {
+  return_product()
+};
+const stringTruncateFromCenter = (str, maxLength) => {
+  const midChar = "…"; // character to insert into the center of the result
+  var left, right;
+
+  if (str.length <= maxLength) return str;
+
+  // length of beginning part
+  left = Math.ceil(maxLength / 2);
+
+  // start index of ending part
+  right = str.length - Math.floor(maxLength / 2) + 1;
+
+  return str.substr(0, left) + midChar + str.substring(right);
+};
 </script>
 <template>
   <Head :title="'Return'" />
@@ -758,17 +798,151 @@ provide("form_return", form)
     </template>
   </ConfirmDialogModal>
   <ConfirmDialogModal :show="confirmation_modal_return" @close="confirmation_modal_return = false" maxWidth="2xl">
-    <template #title>You are going to return a products in the list, please review it first before confirming. <br>
+    <template #title>You are going to return ({{ form.products.length }}) product/s in the list, please review it first
+      before confirming. <br>
       <span class="text-xs text-red-400"> Confirmation this action is not reversible.</span>
     </template>
     <template #content>
+      <div id="toPrint" class="text-justify overflow-auto p-3 relative border bg-white flex-wrap hidden">
+        <table class="">
+          <thead>
+            <tr class="border mb-2">
+              <th>
+                <small>CRISBODS HARDWARE AND CONSTRUCTION SUPPLY</small>
+              </th>
+            </tr>
+            <tr class="border mb-2">
+              <th>
+                <small style="font-size: 10px">Dologon, Busco, Quezon Rd., Maramag, Bukidnon,
+                  8714</small>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="border">
+            <tr>
+              <td>
+                <small>TIN: 487-279-975-00001</small>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <small>Date: {{ moment().format("MMMM Do YYYY") }}</small>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <small>Time: {{ moment().format("h:mm:ss a") }}</small>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <small>Cashier: {{ usePage().props.auth.user.name }}</small>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <small style="font-size: 10px">*************************************</small>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <small>Customer Name:</small>
+                <small>{{ transaction.name }}</small>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <small>Customer Address:</small>
+                <small style="font-size: 10px">{{
+                  transaction.address
+                }}</small>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <small style="font-size: 10px">*************************************</small>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="">
+          <thead>
+            <tr class="border mb-2">
+              <th><small>Retail</small></th>
+              <th><small>QTY</small></th>
+              <!-- <th><small>TOTAL</small></th> -->
+            </tr>
+          </thead>
+          <tbody class="border">
+            <tr v-for="(items, key) in form.products" :key="key">
+              <td>
+                <small>{{ stringTruncateFromCenter(items.product.product.name, 18) }}
+                </small>
+              </td>
+              <td style="width: 20px">
+                <small style="font-size: 10px; word-break: break-all">{{
+                  items.quantity
+                }}</small>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="">
+          <tbody class="border">
+            <tr>
+              <td>
+                <small style="font-size: 10px">*************************************</small>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="">
+          <thead>
+            <tr class="border mb-2">
+              <td>
+                <small>TOTAL AMOUNT:
+                  {{ convert_money(
+                    calculate_overall_sub_total_return()
+                  ) }}</small>
+              </td>
+            </tr>
+          </thead>
+          <tbody class="border">
+            <tr>
+              <td>
+                <small style="font-size: 10px">*************************************</small>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <small> This serve as an OFFICIAL RECEIPT for returning</small>
+                <br>
+                <small>Thank You, Come Again</small>
+                <!-- <svg class="barcode w-[20vmin] h-[10vmin] mx-auto" jsbarcode-format="CODE128" :jsbarcode-value="'12345'"
+                    jsbarcode-textmargin="0" jsbarcode-fontoptions="bold"></svg> -->
+
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <BarcodeReturn :code="transaction.code" style="width:50px; height: 20px;" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <small style="font-size: 10px">*************************************</small>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </template>
     <template #footer>
       <SecondaryButton @click="confirmation_modal_return = false" class="mr-2">
         Cancel
       </SecondaryButton>
       <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing"
-        class="bg-green-200 hover:bg-green-400" @click="add_return_product">
+        class="bg-green-200 hover:bg-green-400" @click="print_checkout">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
           stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round"

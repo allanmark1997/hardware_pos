@@ -132,7 +132,8 @@ const keydownHandler = (event) => {
         console.log("Delete Item ");
         e.preventDefault();
       } else if (
-        e.keyCode == 119 &&
+        e.ctrlKey &&
+        e.keyCode == 68 &&
         router.page.component == "Cashier/Cashier"
       ) {
         if (!SKULookup.value) {
@@ -140,7 +141,9 @@ const keydownHandler = (event) => {
         }
         e.preventDefault();
       } else if (
-        e.keyCode == 120 &&
+        e.ctrlKey &&
+        e.shiftKey &&
+        e.keyCode == 70 &&
         router.page.component == "Cashier/Cashier"
       ) {
         console.log("SKU Look up");
@@ -492,6 +495,7 @@ const check_out = () => {
             transition: toast.TRANSITIONS.FLIP,
             position: toast.POSITION.TOP_RIGHT,
           });
+          printReceipt();
           walk_in.value = false
           form.reset();
           form.products = [];
@@ -589,7 +593,6 @@ const closeModal = () => {
   form.print_show = false;
 };
 const print_checkout = () => {
-  printReceipt();
   form.print_status = true;
   form.print_show = false;
   check_out()

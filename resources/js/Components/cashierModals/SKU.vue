@@ -90,7 +90,7 @@ onMounted(() => {
               <div v-for="items in props.products">
                 <button type="button" v-if="items.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())"
                   @click="showProduct(items)"
-                  class="inline-flex items-center px-1 py-1 text-sm font-medium text-center text-white bg-orange-700 rounded-lg hover:bg-orange-800 focus:ring-4 focus:outline-none focus:ring-orange-300 ">
+                  class="inline-flex items-center px-1 py-1 text-sm font-medium text-center text-white bg-orange-700 rounded-lg hover:bg-orange-800 focus:ring-4 focus:outline-none focus:ring-orange-300 overflow-hidden">
                   <img :src="items.product_image" class="max-w-2xl w-10 rounded-lg  mr-2 object-contain max-h-auto h-10">
                   {{ items.name }}<br>₱ {{ items.current_price.price }}
                 </button>
@@ -131,24 +131,26 @@ onMounted(() => {
               </div>
               <div class="w-full md:w-2/3 bg-white flex flex-col space-y-2 p-3">
                 <div class="flex justify-between item-center">
-                  <p class="text-gray-500 font-medium hidden md:block">Stocks: {{shownProd.quantity}}</p>
+                  <p class="text-gray-500 font-medium hidden md:block">Stocks: {{ shownProd.quantity }}</p>
                   <div class="flex gap-1">
                     <div class="bg-red-500 px-3 py-1 rounded-full text-xs font-medium text-white  ">
-                      {{shownProd.current_discount.discount}}% Discount</div>
+                      {{ shownProd.current_discount.discount }}% Discount</div>
 
                   </div>
-             
+
                 </div>
                 <h3 class="font-black  text-gray-800 md:text-3xl text-xl">{{ shownProd.name }}</h3>
                 <p class="md:text-lg text-gray-500 text-base"><strong>Barcode:{{ shownProd.barcode }}</strong></p>
                 <p class="md:text-lg text-gray-500 text-base"><strong>Details:</strong></p>
-                <p class="md:text-lg text-gray-500 text-base">{{ shownProd.description.details}}</p>
-                <p class="md:text-lg text-orange-800 text-base"><strong>{{shownProd.description.specification.spec_title}}</strong></p>
-               
-                <p v-for="specs in shownProd.description.specification.spec_details"><strong>{{specs.spec_name}}: </strong> {{specs.spec_details}}</p>
-               
-                
-        
+                <p class="md:text-lg text-gray-500 text-base">{{ shownProd.description.details }}</p>
+                <p class="md:text-lg text-orange-800 text-base">
+                  <strong>{{ shownProd.description.specification.spec_title }}</strong></p>
+
+                <p v-for="specs in shownProd.description.specification.spec_details"><strong>{{ specs.spec_name }}:
+                  </strong> {{ specs.spec_details }}</p>
+
+
+
 
                 <div class="text-xl flex justify-end font-black text-gray-800">
                   ₱ {{ shownProd.current_price.price }}

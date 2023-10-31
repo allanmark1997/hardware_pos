@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId("price_id");
             $table->foreignId("sale_discount_id");
             $table->string("remarks");
+            $table->foreignId("proccessed_by");
             $table->timestamps();
             $table->softDeletes();
         });
