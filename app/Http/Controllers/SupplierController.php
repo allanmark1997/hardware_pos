@@ -105,7 +105,7 @@ class SupplierController extends Controller
         $supplier_current = Supplier::where("id", $supplier->id)->first();
         $extracted_path = explode("/", $supplier_current->image);
         $request->validate([
-            'supplier_name' => ['required', 'string', 'max:255', 'unique:suppliers'],
+            'supplier_name' => ['required', 'string', 'max:255'],
             'address' => 'required',
             'mobile_no' => ['required', 'string', 'max:13'],
             // 'image' => ['mimes:jpg,jpeg,png', 'max:1024'],

@@ -1,4 +1,5 @@
 <script setup>
+import Icon from "@/Components/Icon.vue";
 import { Head, Link, router, useForm, usePage } from "@inertiajs/vue3";
 import { ref } from "vue";
 
@@ -9,17 +10,27 @@ const logout_data = useForm({
 const logout = () => {
   logout_data.post(route("logout"));
 };
+const profile = () => {
+  logout_data.get(route('profile.show'));
+};
 </script>
 
 <template>
   <Head :title="'Welcome'" />
   <div
     :class="`relative sm:flex sm:justify-center sm:items-center min-h-screen bg-center bg-no-repeat bg-[url('${props.domain}/storage/logo/wrenches.jpg')] bg-gray-700 bg-blend-multiply`">
-    <div class="sm:fixed sm:top-0 sm:right-0 p-6 text-right z-10">
+    <div class="sm:fixed sm:top-0 sm:right-0 p-6 text-right z-10 gap-4">
+      <Link @click="profile"
+        class="font-semibold text-green-600 hover:text-green-400 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500 cursor-pointer flex">
+      <Icon icon="user" size="sm" />
+      Profile
+      </Link>
       <Link @click="logout"
-        class="font-semibold text-red-600 hover:text-red-400 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500 cursor-pointer">
+        class="font-semibold text-red-600 hover:text-red-400 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500 cursor-pointer flex">
+      <Icon icon="logout" size="md" />
       Logout
       </Link>
+
     </div>
     <div class="max-w-7xl mx-auto p-6 lg:p-8">
       <div class="flex justify-center">

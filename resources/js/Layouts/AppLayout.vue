@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { Head, Link, router } from "@inertiajs/vue3";
+import { Head, Link, router, usePage } from "@inertiajs/vue3";
 import ApplicationMark from "@/Components/ApplicationMark.vue";
 import Banner from "@/Components/Banner.vue";
 import Dropdown from "@/Components/Dropdown.vue";
@@ -79,37 +79,37 @@ const logout = () => {
                   Supplier Management
                 </NavLink>
               </div> -->
-              <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+              <div v-if="usePage().props.auth.user.status == 2" class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                 <NavLink :href="route('products.index')" :active="route().current('products.index')">
                   Products
                 </NavLink>
               </div>
-              <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+              <div v-if="usePage().props.auth.user.status == 2" class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                 <NavLink :href="route('supplier_products.index')" :active="route().current('supplier_products.index')">
                   Supplier Products
                 </NavLink>
               </div>
-              <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+              <div v-if="usePage().props.auth.user.status == 2" class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                 <NavLink :href="route('deliveries.index')" :active="route().current('deliveries.index')">
                   Deliveries
                 </NavLink>
               </div>
-              <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+              <div v-if="usePage().props.auth.user.status == 2" class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                 <NavLink :href="route('deliveries.receive_index')" :active="route().current('deliveries.receive_index')">
                   Accept Deliveries
                 </NavLink>
               </div>
-              <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+              <div v-if="usePage().props.auth.user.status == 2" class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                 <NavLink :href="route('transactions.index')" :active="route().current('transactions.index')">
                   Transactions
                 </NavLink>
               </div>
-              <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+              <div v-if="usePage().props.auth.user.status == 2" class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                 <NavLink :href="route('back_orders.index')" :active="route().current('back_orders.index')">
                   Back Orders
                 </NavLink>
               </div>
-              <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+              <div v-if="usePage().props.auth.user.status == 2" class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                 <NavLink :href="route('return.index')" :active="route().current('return.index')">
                   Return Transactions
                 </NavLink>
@@ -232,21 +232,21 @@ const logout = () => {
                       </div>
                     </DropdownLink>
 
-                    <DropdownLink :href="route('users.index')">
+                    <DropdownLink v-if="usePage().props.auth.user.status == 2" :href="route('users.index')">
                       <div class="flex gap-2">
                         <Icon icon="settings" size="sm" />
                         User Management
                       </div>
                     </DropdownLink>
 
-                    <DropdownLink :href="route('suppliers.index')">
+                    <DropdownLink v-if="usePage().props.auth.user.status == 2" :href="route('suppliers.index')">
                       <div class="flex gap-2">
                         <Icon icon="settings" size="sm" />
                         Supplier Management
                       </div>
                     </DropdownLink>
 
-                    <DropdownLink :href="route('cart.index')">
+                    <DropdownLink v-if="usePage().props.auth.user.status == 2" :href="route('cart.index')">
                       <div class="flex gap-2">
                         <Icon icon="shopping_cart" size="sm" />
                         Cart
