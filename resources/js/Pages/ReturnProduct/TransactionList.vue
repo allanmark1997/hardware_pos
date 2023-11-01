@@ -12,32 +12,34 @@ import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
 const props = defineProps(["transactions", "date_from", "date_to", "search"]);
-
 const date_from = ref(props.date_from);
 const date_to = ref(props.date_to);
 const search = ref(props.search);
+const paginated_transactions = ref({});
+const entries = ref(10);
 
-// onMounted(()=>{
-//   console.log(props.deliveries)
-// })
+function Paginator(items, page, per_page) {
+  var page = page || 1,
+    per_page = per_page || 10,
+    offset = (page - 1) * per_page,
+    paginatedItems = items.slice(offset).slice(0, per_page),
+    total_pages = Math.ceil(items.length / per_page);
+  return {
+    page: page,
+    per_page: per_page,
+    prev_page: page - 1 ? page - 1 : null,
+    next_page: total_pages > page ? page + 1 : null,
+    total: items.length,
+    total_pages: total_pages,
+    data: paginatedItems,
+  };
+}
+console.log(props.transactions);
 
-const notify = () => {
-  toast("Default Notification !");
-
-  toast.success("Success Notification !", {
-    position: toast.POSITION.TOP_CENTER,
-  });
-
-  toast.error("Error Notification !", {
-    position: toast.POSITION.TOP_LEFT,
-  });
-
-  toast.success("FLIP", {
-    autoClose: false,
-    transition: toast.TRANSITIONS.FLIP,
-    position: toast.POSITION.BOTTOM_RIGHT,
-  });
-};
+onMounted(() => {
+  paginated_transactions.value = Paginator(props.transactions, 1, entries.value);
+  console.log(paginated_transactions.value);
+});
 
 const date_time = (data) => {
   return moment(data).format("MM/DD/YYYY, h:mm:ss a");
@@ -54,7 +56,8 @@ const convert_money = (data) => {
 
 const function_filter_range = () => {
   router.get(
-    route("transactions.index", {
+    route("return.index", {
+      search: search.value,
       date_from: date_from.value,
       date_to: date_to.value,
     })
@@ -63,7 +66,7 @@ const function_filter_range = () => {
 
 const search_ = () => {
   router.get(
-    route("transactions.index", {
+    route("return.index", {
       search: search.value,
       date_from: date_from.value,
       date_to: date_to.value,
@@ -73,7 +76,7 @@ const search_ = () => {
 
 const function_filter_remove = () => {
   router.get(
-    route("transactions.index", {
+    route("return.index", {
       date_from: null,
       date_to: null,
       search: null,
@@ -84,11 +87,11 @@ const function_filter_remove = () => {
 const calculate_item_discount = (data) => {
   let temp_data_discounted = 0;
   let convert_discount = data.sale_discount.discount / 100;
-  if (data.status == 1) {
-    for (let index = 0; index < data.quantity; index++) {
-      temp_data_discounted += data.price.price * convert_discount;
-    }
+
+  for (let index = 0; index < data.quantity; index++) {
+    temp_data_discounted += data.price.price * convert_discount;
   }
+
   return temp_data_discounted;
 };
 
@@ -96,13 +99,9 @@ const calculate_sub_total = (data) => {
   let temp_data_result = 0;
   let temp_data_discounted = 0;
   let convert_discount = data.sale_discount.discount / 100;
-  if (data.status == 1 || data.status == 2) {
-    for (let index = 0; index < data.quantity; index++) {
-      temp_data_discounted = data.price.price * convert_discount;
-      temp_data_result += data.price.price - temp_data_discounted;
-    }
-  } else {
-    temp_data_result += data.price.price * data.quantity;
+  for (let index = 0; index < data.quantity; index++) {
+    temp_data_discounted = data.price.price * convert_discount;
+    temp_data_result += data.price.price - temp_data_discounted;
   }
 
   return temp_data_result;
@@ -173,12 +172,12 @@ const calculate_grand_total_unsuccess = (data) => {
         </button>
       </div>
     </div>
-    <a :href="route('transactions.export', {
+    <!-- <a :href="route('transactions.export', {
       date_from: date_from,
       date_to: date_to,
       search: search,
     })
-      " class="bg-green-400 hover:bg-green-600 hover:text-white rounded-lg my-auto p-2">Export Transaction</a>
+      " class="bg-green-400 hover:bg-green-600 hover:text-white rounded-lg my-auto p-2">Export Transaction</a> -->
   </div>
 
   <section class="text-gray-600 bg-white rounded-lg py-5 px-3 mb-5 mt-2">
@@ -188,84 +187,13 @@ const calculate_grand_total_unsuccess = (data) => {
           <thead class="text-xs text-white uppercase bg-yellow-500">
             <tr>
               <th scope="col" class="px-6 py-3">Transaction ID</th>
-              <th scope="col" class="px-6 py-3">Processed by</th>
-              <th scope="col" class="px-6 py-3">Status</th>
-              <th scope="col" class="px-6 py-3">
-                Payment Method & Customer Type
-              </th>
-              <th scope="col" class="px-6 py-3">Tax & Discount</th>
               <th scope="col" class="px-6 py-3">Products</th>
-              <th scope="col" class="px-6 py-3">Total Discount & VAT</th>
-              <th scope="col" class="px-6 py-3">Total Paid</th>
-              <th scope="col" class="px-6 py-3">Customer Cash</th>
-              <th scope="col" class="px-6 py-3">Customer Change</th>
-              <th scope="col" class="px-6 py-3">Total Unsuccess</th>
-              <th scope="col" class="px-6 py-3">Created at</th>
             </tr>
           </thead>
           <tbody>
-            <template v-for="(transaction, key) in transactions.data" :key="key">
+            <template v-for="(transaction, key) in paginated_transactions.data" :key="key">
               <tr class="bg-white border-">
-                <td class="px-6 py-4">{{ transaction.id }}</td>
-                <td class="px-6 py-4">
-                  <small class="flex gap-2">
-                    <img class="h-8 w-8 rounded-full object-cover" :src="transaction.accommodate_by.profile_photo_url"
-                      :alt="transaction.accommodate_by.name" />
-                    {{ transaction.accommodate_by?.name ?? "Pending" }}
-                  </small>
-                </td>
-                <td class="px-6 py-4">
-                  <div v-if="transaction.status == 1" class="flex gap-1">
-                    <Icon icon="check" size="sm" />
-                    <span class="bg-green-400 rounded-md p-1 text-white">
-                      Success
-                    </span>
-                  </div>
-                  <div v-else class="flex gap-1">
-                    <Icon icon="wrong" size="xs" />
-                    <span class="bg-orange-400 rounded-md p-1 text-white">
-                      Unsuccess
-                    </span>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="flex p-1 w-[8vmin]">
-                    <div v-if="transaction.customer_type == 0" class="flex gap-1">
-                      <Icon icon="user" size="md" />
-
-                      <small class="bg-green-400 rounded-md p-1 text-white w-full">
-                        Walk-in
-                      </small>
-                    </div>
-                    <div v-else class="flex gap-1">
-                      <Icon icon="user" size="md" />
-
-                      <small class="bg-orange-400 rounded-md p-1 text-white">
-                        Regular
-                      </small>
-                    </div>
-                  </div>
-                  <div class="flex">
-                    <small class="flex gap-1" v-if="transaction.payment_method == 0">
-                      <Icon icon="cash" size="sm" /> Cash
-                    </small>
-                    <small v-else>Other</small>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="flex rounded-lg bg-red-400 p-[3px] text-white">
-                    <Icon icon="tax" size="sm" />
-                    <small>VAT: </small>
-                    <small> {{ transaction.tax?.tax }}% </small>
-                  </div>
-                  <div class="flex rounded-lg bg-orange-400 p-[3px] text-white mt-1">
-                    <Icon icon="wheelchair" size="sm" />
-                    <small>SD: </small>
-                    <small>{{
-                      transaction.special_discount?.discount ?? "0"
-                    }}%</small>
-                  </div>
-                </td>
+                <td class="px-6 py-4">{{ transaction.transaction_id }}</td>
                 <td scope="row" class="px-2 py-1 text-gray-900 whitespace-nowrap">
                   <table class="w-full text-xs text-left text-gray-500">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-100">
@@ -274,15 +202,13 @@ const calculate_grand_total_unsuccess = (data) => {
                         <th scope="col" class="px-1 py-1">No.</th>
                         <th scope="col" class="px-1 py-1">Price</th>
                         <th scope="col" class="px-1 py-1">Discount %</th>
-                        <th scope="col" class="px-1 py-1">Status</th>
                         <th scope="col" class="px-1 py-1">Total Discount</th>
                         <th scope="col" class="px-1 py-1">Sub-total</th>
+                        <th scope="col" class="px-1 py-1">Created Date</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <template v-for="(
-                          transaction_detail, key2
-                        ) in transaction.transaction_details" :key="key2">
+                      <template v-for="(transaction_detail, key2) in transaction.data" :key="key2">
                         <tr class="bg-white border-">
                           <td class="px-1 py-1 flex">
                             <Icon icon="shopping_cart" size="xs" />
@@ -298,24 +224,6 @@ const calculate_grand_total_unsuccess = (data) => {
                             {{ transaction_detail.sale_discount.discount }}%
                           </td>
                           <td class="px-1 py-1">
-                            <small v-if="transaction_detail.status == 0"
-                              class="bg-orange-400 rounded-sm p-[1px] text-white">
-                              Unsuccess
-                            </small>
-                            <small v-else-if="transaction_detail.status == 1"
-                              class="bg-green-400 rounded-sm p-[1px] text-white">
-                              Success
-                            </small>
-                            <small v-else-if="transaction_detail.status == 2"
-                              class="bg-orange-400 rounded-sm p-[1px] text-white">
-                              Pending Return
-                            </small>
-                            <small v-else-if="transaction_detail.status == 3"
-                              class="bg-red-400 rounded-sm p-[1px] text-white">
-                              Returned
-                            </small>
-                          </td>
-                          <td class="px-1 py-1">
                             <small>{{
                               convert_money(
                                 calculate_item_discount(transaction_detail)
@@ -329,94 +237,17 @@ const calculate_grand_total_unsuccess = (data) => {
                               )
                             }}</small>
                           </td>
+                          <td class="px-1 py-1">
+                            <small>{{
+                              date_time(
+                                transaction_detail.created_at
+                              )
+                            }}</small>
+                          </td>
                         </tr>
                       </template>
                     </tbody>
                   </table>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="flex rounded-lg bg-red-400 p-[3px] text-white">
-                    <small class="flex">
-                      <Icon icon="tax" size="sm" />VAT:
-                    </small>
-                    <small>
-                      {{
-                        convert_money(
-                          calculate_grand_total(
-                            transaction.transaction_details,
-                            transaction.special_discount?.discount ?? 0,
-                            transaction.tax?.tax ?? 0,
-                            1
-                          )
-                        )
-                      }}
-                    </small>
-                  </div>
-                  <div class="flex rounded-lg bg-orange-400 p-[3px] text-white mt-1">
-                    <small class="flex">
-                      <Icon icon="wheelchair" size="sm" />SD:
-                    </small>
-                    <small>{{
-                      convert_money(
-                        calculate_grand_total(
-                          transaction.transaction_details,
-                          transaction.special_discount?.discount ?? 0,
-                          transaction.tax?.tax ?? 0,
-                          2
-                        )
-                      )
-                    }}</small>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  {{
-                    convert_money(
-                      calculate_grand_total(
-                        transaction.transaction_details,
-                        transaction.special_discount?.discount ?? 0,
-                        transaction.tax?.tax ?? 0,
-                        0
-                      )
-                    )
-                  }}
-                </td>
-                <td class="px-6 py-4">
-                  {{
-                    convert_money(
-                      transaction.cash
-                    )
-                  }}
-                </td>
-                <td class="px-6 py-4">
-                  {{
-                    convert_money(
-                      transaction.cash
-                      -
-                      calculate_grand_total(
-                        transaction.transaction_details,
-                        transaction.special_discount?.discount ?? 0,
-                        transaction.tax?.tax ?? 0,
-                        0
-                      )
-                    )
-                  }}
-                </td>
-                <td class="px-6 py-4">
-                  {{
-                    convert_money(
-                      calculate_grand_total_unsuccess(
-                        transaction.transaction_details,
-                        transaction.special_discount?.discount ?? 0,
-                        transaction.tax?.tax ?? 0
-                      )
-                    )
-                  }}
-                </td>
-                <td class="px-6 py-4 flex gap-2">
-                  <Icon icon="calendar" size="md" />
-                  <small>
-                    {{ date_time(transaction.created_at) }}
-                  </small>
                 </td>
               </tr>
             </template>
@@ -424,9 +255,55 @@ const calculate_grand_total_unsuccess = (data) => {
         </table>
       </div>
       <div class="flex items-center justify-between">
-        <Pagination2 :links="props.transactions.links" :date_from="date_from" :date_to="date_to" :search="search" />
-        <p class="mt-6 text-sm text-gray-500">
-          Showing {{ transactions.data.length }} Transactions
+        <!-- <Pagination2 :links="props.transactions.links" :date_from="date_from" :date_to="date_to" :search="search" /> -->
+        <nav class="w-full">
+          <ul class="inline-flex -space-x-px text-sm">
+            <li>
+              <button @click="paginated_transactions = Paginator(props.transactions, paginated_transactions.prev_page, 1)"
+                class="flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700"
+                :disabled="paginated_transactions.prev_page == null"
+                :class="paginated_transactions.prev_page == null ? 'cursor-not-allowed text-gray-100' : ''">
+                Previous
+              </button>
+            </li>
+            <template v-for="(page_number, key) in 10" :key="key">
+              <li>
+                <a v-if="paginated_transactions.page != page_number" href="#"
+                  @click="paginated_transactions = Paginator(props.transactions, page_number, entries)" class=" flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border
+                border-gray-300 hover:bg-gray-100 hover:text-gray-700">{{ page_number }}</a>
+                <a v-else href="#" @click="paginated_transactions = Paginator(props.transactions, page_number, entries)"
+                  class="flex items-center justify-center px-3 h-8 text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 ">{{
+                    page_number }} </a>
+              </li>
+            </template>
+            <li>
+              <button
+                @click="paginated_transactions = Paginator(props.transactions, paginated_transactions.next_page, entries)"
+                :disabled="paginated_transactions.next_page == null"
+                class="flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700"
+                :class="paginated_transactions.next_page == null ? 'cursor-not-allowed text-gray-100' : ''">
+                Next
+              </button>
+            </li>
+          </ul>
+        </nav>
+        <p class="mt-6 text-sm text-gray-500 flex justify-between gap-4">
+          <Input type="number" label="Input showing" v-model="entries"
+            @keyup.enter=" paginated_transactions = Paginator(props.transactions, 1, entries)" />
+          <span class="text-sm text-gray-700 flex mt-4">
+            Page: {{ paginated_transactions.page }}
+          </span>
+          <span class="text-sm text-gray-700 mt-4">
+            Showing
+            <span class="font-semibold text-gray-900">
+              {{ paginated_transactions.per_page }}</span>
+            of
+            <span class="font-semibold text-gray-900">{{
+              paginated_transactions.total
+            }}</span>
+            Entries
+          </span>
+          <!-- Showing {{ transactions.data.length }} Transactions -->
         </p>
       </div>
     </div>

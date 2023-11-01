@@ -185,7 +185,7 @@ const add_return_product = () => {
   console.log(find_product)
   if (find_product == undefined) {
     if (product_object.value.quantity > product_object.value.product.quantity) {
-      toast.error("You inputed quantity which is beyond in the transaction details. This is invalid", {
+      toast.error("You're inputed quantity which is beyond in the transaction details. This is invalid", {
         autoClose: 2000,
         transition: toast.TRANSITIONS.FLIP,
         position: toast.POSITION.TOP_RIGHT,
@@ -295,7 +295,7 @@ const deduct_quantity = (index) => {
   if (index > -1) {
     console.log(form.products[index].quantity)
     total = form.products[index].quantity - 1
-    if (total < form.products[index].product.quantity || total == 0) {
+    if (total <= 0) {
       toast.error("Looks like you are deducting below or zero transaction detail, this is invalid.", {
         autoClose: 2000,
         transition: toast.TRANSITIONS.FLIP,
