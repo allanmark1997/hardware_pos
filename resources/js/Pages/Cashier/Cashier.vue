@@ -611,6 +611,31 @@ const stringTruncateFromCenter = (str, maxLength) => {
 
   return str.substr(0, left) + midChar + str.substring(right);
 };
+
+const remove_scan_item = (index) => {
+  if (index > -1) { // only splice array when item is found
+    form.products.splice(index, 1); // 2nd parameter means remove one item only
+  }
+}
+const add_scan_item = (index) => {
+  if (index > -1) { // only splice array when item is found
+    form.products[index].cashier_quantity += 1; // 2nd parameter means remove one item only
+  }
+}
+const deduct_scan_item = (index) => {
+  if (index > -1) { // only splice array when item is found
+    if (form.products[index].cashier_quantity == 1) {
+      toast.error("Selected item cannot be zero!", {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+    else {
+      form.products[index].cashier_quantity -= 1; // 2nd parameter means remove one item only
+    }
+  }
+}
 </script>
 <template>
   <Head :title="'Cashier'" />
@@ -800,9 +825,11 @@ const stringTruncateFromCenter = (str, maxLength) => {
                         {{ convert_money(items.current_price.price) }}
                       </div>
                       <div class="inline-flex items-center text-base font-semibold text-gray-900">
-                        <a class="bg-red-400 text-white hover:bg-red-500 cursor-pointer rounded-l-lg p-1 mr-2">-</a>
+                        <a class="bg-red-400 text-white hover:bg-red-500 cursor-pointer rounded-l-lg p-1 mr-2"
+                          @click="deduct_scan_item(key)">-</a>
                         <small>x{{ items.cashier_quantity }}</small>
-                        <a class="bg-green-400 text-white hover:bg-green-500 cursor-pointer rounded-r-lg p-1 ml-2">+</a>
+                        <a class="bg-green-400 text-white hover:bg-green-500 cursor-pointer rounded-r-lg p-1 ml-2"
+                          @click="add_scan_item(key)">+</a>
                       </div>
                       <div class="inline-flex items-center text-base font-semibold text-gray-900 text-xs">
                         {{
@@ -816,7 +843,7 @@ const stringTruncateFromCenter = (str, maxLength) => {
                       </div>
                       <div
                         class="inline-flex items-center text-base font-semibold text-gray-900 text-xs bg-red-400 text-white p-2 rounded-lg hover:bg-red-500">
-                        <a class="cursor-pointer">
+                        <a class="cursor-pointer" @click="remove_scan_item(key)">
                           <Icon icon="trash" size="xs" />
                         </a>
                       </div>
