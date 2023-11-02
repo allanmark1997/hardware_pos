@@ -785,7 +785,7 @@ const stringTruncateFromCenter = (str, maxLength) => {
 
             <div v-else class="w-full">
               <div class="flow-root max-h-[50vmin] overflow-auto p-2" id="addedCartScrll">
-                <ul role="addedlist" v-for="items in form.products" class="divide-y divide-gray-200">
+                <ul role="addedlist" v-for="(items, key) in form.products" :key="key" class="divide-y divide-gray-200">
                   <li class="py-3 sm:py-4">
                     <div class="flex items-center space-x-4">
                       <div class="flex-shrink-0">
@@ -796,13 +796,15 @@ const stringTruncateFromCenter = (str, maxLength) => {
                           {{ items.name }}
                         </p>
                       </div>
-                      <div class="inline-flex items-center text-base font-semibold text-gray-900">
+                      <div class="inline-flex items-center text-base font-semibold text-gray-900 text-xs">
                         {{ convert_money(items.current_price.price) }}
                       </div>
                       <div class="inline-flex items-center text-base font-semibold text-gray-900">
+                        <a class="bg-red-400 text-white hover:bg-red-500 cursor-pointer rounded-l-lg p-1 mr-2">-</a>
                         <small>x{{ items.cashier_quantity }}</small>
+                        <a class="bg-green-400 text-white hover:bg-green-500 cursor-pointer rounded-r-lg p-1 ml-2">+</a>
                       </div>
-                      <div class="inline-flex items-center text-base font-semibold text-gray-900">
+                      <div class="inline-flex items-center text-base font-semibold text-gray-900 text-xs">
                         {{
                           convert_money(
                             applyDiscount(
@@ -811,6 +813,12 @@ const stringTruncateFromCenter = (str, maxLength) => {
                             ).discountedPrice * items.cashier_quantity
                           )
                         }}
+                      </div>
+                      <div
+                        class="inline-flex items-center text-base font-semibold text-gray-900 text-xs bg-red-400 text-white p-2 rounded-lg hover:bg-red-500">
+                        <a class="cursor-pointer">
+                          <Icon icon="trash" size="xs" />
+                        </a>
                       </div>
                     </div>
                   </li>
