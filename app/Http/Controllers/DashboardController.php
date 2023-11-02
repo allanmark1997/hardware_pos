@@ -93,9 +93,12 @@ class DashboardController extends Controller
             $week_day_with_quantity_price_total_data_object = [];
             $week_day_with_quantity_price_total_data_pie = [];
             $grouped_weekly_sales_raw = $sale_week->groupBy("product.name");
-            for ($i = $week_start_day; $i <= $week_end_day; $i++) {
-                $temp_week_by_day[] = (int)$i;
+            $timestamp = strtotime('next Sunday');
+            for ($i = 1; $i <= 7; $i++) {
+                $temp_week_by_day[] = strftime('%A', $timestamp);
+                $timestamp = strtotime('+1 day', $timestamp);
             }
+
             foreach ($temp_week_by_day as $day_index => $day) {
                 foreach ($grouped_weekly_sales_raw as $product_name => $group_product) {
                     $week_day_data[$product_name]["name"] = $product_name;
@@ -106,7 +109,7 @@ class DashboardController extends Controller
                     $week_day_data[$product_name]["data"][$day]["total"] = 0;
                     $week_day_quantity = 0;
                     foreach ($group_product as $product_index => $product) {
-                        if ($day == Carbon::parse($product->created_at)->format("d")) {
+                        if ($day == Carbon::parse($product->created_at)->format("l")) {
                             $week_day_quantity += $product->quantity;
 
                             $week_day_data[$product_name]["data"][$day] = array("quantity" => $week_day_quantity);
@@ -134,7 +137,6 @@ class DashboardController extends Controller
                 }
                 $week_counter++;
             }
-
             foreach ($week_day_with_quantity_price_total_data as $key => $value) {
                 $week_day_with_quantity_price_total_data_object[] = (object) array("name" => $value["name"],  "data" => (object) $value["data"], "data_transparency" => $value["data_transparency"], "total_quantity" => $value["total_quantity"], "grand_total_sale" => $value["week_grand_total_sale"]);
             }
