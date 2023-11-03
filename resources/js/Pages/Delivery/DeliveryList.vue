@@ -47,9 +47,18 @@ const convert_money = (data) => {
   const formatter = new Intl.NumberFormat("en-PH", {
     style: "currency",
     currency: "PHP",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 20,
+    minimumSignificantDigits: 1,
+    maximumSignificantDigits: 20
   });
-  formatter.format(data);
-  return formatter.format(data);
+  let total = formatter.format(data);
+  let split_data = total.split(".")
+  let decimal = String(split_data[1])
+  let slice_decimal = decimal.slice(0, 2)
+  let validate_decimal = slice_decimal == "un" ? String("00") : slice_decimal
+  let final_data = String(split_data[0]) + "." + validate_decimal
+  return final_data;
 };
 
 const function_filter_range = () => {
@@ -107,52 +116,28 @@ const count_total_unsuccess = (data) => {
       <div class="flex gap-2">
         <div class="flex">
           <span class="text-md mt-2 mr-2">From</span>
-          <TextInput
-            id="date_from"
-            v-model="date_from"
-            type="date"
-            class="mt-1 block w-full"
-          />
+          <TextInput id="date_from" v-model="date_from" type="date" class="mt-1 block w-full" />
         </div>
         <div class="flex">
           <span class="text-md mt-2 mr-2">To</span>
 
-          <TextInput
-            id="date_to"
-            v-model="date_to"
-            type="date"
-            class="mt-1 block w-full"
-            @keyup.enter="function_filter_range"
-          />
+          <TextInput id="date_to" v-model="date_to" type="date" class="mt-1 block w-full"
+            @keyup.enter="function_filter_range" />
         </div>
         <div class="flex">
-          <Input
-            v-model="search"
-            class="rounded-lg w-[30vmin]"
-            type="text"
-            label="Search delivery"
-            @keyup.enter="search_"
-          />
+          <Input v-model="search" class="rounded-lg w-[30vmin]" type="text" label="Search delivery"
+            @keyup.enter="search_" />
         </div>
-        <button
-          v-if="date_from || date_to || search"
-          class="h-10 my-auto mt-5"
-          @click="function_filter_remove"
-        >
+        <button v-if="date_from || date_to || search" class="h-10 my-auto mt-5" @click="function_filter_remove">
           <Icon icon="close_icon" size="sm" />
         </button>
       </div>
     </div>
-    <a
-      :href="
-        route('deliveries.export', {
-          date_from: date_from,
-          date_to: date_to,
-        })
-      "
-      class="bg-green-400 hover:bg-green-600 hover:text-white rounded-lg my-auto p-2"
-      >Export Delivery</a
-    >
+    <a :href="route('deliveries.export', {
+      date_from: date_from,
+      date_to: date_to,
+    })
+      " class="bg-green-400 hover:bg-green-600 hover:text-white rounded-lg my-auto p-2">Export Delivery</a>
   </div>
 
   <section class="text-gray-600 bg-white rounded-lg py-5 px-3 mb-5 mt-2">
@@ -175,42 +160,27 @@ const count_total_unsuccess = (data) => {
             <template v-for="(delivery, key) in deliveries.data" :key="key">
               <tr class="bg-white border-">
                 <td class="px-6 py-4">
-                  <img
-                    class="h-8 w-8 rounded-full object-cover"
-                    :src="delivery.supplier.image"
-                    :alt="delivery.supplier.supplier_name"
-                  />
+                  <img class="h-8 w-8 rounded-full object-cover" :src="delivery.supplier.image"
+                    :alt="delivery.supplier.supplier_name" />
                   {{ delivery.supplier.supplier_name }}
                 </td>
                 <td class="px-6 py-4">
-                  <img
-                    class="h-8 w-8 rounded-full object-cover"
-                    :src="delivery.user_receiver.profile_photo_url"
-                    :alt="delivery.user_receiver.supplier_name"
-                  />
+                  <img class="h-8 w-8 rounded-full object-cover" :src="delivery.user_receiver.profile_photo_url"
+                    :alt="delivery.user_receiver.supplier_name" />
                   {{ delivery.user_receiver?.name ?? "Pending" }}
                 </td>
                 <td class="px-6 py-4">
-                  <span
-                    v-if="delivery.status == 1"
-                    class="bg-green-400 rounded-md p-1 text-white flex"
-                  >
+                  <span v-if="delivery.status == 1" class="bg-green-400 rounded-md p-1 text-white flex">
                     <Icon icon="check" size="sm" />
                     Success
                   </span>
-                  <span
-                    v-else
-                    class="bg-red-400 rounded-md p-1 text-white flex"
-                  >
+                  <span v-else class="bg-red-400 rounded-md p-1 text-white flex">
                     <Icon icon="wrong" size="sm" />
                     Unuccess
                   </span>
                 </td>
 
-                <td
-                  scope="row"
-                  class="px-2 py-1 text-gray-900 whitespace-nowrap"
-                >
+                <td scope="row" class="px-2 py-1 text-gray-900 whitespace-nowrap">
                   <table class="w-full text-xs text-left text-gray-500">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-100">
                       <tr>
@@ -222,10 +192,7 @@ const count_total_unsuccess = (data) => {
                       </tr>
                     </thead>
                     <tbody>
-                      <template
-                        v-for="(delivery_detail, key2) in delivery.details"
-                        :key="key2"
-                      >
+                      <template v-for="(delivery_detail, key2) in delivery.details" :key="key2">
                         <tr class="bg-white border-">
                           <td class="px-1 py-1 flex pt-2 font-bold">
                             <Icon icon="shopping_cart" size="xs" />
@@ -239,17 +206,12 @@ const count_total_unsuccess = (data) => {
                             {{ convert_money(delivery_detail.price.price) }}
                           </td>
                           <td class="px-1 py-1">
-                            <small
-                              v-if="delivery_detail.status == 1"
-                              class="bg-green-400 rounded-md p-1 text-white flex gap-1"
-                            >
+                            <small v-if="delivery_detail.status == 1"
+                              class="bg-green-400 rounded-md p-1 text-white flex gap-1">
                               <Icon icon="check" size="sm" />
                               Success
                             </small>
-                            <small
-                              v-else
-                              class="bg-red-400 rounded-md p-1 text-white flex gap-1"
-                            >
+                            <small v-else class="bg-red-400 rounded-md p-1 text-white flex gap-1">
                               <Icon icon="wrong" size="xs" />
                               Unsuccess
                             </small>
@@ -258,7 +220,7 @@ const count_total_unsuccess = (data) => {
                             <small>{{
                               convert_money(
                                 delivery_detail.quantity *
-                                  delivery_detail.price.price
+                                delivery_detail.price.price
                               )
                             }}</small>
                           </td>
@@ -284,12 +246,7 @@ const count_total_unsuccess = (data) => {
         </table>
       </div>
       <div class="flex items-center justify-between">
-        <Pagination2
-          :links="props.deliveries.links"
-          :date_from="date_from"
-          :date_to="date_to"
-          :search="search"
-        />
+        <Pagination2 :links="props.deliveries.links" :date_from="date_from" :date_to="date_to" :search="search" />
         <p class="mt-6 text-sm text-gray-500">
           Showing {{ deliveries.data.length }} Deliveries
         </p>

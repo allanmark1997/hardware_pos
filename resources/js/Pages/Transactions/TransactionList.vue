@@ -47,9 +47,18 @@ const convert_money = (data) => {
   const formatter = new Intl.NumberFormat("en-PH", {
     style: "currency",
     currency: "PHP",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 20,
+    minimumSignificantDigits: 1,
+    maximumSignificantDigits: 20
   });
-  formatter.format(data);
-  return formatter.format(data);
+  let total = formatter.format(data);
+  let split_data = total.split(".")
+  let decimal = String(split_data[1])
+  let slice_decimal = decimal.slice(0, 2)
+  let validate_decimal = slice_decimal == "un" ? String("00") : slice_decimal
+  let final_data = String(split_data[0]) + "." + validate_decimal
+  return final_data;
 };
 
 const function_filter_range = () => {

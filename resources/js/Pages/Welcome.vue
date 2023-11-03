@@ -15,7 +15,7 @@ defineProps({
     <div class="relative sm:flex sm:justify-center sm:items-center min-h-screen   selection:text-white color-change-2x">
 
 
-        <div class="max-w-7xl mx-auto p-6 lg:p-8" >
+        <div class="max-w-7xl mx-auto p-6 lg:p-8">
             <div class="flex justify-center mt-16 px-6 sm:items-center sm:justify-between">
                 <div class="text-center text-sm text-gray-500  sm:text-left">
                     <div class="flex items-center gap-4">
@@ -31,8 +31,7 @@ defineProps({
                                         We offer the best selection of high-quality tools at affordable prices. From power
                                         tools to hand tools, we have everything you need for your projects. Our
                                         knowledgeable staff is here to assist you in finding the right tool, and we also
-                                        offer repair and maintenance services. Shop online for convenience and enjoy fast
-                                        shipping. Visit us today for all your hardware needs!
+                                        offer repair and maintenance services. Visit us today for all your hardware needs!
                                     </p>
                                     <a type="button" :href="route('login')"
                                         class="text-gray-900 bg-[#F7BE38] hover:bg-[#F7BE38]/90 focus:ring-4 focus:outline-none focus:ring-[#F7BE38]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 mb-2">
@@ -70,8 +69,8 @@ defineProps({
 
 <style >
 .color-change-2x {
-	-webkit-animation: color-change-2x 2s linear infinite alternate both;
-	        animation: color-change-2x 2s linear infinite alternate both;
+    -webkit-animation: color-change-2x 2s linear infinite alternate both;
+    animation: color-change-2x 2s linear infinite alternate both;
 }
 
 /* ----------------------------------------------
@@ -86,21 +85,23 @@ defineProps({
  * animation color-change-2x
  * ----------------------------------------
  */
- @-webkit-keyframes color-change-2x {
-  0% {
-    background: white;
-  }
-  100% {
-    background: #ffd82c36;
-  }
-}
-@keyframes color-change-2x {
-  0% {
-    background: white;
-  }
-  100% {
-    background: #ffd82c36;
-  }
+@-webkit-keyframes color-change-2x {
+    0% {
+        background: white;
+    }
+
+    100% {
+        background: #ffd82c36;
+    }
 }
 
+@keyframes color-change-2x {
+    0% {
+        background: white;
+    }
+
+    100% {
+        background: #ffd82c36;
+    }
+}
 </style>

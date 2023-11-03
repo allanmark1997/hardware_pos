@@ -36,9 +36,18 @@ const convert_money = (data) => {
   const formatter = new Intl.NumberFormat("en-PH", {
     style: "currency",
     currency: "PHP",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 20,
+    minimumSignificantDigits: 1,
+    maximumSignificantDigits: 20
   });
-  formatter.format(data);
-  return formatter.format(data);
+  let total = formatter.format(data);
+  let split_data = total.split(".")
+  let decimal = String(split_data[1])
+  let slice_decimal = decimal.slice(0, 2)
+  let validate_decimal = slice_decimal == "un" ? String("00") : slice_decimal
+  let final_data = String(split_data[0]) + "." + validate_decimal
+  return final_data;
 };
 
 const function_filter_range = () => {
@@ -155,38 +164,19 @@ const authorize = () => {
       <div class="flex gap-2">
         <div class="flex">
           <span class="text-md mt-2 mr-2">From</span>
-          <TextInput
-            id="date_from"
-            v-model="date_from"
-            type="date"
-            class="mt-1 block w-full"
-          />
+          <TextInput id="date_from" v-model="date_from" type="date" class="mt-1 block w-full" />
         </div>
         <div class="flex">
           <span class="text-md mt-2 mr-2">To</span>
 
-          <TextInput
-            id="date_to"
-            v-model="date_to"
-            type="date"
-            class="mt-1 block w-full"
-            @keyup.enter="function_filter_range"
-          />
+          <TextInput id="date_to" v-model="date_to" type="date" class="mt-1 block w-full"
+            @keyup.enter="function_filter_range" />
         </div>
         <div class="flex">
-          <Input
-            v-model="search"
-            class="rounded-lg w-[30vmin]"
-            type="text"
-            label="Search delivery"
-            @keyup.enter="search_"
-          />
+          <Input v-model="search" class="rounded-lg w-[30vmin]" type="text" label="Search delivery"
+            @keyup.enter="search_" />
         </div>
-        <button
-          v-if="date_from || date_to || search"
-          class="h-10 my-auto mt-5"
-          @click="function_filter_remove"
-        >
+        <button v-if="date_from || date_to || search" class="h-10 my-auto mt-5" @click="function_filter_remove">
           <Icon icon="close_icon" size="sm" />
         </button>
       </div>
@@ -213,11 +203,8 @@ const authorize = () => {
             <template v-for="(delivery, key) in deliveries.data" :key="key">
               <tr class="bg-white border-">
                 <td class="px-6 py-4">
-                  <img
-                    class="h-8 w-8 rounded-full object-cover"
-                    :src="delivery.supplier.image"
-                    :alt="delivery.supplier.supplier_name"
-                  />
+                  <img class="h-8 w-8 rounded-full object-cover" :src="delivery.supplier.image"
+                    :alt="delivery.supplier.supplier_name" />
                   {{ delivery.supplier.supplier_name }}
                 </td>
                 <!-- <td class="px-6 py-4">
@@ -237,10 +224,7 @@ const authorize = () => {
                   </span>
                 </td> -->
 
-                <td
-                  scope="row"
-                  class="px-2 py-1 text-gray-900 whitespace-nowrap"
-                >
+                <td scope="row" class="px-2 py-1 text-gray-900 whitespace-nowrap">
                   <Product :delivery_details="delivery.details" />
                 </td>
                 <!-- <td class="px-6 py-4">
@@ -263,23 +247,14 @@ const authorize = () => {
         </table>
       </div>
       <div class="flex items-center justify-between">
-        <Pagination2
-          :links="props.deliveries.links"
-          :date_from="date_from"
-          :date_to="date_to"
-          :search="search"
-        />
+        <Pagination2 :links="props.deliveries.links" :date_from="date_from" :date_to="date_to" :search="search" />
         <p class="mt-6 text-sm text-gray-500">
           Showing {{ deliveries.data.length }} Deliveries
         </p>
       </div>
     </div>
   </section>
-  <ConfirmDialogModal
-    :show="condfirmationModal"
-    @close="condfirmationModal = false"
-    maxWidth="2xl"
-  >
+  <ConfirmDialogModal :show="condfirmationModal" @close="condfirmationModal = false" maxWidth="2xl">
     <template #title>
       Are you sure you want to authorize this delivery?
     </template>
@@ -287,35 +262,18 @@ const authorize = () => {
       <p class="text-red-500">
         Clicking can update the system and it may cause a possible error!
       </p>
-      <Input
-        label="Administrator password"
-        type="password"
-        v-model="form.password"
-      />
+      <Input label="Administrator password" type="password" v-model="form.password" />
     </template>
     <template #footer>
       <SecondaryButton @click="condfirmationModal = false" class="mr-2">
         nevermind
       </SecondaryButton>
-      <Button
-        :class="{ 'opacity-25': form.processing }"
-        :disabled="form.processing"
-        class="bg-green-200 hover:bg-green-400"
-        @click="authorize"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-auto"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-          />
+      <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing"
+        class="bg-green-200 hover:bg-green-400" @click="authorize">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
         </svg>
         &nbsp;Submit
       </Button>

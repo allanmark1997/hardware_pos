@@ -186,9 +186,18 @@ const convert_money = (data) => {
   const formatter = new Intl.NumberFormat("en-PH", {
     style: "currency",
     currency: "PHP",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 20,
+    minimumSignificantDigits: 1,
+    maximumSignificantDigits: 20
   });
-  formatter.format(data);
-  return formatter.format(data);
+  let total = formatter.format(data);
+  let split_data = total.split(".")
+  let decimal = String(split_data[1])
+  let slice_decimal = decimal.slice(0, 2)
+  let validate_decimal = slice_decimal == "un" ? String("00") : slice_decimal
+  let final_data = String(split_data[0]) + "." + validate_decimal
+  return final_data;
 };
 
 const date_time = (data) => {
@@ -294,129 +303,82 @@ onMounted(() => {
           <div v-if="products.data.length <= 0" class="mx-auto">
             <h1 class="text-4xl font-bold mt-6">No products found!</h1>
           </div>
-          <div
-            v-else
-            class="p-4 md:w-1/4"
-            v-for="(product, index) in products.data"
-            :key="index"
-          >
-            <div
-              class="h-full border-2 border-gray-100 shadow-md rounded-lg overflow-hidden group"
-            >
+          <div v-else class="p-4 md:w-1/4" v-for="(product, index) in products.data" :key="index">
+            <div class="h-full border-2 border-gray-100 shadow-md rounded-lg overflow-hidden group">
               <div class="relative">
-                <img
-                  v-if="product.product_image"
+                <img v-if="product.product_image"
+                  class="lg:h-36 md:h-36 w-full object-scale-down object-center bg-gray-100" :src="product.product_image"
+                  :alt="product.name" />
+                <img v-if="!product.product_image"
                   class="lg:h-36 md:h-36 w-full object-scale-down object-center bg-gray-100"
-                  :src="product.product_image"
-                  :alt="product.name"
-                />
-                <img
-                  v-if="!product.product_image"
-                  class="lg:h-36 md:h-36 w-full object-scale-down object-center bg-gray-100"
-                  src="https://dummyimage.com/720x400"
-                  :alt="product.name"
-                />
-                <div
-                  class="absolute hidden group-hover:block top-0 right-0 text-white p-2 rounded"
-                >
-                  <button
-                    @click="
-                      openDetails(
-                        product.description.details,
-                        product.name,
-                        product.description.specification,
-                        product.product_image
-                      )
-                    "
-                    class="p-2 bg-gray-400 rounded-lg hover:bg-gray-600 mr-2 w-auto"
-                  >
+                  src="https://dummyimage.com/720x400" :alt="product.name" />
+                <div class="absolute hidden group-hover:block top-0 right-0 text-white p-2 rounded">
+                  <button @click="
+                    openDetails(
+                      product.description.details,
+                      product.name,
+                      product.description.specification,
+                      product.product_image
+                    )
+                    " class="p-2 bg-gray-400 rounded-lg hover:bg-gray-600 mr-2 w-auto">
                     <Icon icon="docs" />
                   </button>
-                  <button
-                    @click="function_open_modal_update(product)"
-                    class="p-2 bg-yellow-400 rounded-lg hover:bg-yellow-600 mr-2 w-auto"
-                  >
+                  <button @click="function_open_modal_update(product)"
+                    class="p-2 bg-yellow-400 rounded-lg hover:bg-yellow-600 mr-2 w-auto">
                     <Icon icon="pencil" size="sm" />
                   </button>
-                  <button
-                    @click="function_open_modal_back_order(product)"
-                    class="p-2 bg-red-400 rounded-lg hover:bg-red-600 w-auto mr-2 mt-2"
-                    title="Send to back orders"
-                  >
+                  <button @click="function_open_modal_back_order(product)"
+                    class="p-2 bg-red-400 rounded-lg hover:bg-red-600 w-auto mr-2 mt-2" title="Send to back orders">
                     <Icon icon="back_order" size="sm" />
                   </button>
-                  <button
-                    @click="function_open_modal_confirmation(product)"
-                    class="p-2 bg-red-400 rounded-lg hover:bg-red-600 w-auto mt-2"
-                  >
+                  <button @click="function_open_modal_confirmation(product)"
+                    class="p-2 bg-red-400 rounded-lg hover:bg-red-600 w-auto mt-2">
                     <Icon icon="trash" size="sm" />
                   </button>
                 </div>
               </div>
 
               <div class="flex justify-between -mt-5 relative">
-                <h2
-                  class="tracking-widest text-sm title-font font-bold bg-yellow-500 bg-white rounded-lg p-1"
-                >
+                <h2 class="tracking-widest text-sm title-font font-bold bg-yellow-500 bg-white rounded-lg p-1">
                   Stocks: {{ product.quantity }}
                 </h2>
-                <h2
-                  class="tracking-widest text-sm title-font font-bold bg-red-500 rounded-lg p-1"
-                >
-                  <span class="text-white"
-                    >Discount: {{ product.current_discount.discount }}%</span
-                  >
+                <h2 class="tracking-widest text-sm title-font font-bold bg-red-500 rounded-lg p-1">
+                  <span class="text-white">Discount: {{ product.current_discount.discount }}%</span>
                 </h2>
               </div>
               <div class="p-4">
-                <h1
-                  class="title-font text-lg capitalize font-bold text-gray-900 -mt-2"
-                >
+                <h1 class="title-font text-lg capitalize font-bold text-gray-900 -mt-2">
                   {{ product.name }}
-                  <span
-                    v-if="product.quantity == 0"
-                    class="italic text-xs text-red-500"
-                    >- (Out of stocks)</span
-                  >
+                  <span v-if="product.quantity == 0" class="italic text-xs text-red-500">- (Out of stocks)</span>
                 </h1>
-                <h2
-                  class="tracking-widest text-lg title-font font-bold text-gray-500"
-                >
+                <h2 class="tracking-widest text-lg title-font font-bold text-gray-500">
                   {{
                     convert_money(
                       product.current_price.price -
-                        product.current_price.price *
-                          (product.current_discount.discount / 100)
-                    )
-                  }}<span
-                    v-if="
-                      product.current_price.price -
-                        (product.current_price.price -
-                          product.current_price.price *
-                            (product.current_discount.discount / 100)) !=
-                      0
-                    "
-                    class="text-xs text-red-400"
-                    >({{
-                      convert_money(
-                        product.current_price.price -
-                          (product.current_price.price -
-                            product.current_price.price *
-                              (product.current_discount.discount / 100))
-                      )
-                    }}
-                    less)</span
-                  >
-                </h2>
-                <h2
-                  v-if="
-                    product.current_price.price -
                       product.current_price.price *
-                        (product.current_discount.discount / 100) !=
+                      (product.current_discount.discount / 100)
+                    )
+                  }}<span v-if="product.current_price.price -
+    (product.current_price.price -
+      product.current_price.price *
+      (product.current_discount.discount / 100)) !=
+    0
+    " class="text-xs text-red-400">({{
+      convert_money(
+        product.current_price.price -
+        (product.current_price.price -
+          product.current_price.price *
+          (product.current_discount.discount / 100))
+      )
+    }}
+                    less)</span>
+                </h2>
+                <h2 v-if="product.current_price.price -
+                    product.current_price.price *
+                    (product.current_discount.discount / 100) !=
                     product.current_price.price
-                  "
-                  class="tracking-widest text-sm title-font font-bold text-gray-500 mb-2 -mt-2 line-through decoration-red-700 decoration-double"
-                >
+                    "
+                  class="tracking-widest text-sm title-font font-bold text-gray-500 mb-2 -mt-2 line-through decoration-red-700 decoration-double">
                   {{ convert_money(product.current_price.price) }}
                 </h2>
                 <!-- <svg
@@ -427,28 +389,18 @@ onMounted(() => {
                   jsbarcode-fontoptions="bold"
                 ></svg> -->
                 <p class="leading-relaxed text-xs flex gap-2 mb-2">
-                  <img
-                    class="w-6 h-6 rounded-full"
-                    :src="product.user.profile_photo_url"
-                    :alt="product.user.name"
-                  />
+                  <img class="w-6 h-6 rounded-full" :src="product.user.profile_photo_url" :alt="product.user.name" />
                   {{ product.user.name }}
                 </p>
                 <div class="flex gap-1">
-                  <p
-                    class="flex leading-relaxed text-xs break-words"
-                    :title="date_time_now(product.updated_at)"
-                  >
+                  <p class="flex leading-relaxed text-xs break-words" :title="date_time_now(product.updated_at)">
                     <!--<span class="font-bold text-xs">Updated at: </span>-->
                     <Icon class="mr-1" icon="clock" size="sm" />
                     <time class="ml-1">{{
                       date_time_now(product.updated_at)
                     }}</time>
                   </p>
-                  <p
-                    class="flex leading-relaxed mb-1 text-xs break-words"
-                    :title="date_time(product.created_at)"
-                  >
+                  <p class="flex leading-relaxed mb-1 text-xs break-words" :title="date_time(product.created_at)">
                     <!-- <span class="font-bold text-xs">Created at: </span> -->
                     <Icon class="mr-1" icon="calendar_plus" size="xs" />
                     <time class="ml-1">{{
@@ -462,11 +414,7 @@ onMounted(() => {
         </div>
 
         <div class="flex items-center justify-between">
-          <Pagination2
-            :links="props.products.links"
-            :search="props.search"
-            :category="category"
-          />
+          <Pagination2 :links="props.products.links" :search="props.search" :category="category" />
           <p class="mt-6 text-sm text-gray-500">
             Showing {{ products.data.length }} Products
           </p>
@@ -474,16 +422,11 @@ onMounted(() => {
       </div>
     </section>
   </div>
-  <ConfirmDialogModal
-    :show="condfirmationModal"
-    @close="condfirmationModal = false"
-    maxWidth="2xl"
-  >
+  <ConfirmDialogModal :show="condfirmationModal" @close="condfirmationModal = false" maxWidth="2xl">
     <template #title>
       Are you sure you want to remove this product({{
         form.product.name
-      }})?</template
-    >
+      }})?</template>
     <template #content>
       <p class="text-red-500">
         This action can update the system and this is not reversible!
@@ -493,99 +436,49 @@ onMounted(() => {
       <SecondaryButton @click="condfirmationModal = false" class="mr-2">
         nevermind
       </SecondaryButton>
-      <Button
-        :class="{ 'opacity-25': form.processing }"
-        :disabled="form.processing"
-        class="bg-green-200 hover:bg-green-400"
-        @click="remove_product"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-auto"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-          /></svg
-        >&nbsp;Submit
+      <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing"
+        class="bg-green-200 hover:bg-green-400" @click="remove_product">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+        </svg>&nbsp;Submit
       </Button>
     </template>
   </ConfirmDialogModal>
 
-  <ConfirmDialogModal
-    :show="condfirmationBackOrderModal"
-    @close="condfirmationBackOrderModal = false"
-    maxWidth="2xl"
-  >
+  <ConfirmDialogModal :show="condfirmationBackOrderModal" @close="condfirmationBackOrderModal = false" maxWidth="2xl">
     <template #title> Are you sure you want to sent this product?</template>
     <template #content>
       <p class="text-red-500">
         This action can update the system and this is not reversible!
       </p>
-      <Input
-        type="number"
-        label="Enter product quantity"
-        v-model="form_back_order.quantity"
-      />
+      <Input type="number" label="Enter product quantity" v-model="form_back_order.quantity" />
       <JetInputError :message="form_back_order.errors.quantity" class="mt-2" />
-      <Input
-        type="text"
-        label="Enter your remarks"
-        v-model="form_back_order.remarks"
-      />
+      <Input type="text" label="Enter your remarks" v-model="form_back_order.remarks" />
     </template>
     <template #footer>
-      <SecondaryButton
-        @click="condfirmationBackOrderModal = false"
-        class="mr-2"
-      >
+      <SecondaryButton @click="condfirmationBackOrderModal = false" class="mr-2">
         nevermind
       </SecondaryButton>
-      <Button
-        :class="{ 'opacity-25': form_back_order.processing }"
-        :disabled="form_back_order.processing"
-        class="bg-green-200 hover:bg-green-400"
-        @click="back_order"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-auto"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-          /></svg
-        >&nbsp;Submit
+      <Button :class="{ 'opacity-25': form_back_order.processing }" :disabled="form_back_order.processing"
+        class="bg-green-200 hover:bg-green-400" @click="back_order">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+        </svg>&nbsp;Submit
       </Button>
     </template>
   </ConfirmDialogModal>
 
-  <JetDialogModal
-    :show="detailModal"
-    @close="detailModal = false"
-    maxWidth="2xl"
-  >
+  <JetDialogModal :show="detailModal" @close="detailModal = false" maxWidth="2xl">
     <template #title>{{ detailModalData.ProdTitle }}</template>
     <template #content>
       <div class="grid grid-cols-5">
-        <div
-          id="imageContent"
-          class="border-r border-yellow-500 col-span-2 p-2"
-        >
+        <div id="imageContent" class="border-r border-yellow-500 col-span-2 p-2">
           <img class="rounded-lg max-w-sx" :src="detailModalData.ProdIMG" />
-          <p
-            class="text-gray-900 font-bold uppercase text-yellow-700 mt-5 mb-1"
-          >
+          <p class="text-gray-900 font-bold uppercase text-yellow-700 mt-5 mb-1">
             {{ detailModalData.ProdSpec.spec_title }}:
           </p>
           <div v-for="spec in detailModalData.ProdSpec.spec_details">
@@ -609,36 +502,22 @@ onMounted(() => {
       </SecondaryButton>
     </template>
   </JetDialogModal>
-  <JetDialogModal
-    :show="updateModal"
-    @close="updateModal = false"
-    maxWidth="2xl"
-  >
+  <JetDialogModal :show="updateModal" @close="updateModal = false" maxWidth="2xl">
     <template #title> Are you sure you want to update this product?</template>
     <template #content>
       <div class="grid grid-cols-12 gap-1">
         <div class="col-span-12">
-          <Input
-            type="text"
-            label="Enter product name"
-            v-model="form_update.name"
-          />
+          <Input type="text" label="Enter product name" v-model="form_update.name" />
           <JetInputError :message="form_update.errors.name" class="mt-2" />
         </div>
         <div class="col-span-12">
-          <Input
-            type="text"
-            label="Enter product barcode"
-            v-model="form_update.barcode"
-          />
+          <Input type="text" label="Enter product barcode" v-model="form_update.barcode" />
           <JetInputError :message="form_update.errors.barcode" class="mt-2" />
         </div>
         <div class="col-span-12">
           <textarea
             class="w-full rounded-lg border-1 border-gray-300 h-[100px] focus:ring-yellow-500 focus:border-yellow-500"
-            placeholder="Product description"
-            v-model="form_update.description.details"
-          >
+            placeholder="Product description" v-model="form_update.description.details">
           </textarea>
           <!-- <JetInputError
             :message="form_update.errors.description"
@@ -646,158 +525,83 @@ onMounted(() => {
           /> -->
         </div>
         <div class="col-span-12">
-          <Input
-            type="text"
-            label="Product Specification title"
-            v-model="form_update.description.specification.spec_title"
-          />
+          <Input type="text" label="Product Specification title"
+            v-model="form_update.description.specification.spec_title" />
           <!-- <JetInputError :message="form_update.errors.remarks" class="mt-2" /> -->
         </div>
-        <div
-          v-if="
-            form_update.description.specification.spec_title != '' &&
-            open_close_input_spec_update == false
-          "
-          class="col-span-3"
-        >
-          <Input
-            type="text"
-            label="Specification name"
-            v-model="specification.spec_name"
-          />
+        <div v-if="form_update.description.specification.spec_title != '' &&
+          open_close_input_spec_update == false
+          " class="col-span-3">
+          <Input type="text" label="Specification name" v-model="specification.spec_name" />
           <JetInputError :message="spec_name" class="mt-2" />
         </div>
-        <div
-          v-if="
-            form_update.description.specification.spec_title != '' &&
-            open_close_input_spec_update == false
-          "
-          class="col-span-6"
-        >
-          <Input
-            type="text"
-            label="Specification details"
-            v-model="specification.spec_details"
-          />
+        <div v-if="form_update.description.specification.spec_title != '' &&
+          open_close_input_spec_update == false
+          " class="col-span-6">
+          <Input type="text" label="Specification details" v-model="specification.spec_details" />
           <JetInputError :message="spec_details" class="mt-2" />
         </div>
-        <div
-          v-if="
-            form_update.description.specification.spec_title != '' &&
-            open_close_input_spec_update == false
-          "
-          class="col-span-3 mx-auto mt-3"
-        >
-          <SecondaryButton
-            @click="add_specification"
-            class="bg-green-200 hover:bg-green-400"
-          >
+        <div v-if="form_update.description.specification.spec_title != '' &&
+          open_close_input_spec_update == false
+          " class="col-span-3 mx-auto mt-3">
+          <SecondaryButton @click="add_specification" class="bg-green-200 hover:bg-green-400">
             Add Specification
           </SecondaryButton>
         </div>
-        <div
-          v-if="
-            form_update.description.specification.spec_title != '' &&
-            open_close_input_spec_update == true
-          "
-          class="col-span-3"
-        >
-          <Input
-            type="text"
-            label="Specification name"
-            v-model="specification.spec_name"
-          />
+        <div v-if="form_update.description.specification.spec_title != '' &&
+          open_close_input_spec_update == true
+          " class="col-span-3">
+          <Input type="text" label="Specification name" v-model="specification.spec_name" />
           <JetInputError :message="spec_name" class="mt-2" />
         </div>
-        <div
-          v-if="
-            form_update.description.specification.spec_title != '' &&
-            open_close_input_spec_update == true
-          "
-          class="col-span-6"
-        >
-          <Input
-            type="text"
-            label="Specification details"
-            v-model="specification.spec_details"
-          />
+        <div v-if="form_update.description.specification.spec_title != '' &&
+          open_close_input_spec_update == true
+          " class="col-span-6">
+          <Input type="text" label="Specification details" v-model="specification.spec_details" />
           <JetInputError :message="spec_details" class="mt-2" />
         </div>
-        <div
-          v-if="
-            form_update.description.specification.spec_title != '' &&
-            open_close_input_spec_update == true
-          "
-          class="col-span-3 mx-auto mt-3"
-        >
-          <SecondaryButton
-            @click="update_specification"
-            class="bg-green-200 hover:bg-green-400"
-          >
+        <div v-if="form_update.description.specification.spec_title != '' &&
+          open_close_input_spec_update == true
+          " class="col-span-3 mx-auto mt-3">
+          <SecondaryButton @click="update_specification" class="bg-green-200 hover:bg-green-400">
             Update Specification
           </SecondaryButton>
         </div>
-        <div
-          v-if="
-            form_update.description.specification.spec_details?.length != 0 &&
-            form_update.description.specification?.spec_title != ''
-          "
-          class="col-span-12"
-        >
+        <div v-if="form_update.description.specification.spec_details?.length != 0 &&
+          form_update.description.specification?.spec_title != ''
+          " class="col-span-12">
           <div class="grid grid-cols-12 border p-2 gap-2">
-            <template
-              v-for="(spec, key) in form_update.description.specification
-                .spec_details"
-              :key="key"
-            >
+            <template v-for="(spec, key) in form_update.description.specification
+              .spec_details" :key="key">
               <div class="col-span-10 border-b-2">
                 <p>{{ spec.spec_details }}</p>
                 <span>{{ spec.spec_name }}</span>
               </div>
               <div class="col-span-1">
-                <Button
-                  class="bg-orange-400 hover:bg-orange-500 hover:text-white"
-                  title="Update spec"
-                  @click="update_spec(spec.spec_name, spec.spec_details, key)"
-                >
+                <Button class="bg-orange-400 hover:bg-orange-500 hover:text-white" title="Update spec"
+                  @click="update_spec(spec.spec_name, spec.spec_details, key)">
                   <Icon icon="pencil" size="sm" />
                 </Button>
               </div>
               <div class="col-span-1">
-                <Button
-                  class="bg-red-400 hover:bg-red-500 hover:text-white ml-2"
-                  title="Remove spec"
-                  @click="remove_spec(key)"
-                  >x</Button
-                >
+                <Button class="bg-red-400 hover:bg-red-500 hover:text-white ml-2" title="Remove spec"
+                  @click="remove_spec(key)">x</Button>
               </div>
             </template>
           </div>
         </div>
         <div class="col-span-6">
-          <Input
-            type="number"
-            label="Product price"
-            v-model="form_update.price"
-          />
+          <Input type="number" label="Product price" v-model="form_update.price" />
           <JetInputError :message="form_update.errors.price" class="mt-2" />
         </div>
         <div class="col-span-6">
-          <Input
-            type="number"
-            label="Product discount"
-            v-model="form_update.sale_discount"
-          />
-          <JetInputError
-            :message="form_update.errors.sale_discount"
-            class="mt-2"
-          />
+          <Input type="number" label="Product discount" v-model="form_update.sale_discount" />
+          <JetInputError :message="form_update.errors.sale_discount" class="mt-2" />
         </div>
         <div class="col-span-12">
           <select
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full h-10 my-auto mt-5"
-            v-model="form_update.category"
-          >
+            v-model="form_update.category">
             <option selected value="">Choose a category</option>
             <template v-for="(category, key) in props.categories" :key="key">
               <option :value="category.id">{{ category.name }}</option>
@@ -805,33 +609,15 @@ onMounted(() => {
           </select>
           <JetInputError :message="form_update.errors.category" class="mt-2" />
         </div>
-        <div
-          v-if="post_images == 0"
-          class="col-span-12 flex items-center justify-center w-full mt-4"
-          @dragover.prevent
-          @drop.prevent
-        >
-          <label
-            @drop="dragFile"
-            @click="openFile"
-            for="dropzone-file"
-            class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
-          >
+        <div v-if="post_images == 0" class="col-span-12 flex items-center justify-center w-full mt-4" @dragover.prevent
+          @drop.prevent>
+          <label @drop="dragFile" @click="openFile" for="dropzone-file"
+            class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
             <div class="flex flex-col items-center justify-center pt-5 pb-6">
-              <svg
-                aria-hidden="true"
-                class="w-10 h-10 mb-3 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                ></path>
+              <svg aria-hidden="true" class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
               </svg>
               <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
                 <span class="font-semibold">Click to upload</span> or drag and
@@ -841,12 +627,7 @@ onMounted(() => {
                 PNG, JPG or GIF (MAX. 800x400px)
               </p>
             </div>
-            <input
-              id="post_image"
-              type="file"
-              accept="image/png, image/gif, image/jpeg"
-              class="hidden"
-            />
+            <input id="post_image" type="file" accept="image/png, image/gif, image/jpeg" class="hidden" />
           </label>
         </div>
         <div class="col-span-12 flex items-center justify-center mt-4">
@@ -856,24 +637,11 @@ onMounted(() => {
                 <img class="w-full max-h-[40vmin] object-cover" :src="image" />
                 <ul class="mt-3 flex justify-end flex-wrap">
                   <li>
-                    <button
-                      @click="remove_image(key)"
-                      class="flex text-gray-400 hover:text-gray-600"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        class="w-6 h-6"
-                      >
-                        <path
-                          class="text-red-500"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                        />
+                    <button @click="remove_image(key)" class="flex text-gray-400 hover:text-gray-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-6 h-6">
+                        <path class="text-red-500" stroke-linecap="round" stroke-linejoin="round"
+                          d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                       </svg>
                       <span class="text-red-500">Remove</span>
                     </button>
@@ -883,36 +651,20 @@ onMounted(() => {
             </div>
           </template>
         </div>
-        <JetInputError
-          :message="form_update.errors.text_image"
-          class="mt-2 col-span-12"
-        />
+        <JetInputError :message="form_update.errors.text_image" class="mt-2 col-span-12" />
       </div>
     </template>
     <template #footer>
       <SecondaryButton @click="updateModal = false" class="mr-2">
         nevermind
       </SecondaryButton>
-      <Button
-        :class="{ 'opacity-25': form_update.processing }"
-        :disabled="form_update.processing"
-        class="bg-green-200 hover:bg-green-400"
-        @click="update_product"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-auto"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-          /></svg
-        >&nbsp;Submit
+      <Button :class="{ 'opacity-25': form_update.processing }" :disabled="form_update.processing"
+        class="bg-green-200 hover:bg-green-400" @click="update_product">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+        </svg>&nbsp;Submit
       </Button>
     </template>
   </JetDialogModal>

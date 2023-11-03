@@ -49,9 +49,18 @@ const convert_money = (data) => {
   const formatter = new Intl.NumberFormat("en-PH", {
     style: "currency",
     currency: "PHP",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 20,
+    minimumSignificantDigits: 1,
+    maximumSignificantDigits: 20
   });
-  formatter.format(data);
-  return formatter.format(data);
+  let total = formatter.format(data);
+  let split_data = total.split(".")
+  let decimal = String(split_data[1])
+  let slice_decimal = decimal.slice(0, 2)
+  let validate_decimal = slice_decimal == "un" ? String("00") : slice_decimal
+  let final_data = String(split_data[0]) + "." + validate_decimal
+  return final_data;
 };
 
 const function_filter_range = () => {
@@ -139,43 +148,24 @@ const authorize = () => {
       <div class="flex gap-2">
         <div class="flex">
           <span class="text-md mt-2 mr-2">From</span>
-          <TextInput
-            id="date_from"
-            v-model="date_from"
-            type="date"
-            class="mt-1 block w-full"
-          />
+          <TextInput id="date_from" v-model="date_from" type="date" class="mt-1 block w-full" />
         </div>
         <div class="flex">
           <span class="text-md mt-2 mr-2">To</span>
 
-          <TextInput
-            id="date_to"
-            v-model="date_to"
-            type="date"
-            class="mt-1 block w-full"
-            @keyup.enter="function_filter_range"
-          />
+          <TextInput id="date_to" v-model="date_to" type="date" class="mt-1 block w-full"
+            @keyup.enter="function_filter_range" />
         </div>
-        <button
-          v-if="date_from || date_to"
-          class="h-10 my-auto mt-5"
-          @click="function_filter_remove"
-        >
+        <button v-if="date_from || date_to" class="h-10 my-auto mt-5" @click="function_filter_remove">
           <Icon icon="close_icon" size="sm" />
         </button>
       </div>
     </div>
-    <a
-      :href="
-        route('back_orders.export', {
-          date_from: date_from,
-          date_to: date_to,
-        })
-      "
-      class="bg-green-400 hover:bg-green-600 hover:text-white rounded-lg my-auto p-2"
-      >Export Back-orders</a
-    >
+    <a :href="route('back_orders.export', {
+      date_from: date_from,
+      date_to: date_to,
+    })
+      " class="bg-green-400 hover:bg-green-600 hover:text-white rounded-lg my-auto p-2">Export Back-orders</a>
   </div>
 
   <section class="text-gray-600 bg-white rounded-lg py-5 px-3 mb-5 mt-2">
@@ -201,11 +191,8 @@ const authorize = () => {
             <template v-for="(back_order, key) in back_orders.data" :key="key">
               <tr class="bg-white border-">
                 <td class="px-6 py-4">
-                  <img
-                    class="h-8 w-8 rounded-full object-cover"
-                    :src="back_order.user.profile_photo_url"
-                    :alt="back_order.user.name"
-                  />
+                  <img class="h-8 w-8 rounded-full object-cover" :src="back_order.user.profile_photo_url"
+                    :alt="back_order.user.name" />
                   {{ back_order.user.name }}
                 </td>
                 <td class="px-6 py-4">
@@ -219,24 +206,15 @@ const authorize = () => {
                   {{ back_order.quantity }}
                 </td>
                 <td class="px-6 py-4">
-                  <span
-                    v-if="back_order.status == 1"
-                    class="bg-green-400 rounded-md p-1 text-white flex"
-                  >
+                  <span v-if="back_order.status == 1" class="bg-green-400 rounded-md p-1 text-white flex">
                     <Icon icon="check" size="sm" />
                     Success
                   </span>
-                  <span
-                    v-else-if="back_order.status == 0"
-                    class="bg-orange-400 rounded-md p-1 text-white flex gap-1"
-                  >
+                  <span v-else-if="back_order.status == 0" class="bg-orange-400 rounded-md p-1 text-white flex gap-1">
                     <Icon icon="wrong" size="sm" />
                     Pending
                   </span>
-                  <span
-                    v-else
-                    class="bg-red-400 rounded-md p-1 text-white flex gap-1"
-                  >
+                  <span v-else class="bg-red-400 rounded-md p-1 text-white flex gap-1">
                     <Icon icon="wrong" size="sm" />
                     Cancelled
                   </span>
@@ -270,11 +248,7 @@ const authorize = () => {
                   {{ date_time(back_order.created_at) }}
                 </td>
                 <td class="px-6 py-4 gap-2">
-                  <Button
-                    v-if="back_order.status == 0"
-                    @click="open_authorization(back_order)"
-                    >Authorize</Button
-                  >
+                  <Button v-if="back_order.status == 0" @click="open_authorization(back_order)">Authorize</Button>
                 </td>
               </tr>
             </template>
@@ -282,58 +256,33 @@ const authorize = () => {
         </table>
       </div>
       <div class="flex items-center justify-between">
-        <Pagination2
-          :links="props.back_orders.links"
-          :date_from="date_from"
-          :date_to="date_to"
-        />
+        <Pagination2 :links="props.back_orders.links" :date_from="date_from" :date_to="date_to" />
         <p class="mt-6 text-sm text-gray-500">
           Showing {{ back_orders.data.length }} Back-orders
         </p>
       </div>
     </div>
   </section>
-  <ConfirmDialogModal
-    :show="ConfirmationModal"
-    @close="ConfirmationModal = false"
-    maxWidth="2xl"
-  >
+  <ConfirmDialogModal :show="ConfirmationModal" @close="ConfirmationModal = false" maxWidth="2xl">
     <template #title> Please input administrators pass code</template>
     <template #content>
       <p class="text-red-500">
         Once approved, this action can update the system and this is not
         reversible!
       </p>
-      <Input
-        type="password"
-        label="Administrator's passcode"
-        v-model="form.password"
-      />
+      <Input type="password" label="Administrator's passcode" v-model="form.password" />
     </template>
     <template #footer>
       <SecondaryButton @click="ConfirmationModal = false" class="mr-2">
         nevermind
       </SecondaryButton>
-      <Button
-        :class="{ 'opacity-25': form.processing }"
-        :disabled="form.processing"
-        class="bg-green-200 hover:bg-green-400"
-        @click="authorize"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-auto"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-          /></svg
-        >&nbsp;Submit
+      <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing"
+        class="bg-green-200 hover:bg-green-400" @click="authorize">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+        </svg>&nbsp;Submit
       </Button>
     </template>
   </ConfirmDialogModal>

@@ -27,10 +27,20 @@ const convert_money = (data) => {
   const formatter = new Intl.NumberFormat("en-PH", {
     style: "currency",
     currency: "PHP",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 20,
+    minimumSignificantDigits: 1,
+    maximumSignificantDigits: 20
   });
-  formatter.format(data);
-  return formatter.format(data);
+  let total = formatter.format(data);
+  let split_data = total.split(".")
+  let decimal = String(split_data[1])
+  let slice_decimal = decimal.slice(0, 2)
+  let validate_decimal = slice_decimal == "un" ? String("00") : slice_decimal
+  let final_data = String(split_data[0]) + "." + validate_decimal
+  return final_data;
 };
+
 const date_time = (data) => {
   return moment(data).format("MM/DD/YYYY, h:mm:ss a");
 };
@@ -78,39 +88,31 @@ const calculate_grand_total = (data, discount, vat, type) => {
 
     <div class="py-12">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div
-          class="bg-transparent overflow-hidden shadow-xl sm:rounded-lg mb-2"
-        >
+        <div class="bg-transparent overflow-hidden shadow-xl sm:rounded-lg mb-2">
           <div class="grid grid-cols-12 gap-2">
             <div class="col-span-12 border bg-white rounded-lg">
               <p class="p-2 text-xl font-bold">
                 This Day({{ current_day }}) sales
               </p>
-              <column-chart
-                :data="props.day_with_quantity_price_total_data_column"
-                :colors="[
-                  '#713ABE',
-                  '#071952',
-                  '#FF3FA4',
-                  '#016A70',
-                  '#C70039',
-                  '#F94C10',
-                  '#FFCF96',
-                  '#FD8D14',
-                  '#F0DE36',
-                  '#F86F03',
-                ]"
-              />
+              <column-chart :data="props.day_with_quantity_price_total_data_column" :colors="[
+                '#713ABE',
+                '#071952',
+                '#FF3FA4',
+                '#016A70',
+                '#C70039',
+                '#F94C10',
+                '#FFCF96',
+                '#FD8D14',
+                '#F0DE36',
+                '#F86F03',
+              ]" />
             </div>
             <div class="col-span-6 border bg-white rounded-lg">
               <p class="p-2 text-xl font-bold">
                 Top 10 sold products in this day({{ props.current_day }})
               </p>
               <div class="grid grid-cols-12 gap-2 p-4">
-                <template
-                  v-for="(top, key) in props.top_10_prod_current_day"
-                  :key="key"
-                >
+                <template v-for="(top, key) in props.top_10_prod_current_day" :key="key">
                   <div class="col-span-6 text-sm flex">
                     <Icon v-if="key + 1 == 1" icon="gold_medal" size="sm" />
                     <Icon v-if="key + 1 == 2" icon="silver_medal" size="sm" />
@@ -132,57 +134,46 @@ const calculate_grand_total = (data, discount, vat, type) => {
               <p class="text-xl font-bold">
                 Top 10 high value products in this Day({{ props.current_day }})
               </p>
-              <pie-chart
-                :data="props.day_with_quantity_price_total_data_pie"
-                :colors="[
-                  '#713ABE',
-                  '#071952',
-                  '#FF3FA4',
-                  '#016A70',
-                  '#C70039',
-                  '#F94C10',
-                  '#FFCF96',
-                  '#FD8D14',
-                  '#F0DE36',
-                  '#F86F03',
-                ]"
-              />
+              <pie-chart :data="props.day_with_quantity_price_total_data_pie" :colors="[
+                '#713ABE',
+                '#071952',
+                '#FF3FA4',
+                '#016A70',
+                '#C70039',
+                '#F94C10',
+                '#FFCF96',
+                '#FD8D14',
+                '#F0DE36',
+                '#F86F03',
+              ]" />
             </div>
           </div>
         </div>
-        <div
-          class="bg-transparent overflow-hidden shadow-xl sm:rounded-lg mb-2"
-        >
+        <div class="bg-transparent overflow-hidden shadow-xl sm:rounded-lg mb-2">
           <div class="grid grid-cols-12 gap-2">
             <div class="col-span-12 border bg-white rounded-lg">
               <p class="p-2 text-xl font-bold">
                 This Week({{ current_week }}) sales
               </p>
-              <line-chart
-                :data="props.top_10_prod_current_week"
-                :colors="[
-                  '#713ABE',
-                  '#071952',
-                  '#FF3FA4',
-                  '#016A70',
-                  '#C70039',
-                  '#F94C10',
-                  '#FFCF96',
-                  '#FD8D14',
-                  '#F0DE36',
-                  '#F86F03',
-                ]"
-              />
+              <line-chart :data="props.top_10_prod_current_week" :colors="[
+                '#713ABE',
+                '#071952',
+                '#FF3FA4',
+                '#016A70',
+                '#C70039',
+                '#F94C10',
+                '#FFCF96',
+                '#FD8D14',
+                '#F0DE36',
+                '#F86F03',
+              ]" />
             </div>
             <div class="col-span-6 border bg-white rounded-lg">
               <p class="p-2 text-xl font-bold">
                 Top 10 sold products in this week({{ props.current_week }})
               </p>
               <div class="grid grid-cols-12 gap-2 p-4">
-                <template
-                  v-for="(top, key) in props.top_10_prod_current_week"
-                  :key="key"
-                >
+                <template v-for="(top, key) in props.top_10_prod_current_week" :key="key">
                   <div class="col-span-6 text-sm flex">
                     <Icon v-if="key + 1 == 1" icon="gold_medal" size="sm" />
                     <Icon v-if="key + 1 == 2" icon="silver_medal" size="sm" />
@@ -206,57 +197,46 @@ const calculate_grand_total = (data, discount, vat, type) => {
                   props.current_week
                 }})
               </p>
-              <pie-chart
-                :data="props.week_day_with_quantity_price_total_data_pie"
-                :colors="[
-                  '#713ABE',
-                  '#071952',
-                  '#FF3FA4',
-                  '#016A70',
-                  '#C70039',
-                  '#F94C10',
-                  '#FFCF96',
-                  '#FD8D14',
-                  '#F0DE36',
-                  '#F86F03',
-                ]"
-              />
+              <pie-chart :data="props.week_day_with_quantity_price_total_data_pie" :colors="[
+                '#713ABE',
+                '#071952',
+                '#FF3FA4',
+                '#016A70',
+                '#C70039',
+                '#F94C10',
+                '#FFCF96',
+                '#FD8D14',
+                '#F0DE36',
+                '#F86F03',
+              ]" />
             </div>
           </div>
         </div>
-        <div
-          class="bg-transparent overflow-hidden shadow-xl sm:rounded-lg mb-2"
-        >
+        <div class="bg-transparent overflow-hidden shadow-xl sm:rounded-lg mb-2">
           <div class="grid grid-cols-12 gap-2">
             <div class="col-span-12 border bg-white rounded-lg">
               <p class="p-2 text-xl font-bold">
                 This Month({{ current_month }}) sales
               </p>
-              <line-chart
-                :data="props.top_10_current_month_sale"
-                :colors="[
-                  '#713ABE',
-                  '#071952',
-                  '#FF3FA4',
-                  '#016A70',
-                  '#C70039',
-                  '#F94C10',
-                  '#FFCF96',
-                  '#FD8D14',
-                  '#F0DE36',
-                  '#F86F03',
-                ]"
-              />
+              <line-chart :data="props.top_10_current_month_sale" :colors="[
+                '#713ABE',
+                '#071952',
+                '#FF3FA4',
+                '#016A70',
+                '#C70039',
+                '#F94C10',
+                '#FFCF96',
+                '#FD8D14',
+                '#F0DE36',
+                '#F86F03',
+              ]" />
             </div>
             <div class="col-span-6 border bg-white rounded-lg">
               <p class="p-2 text-xl font-bold">
                 Top 10 sold products in this month({{ props.current_month }})
               </p>
               <div class="grid grid-cols-12 gap-2 p-4">
-                <template
-                  v-for="(top, key) in props.top_10_current_month_sale"
-                  :key="key"
-                >
+                <template v-for="(top, key) in props.top_10_current_month_sale" :key="key">
                   <div class="col-span-6 text-sm flex">
                     <Icon v-if="key + 1 == 1" icon="gold_medal" size="sm" />
                     <Icon v-if="key + 1 == 2" icon="silver_medal" size="sm" />
@@ -280,57 +260,46 @@ const calculate_grand_total = (data, discount, vat, type) => {
                   props.current_month
                 }})
               </p>
-              <pie-chart
-                :data="props.top_10_current_month_sale_money"
-                :colors="[
-                  '#713ABE',
-                  '#071952',
-                  '#FF3FA4',
-                  '#016A70',
-                  '#C70039',
-                  '#F94C10',
-                  '#FFCF96',
-                  '#FD8D14',
-                  '#F0DE36',
-                  '#F86F03',
-                ]"
-              />
+              <pie-chart :data="props.top_10_current_month_sale_money" :colors="[
+                '#713ABE',
+                '#071952',
+                '#FF3FA4',
+                '#016A70',
+                '#C70039',
+                '#F94C10',
+                '#FFCF96',
+                '#FD8D14',
+                '#F0DE36',
+                '#F86F03',
+              ]" />
             </div>
           </div>
         </div>
-        <div
-          class="bg-transparent overflow-hidden shadow-xl sm:rounded-lg mb-2"
-        >
+        <div class="bg-transparent overflow-hidden shadow-xl sm:rounded-lg mb-2">
           <div class="grid grid-cols-12 gap-2">
             <div class="col-span-12 border bg-white rounded-lg">
               <p class="p-2 text-xl font-bold">
                 This Year({{ current_year }}) sales
               </p>
-              <line-chart
-                :data="props.top_10_current_year_sale"
-                :colors="[
-                  '#713ABE',
-                  '#071952',
-                  '#FF3FA4',
-                  '#016A70',
-                  '#C70039',
-                  '#F94C10',
-                  '#FFCF96',
-                  '#FD8D14',
-                  '#F0DE36',
-                  '#F86F03',
-                ]"
-              />
+              <line-chart :data="props.top_10_current_year_sale" :colors="[
+                '#713ABE',
+                '#071952',
+                '#FF3FA4',
+                '#016A70',
+                '#C70039',
+                '#F94C10',
+                '#FFCF96',
+                '#FD8D14',
+                '#F0DE36',
+                '#F86F03',
+              ]" />
             </div>
             <div class="col-span-6 border bg-white rounded-lg">
               <p class="p-2 text-xl font-bold">
                 Top 10 sold products in this year({{ props.current_year }})
               </p>
               <div class="grid grid-cols-12 gap-2 p-4">
-                <template
-                  v-for="(top, key) in props.top_10_current_year_sale"
-                  :key="key"
-                >
+                <template v-for="(top, key) in props.top_10_current_year_sale" :key="key">
                   <div class="col-span-6 text-sm flex">
                     <Icon v-if="key + 1 == 1" icon="gold_medal" size="sm" />
                     <Icon v-if="key + 1 == 2" icon="silver_medal" size="sm" />
@@ -354,21 +323,18 @@ const calculate_grand_total = (data, discount, vat, type) => {
                   props.current_year
                 }})
               </p>
-              <pie-chart
-                :data="props.top_10_current_year_sale_money"
-                :colors="[
-                  '#713ABE',
-                  '#071952',
-                  '#FF3FA4',
-                  '#016A70',
-                  '#C70039',
-                  '#F94C10',
-                  '#FFCF96',
-                  '#FD8D14',
-                  '#F0DE36',
-                  '#F86F03',
-                ]"
-              />
+              <pie-chart :data="props.top_10_current_year_sale_money" :colors="[
+                '#713ABE',
+                '#071952',
+                '#FF3FA4',
+                '#016A70',
+                '#C70039',
+                '#F94C10',
+                '#FFCF96',
+                '#FD8D14',
+                '#F0DE36',
+                '#F86F03',
+              ]" />
             </div>
           </div>
         </div>
@@ -388,18 +354,12 @@ const calculate_grand_total = (data, discount, vat, type) => {
                 </tr>
               </thead>
               <tbody>
-                <template
-                  v-for="(transaction, key) in props.current_transaction"
-                  :key="key"
-                >
+                <template v-for="(transaction, key) in props.current_transaction" :key="key">
                   <tr class="bg-white border-b">
                     <td class="px-6 py-4">
                       {{ key + 1 }}
                     </td>
-                    <th
-                      scope="row"
-                      class="px-6 py-4 font-medium text-yellow-900 whitespace-nowrap"
-                    >
+                    <th scope="row" class="px-6 py-4 font-medium text-yellow-900 whitespace-nowrap">
                       Processed by {{ transaction.accommodate_by.name }}
                     </th>
                     <td class="px-6 py-4">
@@ -418,22 +378,14 @@ const calculate_grand_total = (data, discount, vat, type) => {
                       }}
                     </td>
                     <td class="px-6 py-4">
-                      <span
-                        v-if="transaction.status == 1"
-                        class="inline-flex items-center bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full"
-                      >
-                        <span
-                          class="w-2 h-2 mr-1 bg-green-500 rounded-full"
-                        ></span>
+                      <span v-if="transaction.status == 1"
+                        class="inline-flex items-center bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">
+                        <span class="w-2 h-2 mr-1 bg-green-500 rounded-full"></span>
                         Success
                       </span>
-                      <span
-                        v-else
-                        class="inline-flex items-center bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full"
-                      >
-                        <span
-                          class="w-2 h-2 mr-1 bg-red-500 rounded-full"
-                        ></span>
+                      <span v-else
+                        class="inline-flex items-center bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">
+                        <span class="w-2 h-2 mr-1 bg-red-500 rounded-full"></span>
                         Cancelled
                       </span>
                     </td>
