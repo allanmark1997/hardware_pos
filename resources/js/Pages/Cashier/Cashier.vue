@@ -692,6 +692,16 @@ const deduct_scan_item = (index) => {
         quantity }}</kbd>
     </div>
     <div class="flex max-w-7xl mx-auto justify-start">
+      <p class="text-2xl text-gray-800">
+        <span class="font-bold">Barcode:</span>
+        <span class="text-3xl font-bold animate-ping">
+          {{
+            prodScan
+          }}
+        </span>
+      </p>
+    </div>
+    <div class="flex max-w-7xl mx-auto justify-start">
       <p class="text-4xl text-gray-800">
         <span class="font-bold">Grand Total:</span>
         <span class="text-5xl font-bold">
