@@ -13,6 +13,8 @@ const logout = () => {
 const profile = () => {
   logout_data.get(route('profile.show'));
 };
+
+document.addEventListener('contextmenu', event => event.preventDefault());
 </script>
 
 <template>

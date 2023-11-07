@@ -29,6 +29,9 @@ const submit = () => {
       onFinish: () => form.reset("password"),
     });
 };
+
+document.addEventListener('contextmenu', event => event.preventDefault());
+
 </script>
 
 <template>
@@ -46,28 +49,15 @@ const submit = () => {
     <form @submit.prevent="submit">
       <div>
         <InputLabel for="email" value="Email" />
-        <TextInput
-          id="email"
-          v-model="form.email"
-          type="email"
-          class="mt-1 block w-full"
-          required
-          autofocus
-          autocomplete="username"
-        />
+        <TextInput id="email" v-model="form.email" type="email" class="mt-1 block w-full" required autofocus
+          autocomplete="username" />
         <InputError class="mt-2" :message="form.errors.email" />
       </div>
 
       <div class="mt-4">
         <InputLabel for="password" value="Password" />
-        <TextInput
-          id="password"
-          v-model="form.password"
-          type="password"
-          class="mt-1 block w-full"
-          required
-          autocomplete="current-password"
-        />
+        <TextInput id="password" v-model="form.password" type="password" class="mt-1 block w-full" required
+          autocomplete="current-password" />
         <InputError class="mt-2" :message="form.errors.password" />
       </div>
 
@@ -91,11 +81,7 @@ const submit = () => {
           Forgot your password?
         </Link> -->
 
-        <PrimaryButton
-          class="ml-4"
-          :class="{ 'opacity-25': form.processing }"
-          :disabled="form.processing"
-        >
+        <PrimaryButton class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
           Log in
         </PrimaryButton>
       </div>

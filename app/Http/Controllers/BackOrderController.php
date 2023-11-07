@@ -19,7 +19,7 @@ class BackOrderController extends Controller
      */
     public function index(Request $request)
     {
-        if (Auth::user()->type != 0) {
+        if (Auth::user()->type == 2) {
             return Redirect::route('cashier.index');
         } else {
             $date_from = $request->date_from ?? "";

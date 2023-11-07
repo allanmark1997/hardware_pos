@@ -15,7 +15,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        if (Auth::user()->type != 0) {
+        if (Auth::user()->type == 2) {
             return Redirect::route('cashier.index');
         } else {
             $orders = Order::with("supplier")->with("user")->with("product")->has("product")->with("price")->where("status", 0)->get();
@@ -56,6 +56,7 @@ class OrderController extends Controller
     {
         $request->validate([
             'quantity' => ["required", "integer"],
+            'remarks' => ["required"],
         ]);
         $order_find = Order::where("product_id", $request->product["product_id"])->where("status", 0)->first();
         if ($order_find == null) {
@@ -72,7 +73,8 @@ class OrderController extends Controller
         } else {
             $added_quantity = $order_find->quantity + $request->quantity;
             $order_find->update([
-                "quantity" => $added_quantity
+                "quantity" => $added_quantity,
+                "remarks" => $request->remarks
             ]);
         }
 
@@ -102,7 +104,8 @@ class OrderController extends Controller
     {
         // dd($request->quantity);
         $order->update([
-            "quantity" => $request->quantity
+            "quantity" => $request->quantity,
+            "remarks" => $request->remarks
         ]);
         return back();
     }

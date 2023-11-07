@@ -77,6 +77,27 @@ const form = useForm({
 });
 
 onMounted(() => {
+  document.onkeydown = (e) => {
+    if (e.key == "F12" || e.key == 123) {
+      e.preventDefault();
+    }
+    if (e.key == "F5" || e.key == 116) {
+      e.preventDefault();
+    }
+    if (e.ctrlKey && e.shiftKey && e.key == "I") {
+      e.preventDefault();
+    }
+    if (e.ctrlKey && e.shiftKey && e.key == "C") {
+      e.preventDefault();
+    }
+    if (e.ctrlKey && e.shiftKey && e.key == "J") {
+      e.preventDefault();
+    }
+    if (e.ctrlKey && e.key == "U") {
+      e.preventDefault();
+    }
+  };
+  document.addEventListener('contextmenu', event => event.preventDefault());
   keydownHandler();
 });
 
@@ -87,7 +108,8 @@ const keydownHandler = (event) => {
         console.log("Start transaction.");
         e.preventDefault();
       } else if (
-        e.keyCode == 113 &&
+        e.ctrlKey &&
+        e.keyCode == 68 &&
         router.page.component == "Cashier/Cashier"
       ) {
         console.log("Discount");

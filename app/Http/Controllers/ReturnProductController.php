@@ -18,7 +18,7 @@ class ReturnProductController extends Controller
      */
     public function index(Request $request)
     {
-        if (Auth::user()->type != 0) {
+        if (Auth::user()->type == 2) {
             return Redirect::route('cashier.index');
         } else {
             $date_from = $request->date_from ?? "";
@@ -100,13 +100,26 @@ class ReturnProductController extends Controller
 
         foreach ($request->products as $key => $product) {
             $return_product = ReturnProduct::where("transaction_detail_id", $product["product"]["id"])->first();
+            $product_find = Product::where("id", $product["product"]["product"]["id"])->first();
+
             if ($return_product != null) {
                 $return_product->update([
                     "quantity" => $return_product->quantity + $product["quantity"],
                     "remarks" => $product["remarks"],
                     "proccessed_by" => Auth::user()->id
                 ]);
+
+                $deduct_inventory = $product_find->quantity - $product["quantity"];
+                $product_find->update([
+                    "quantity" => $deduct_inventory
+                ]);
             } else {
+
+                $deduct_inventory = $product_find->quantity - $product["quantity"];
+                $product_find->update([
+                    "quantity" => $deduct_inventory
+                ]);
+
                 ReturnProduct::create([
                     "transaction_id" => $product["product"]["transaction_id"],
                     "transaction_detail_id" => $product["product"]["id"],

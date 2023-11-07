@@ -7,6 +7,8 @@ defineProps({
     laravelVersion: String,
     phpVersion: String,
 });
+document.addEventListener('contextmenu', event => event.preventDefault());
+
 </script>
 
 <template>

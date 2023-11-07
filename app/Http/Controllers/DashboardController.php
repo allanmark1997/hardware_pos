@@ -29,7 +29,7 @@ class DashboardController extends Controller
         $week_end_day = date('d', strtotime('+' . (6 - $day) . ' days'));
         $month_start = date('Y-m-01');
         $month_end = date('t');
-        if (Auth::user()->type != 0) {
+        if (Auth::user()->type == 2) {
             return Redirect::route('cashier.index');
         } else {
             $sale_day = TransactionDetail::with("product")->with("price")->with("sale_discount")->where("created_at", "LIKE", "%{$day_today}%")->where("status", 1)->get();
