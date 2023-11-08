@@ -264,62 +264,8 @@ class DashboardController extends Controller
             foreach ($top_10_prod_current_year as $key => $value) {
                 $year_month_with_quantity_price_total_data_pie[] = array($value->name, $value->grand_total_sale);
             }
-
-
             $current_transaction = Transaction::with("accommodate_by")->with("tax")->with("special_discount")->with("transaction_details")->where("status", 1)->orderBy("created_at", "desc")->limit(10)->get();
 
-            // dd($current_transaction);
-
-            //
-
-            // $sale_year = TransactionDetail::with("product")->with("price")->with("sale_discount")->where("created_at", "LIKE", "%{$year_today}%")->get();
-            // $grouped_sales_raw = $sale_year->groupBy("product.name");
-            // $temp_array = [];
-            // $temp_counter = [];
-            // $temp_final = [];
-            // $months = [
-            //     "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
-            // ];
-            // foreach ($grouped_sales_raw as $key => $group) {
-            //     foreach ($group as $key2 => $product) {
-            //         $temp_counter[$key][Carbon::parse($product->created_at)->format("F")][] = array("quantity" => $product->quantity, "price" => $product->price->price, "discount" => $product->sale_discount->discount / 100);
-            //     }
-            // }
-            // foreach ($temp_counter as $key1 => $group_products) {
-            //     $temp_all_quantity = 0;
-            //     $temp_all_price = 0;
-            //     foreach ($group_products as $key2 => $group_date) {
-            //         $temp_result_per_month = 0;
-            //         foreach ($group_date as $key3 => $product_quantity_price) {
-            //             $temp_result_per_month += $product_quantity_price["quantity"];
-            //             $temp_all_quantity += $product_quantity_price["quantity"];
-            //             $temp_all_price += $product_quantity_price["quantity"] * ($product_quantity_price["price"] - ($product_quantity_price["price"] * $product_quantity_price["discount"]));
-            //         }
-            //         $temp_array[$key1]["name"] = $key1;
-            //         $temp_array[$key1]["data"][$key2] = $temp_result_per_month;
-            //     }
-            //     $temp_array[$key1]["quantity"] = $temp_all_quantity;
-            //     $temp_array[$key1]["total_sale"] = $temp_all_price;
-            // }
-
-            // foreach ($temp_array as $key => $value) {
-            //     $temp_final[] = (object) array("name" => $value["name"],  "data" => (object) $value["data"], "quantity" => $value["quantity"], "total_sale" => $value["total_sale"]);
-            // }
-            // $sale_year_filtered = $this->sortByField($temp_final, 'quantity');
-            // $top_10_prod_year = array_slice($sale_year_filtered, 0, 10);
-
-            // $sample_array_months_jan_to_dec = [];
-            // foreach ($months as $key => $months_value) {
-            //     foreach ($top_10_prod_year as $key2 => $value2) {
-            //         $sample_array_months_jan_to_dec[$key2]["name"] = $value2->name;
-            //         $sample_array_months_jan_to_dec[$key2]["data"][$months_value] = 0;
-            //         foreach ($value2->data as $key3 => $value3) {
-            //             if ($key3 == $months_value) {
-            //                 $sample_array_months_jan_to_dec[$key2]["data"][$months_value] = $value3;
-            //             }
-            //         }
-            //     }
-            // }
             return Inertia::render("Dashboard", [
                 "top_10_prod_current_day" => $top_10_prod_current_day,
                 "day_with_quantity_price_total_data_pie" => $day_with_quantity_price_total_data_pie,
