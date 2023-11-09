@@ -288,7 +288,7 @@ class DashboardController extends Controller
     public function month($val)
     {
         if ($val == 1) {
-            return "Januray";
+            return "January";
         } elseif ($val == 2) {
             return "February";
         } elseif ($val == 3) {
