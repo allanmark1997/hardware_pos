@@ -62,7 +62,7 @@ class TransactionController extends Controller
         // $results[] = ['DATE RANGES', 'From', 'To', 'Paid grand total', "Unsuccessful grand total"];
         // $results[] = ['', $request->date_from ?? "--", $request->date_to ?? '--', "PHP " . number_format($this->grand_total_success($transactions), 2), "PHP " . number_format($this->grand_total_unsuccess($transactions), 2)];
         $grand_unsuccess_total[] = ['Paid grand total', "Unsuccessful grand total"];
-        $grand_unsuccess_total[] = ["PHP " . $this->number_format_conversion($this->grand_total_success($transactions), 2), "PHP " . $this->number_format_conversion($this->grand_total_unsuccess($transactions), 2)];
+        $grand_unsuccess_total[] = ["PHP " . $this->number_format_conversion($this->grand_total_success($transactions)), "PHP " . $this->number_format_conversion($this->grand_total_unsuccess($transactions))];
 
         $results[] = ['TRANSACTION ID', 'ACCOMMODATED BY', 'STATUS', 'PAYMENT METHOD', 'CUSTOMER TYPE', 'TAX IN PERCENT', 'SPECIAL DISCOUNT IN PERCENT', '', '', '', '', '', '', '', "TOTAL VAT ADDED", "TOTAL SPECIAL DISCOUNTED", "TOTAL PRICE PAID", "CUSTOMER CASH", "CUSTOMER CHANGE", "TOTAL BACK ORDER", 'CREATED AT'];
 
@@ -83,12 +83,12 @@ class TransactionController extends Controller
                 count($transaction->transaction_details) != 0 ? "Status" : "--",
                 count($transaction->transaction_details) != 0 ? "Total Discount" : "--",
                 count($transaction->transaction_details) != 0 ? "Sub-total" : "--",
-                "PHP " . $this->number_format_conversion($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount : 0, 0, $transaction->status), 2),
-                "PHP " . $this->number_format_conversion($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount : 0, 1, $transaction->status), 2),
-                "PHP " . $this->number_format_conversion($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount : 0, 2, $transaction->status), 2),
-                "PHP " . $this->number_format_conversion($transaction->cash, 2),
-                "PHP " . $this->number_format_conversion(($transaction->cash - $this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount : 0, 2, $transaction->status)), 2),
-                "PHP " . $this->number_format_conversion($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount : 0, 3, $transaction->status), 2),
+                "PHP " . $this->number_format_conversion($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount : 0, 0, $transaction->status)),
+                "PHP " . $this->number_format_conversion($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount : 0, 1, $transaction->status)),
+                "PHP " . $this->number_format_conversion($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount : 0, 2, $transaction->status)),
+                "PHP " . $this->number_format_conversion($transaction->cash),
+                "PHP " . $this->number_format_conversion(($transaction->cash - $this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount : 0, 2, $transaction->status))),
+                "PHP " . $this->number_format_conversion($this->calculate_vat_special_discounted($transaction->transaction_details, $transaction->tax->tax, $transaction->special_discount?->discount ? $transaction->special_discount->discount : 0, 3, $transaction->status)),
 
                 Carbon::parse($transaction->created_at)->format('d-m-Y')
             ];
@@ -106,8 +106,8 @@ class TransactionController extends Controller
                     "PHP " . $this->number_format_conversion($transaction_detail->price->price),
                     $transaction_detail->sale_discount->discount / 100,
                     $transaction_detail->status == 1 || $transaction_detail->status == 2 || $transaction_detail->status == 3 ? "Success" : "Unsuccess",
-                    "PHP " . $this->number_format_conversion($this->calculate_sub_total_discounted_amount($transaction_detail->price->price, $transaction_detail->sale_discount->discount, $transaction_detail->quantity, $transaction_detail->status), 2),
-                    "PHP " . $this->number_format_conversion($this->calculate_sub_total_discounted($transaction_detail->price->price, $transaction_detail->sale_discount->discount, $transaction_detail->quantity, $transaction_detail->status), 2),
+                    "PHP " . $this->number_format_conversion($this->calculate_sub_total_discounted_amount($transaction_detail->price->price, $transaction_detail->sale_discount->discount, $transaction_detail->quantity, $transaction_detail->status)),
+                    "PHP " . $this->number_format_conversion($this->calculate_sub_total_discounted($transaction_detail->price->price, $transaction_detail->sale_discount->discount, $transaction_detail->quantity, $transaction_detail->status)),
                     "",
                     "",
                     "",
