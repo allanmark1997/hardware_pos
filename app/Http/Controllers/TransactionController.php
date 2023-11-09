@@ -75,7 +75,7 @@ class TransactionController extends Controller
                 $transaction->payment_method == 0 ? "Cash" : "Other",
                 $transaction->customer_type == 0 ? "Walk-in" : "Regular",
                 $transaction->tax->tax / 100,
-                $transaction->special_discount?->discount ? $transaction->special_discount->discount : 0 / 100,
+                $transaction->special_discount?->discount ? $transaction->special_discount->discount / 100 : 0,
                 count($transaction->transaction_details) != 0 ? "Product name" : "--",
                 count($transaction->transaction_details) != 0 ? "Quantity" : "--",
                 count($transaction->transaction_details) != 0 ? "Price" : "--",
