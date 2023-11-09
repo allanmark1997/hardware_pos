@@ -46,7 +46,7 @@ class BackOrderController extends Controller
         })->get();
 
         $grand_total[] = ["GRAND TOTAL SUCCESS", "GRAND TOTAL IN PROGRESS"];
-        $grand_total[] = ["PHP " . number_format($this->calculate_success_grand_totals($back_orders), 2), "PHP " . number_format($this->calculate_inprogress_grand_totals($back_orders), 2)];
+        $grand_total[] = ["PHP " . $this->number_format_conversion($this->calculate_success_grand_totals($back_orders), 2), "PHP " . $this->number_format_conversion($this->calculate_inprogress_grand_totals($back_orders), 2)];
 
         $results[] = [
             "PROCESSED BY",
@@ -63,17 +63,32 @@ class BackOrderController extends Controller
             $results[] = [
                 $backorder->user->name,
                 $backorder->product->name,
-                "PHP " . number_format($backorder->price->price, 2),
+                "PHP " . $this->number_format_conversion($backorder->price->price, 2),
                 $backorder->discount->discount,
                 $backorder->quantity,
                 $backorder->status == 1 ? "Refunded" : "In progress",
-                "PHP " . number_format($backorder->status == 1 ? $backorder->quantity * $backorder->price->price : 0, 2),
-                "PHP " . number_format($backorder->status == 0 ? $backorder->quantity * $backorder->price->price : 0, 2),
+                "PHP " . $this->number_format_conversion($backorder->status == 1 ? $backorder->quantity * $backorder->price->price : 0, 2),
+                "PHP " . $this->number_format_conversion($backorder->status == 0 ? $backorder->quantity * $backorder->price->price : 0, 2),
                 Carbon::parse($backorder->created_at)->format('d-m-Y')
             ];
         }
 
         return (new BackOrderExport([$results, $grand_total], ['Back Orders', 'Grand totals']))->download($request->date_from . " to " . $request->date_to . " Back-orders.xlsx");
+    }
+
+    private function number_format_conversion($data)
+    {
+        $split_data = explode(".", strval($data));
+        $decimal = "";
+        try {
+            $decimal = strval($split_data[1]);
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+        $substring_decimal = $decimal == "" ? "00" : substr($decimal, 0, 2);
+        $validate_decimal = $substring_decimal;
+        $final_data = strval($split_data[0]) . "." . $validate_decimal;
+        return $final_data;
     }
 
     private function calculate_success_grand_totals($back_orders)
