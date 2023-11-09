@@ -57,18 +57,20 @@ class BackOrderController extends Controller
             "STATUS",
             "SUCCESS SUB-TOTAL",
             "INPROGRESS SUB-TOTAL",
+            "CANCEL SUB-TOTAL",
             "CREATED AT"
         ];
         foreach ($back_orders as $key => $backorder) {
             $results[] = [
                 $backorder->user->name,
                 $backorder->product->name,
-                "PHP " . $this->number_format_conversion($backorder->price->price, 2),
+                "PHP " . $this->number_format_conversion($backorder->price->price),
                 $backorder->discount->discount,
                 $backorder->quantity,
                 $backorder->status == 1 ? "Refunded" : "In progress",
                 "PHP " . $this->number_format_conversion($backorder->status == 1 ? $backorder->quantity * $backorder->price->price : 0),
                 "PHP " . $this->number_format_conversion($backorder->status == 0 ? $backorder->quantity * $backorder->price->price : 0),
+                "PHP " . $this->number_format_conversion($backorder->status == 2 ? $backorder->quantity * $backorder->price->price : 0),
                 Carbon::parse($backorder->created_at)->format('d-m-Y')
             ];
         }
