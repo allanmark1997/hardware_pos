@@ -45,8 +45,8 @@ class BackOrderController extends Controller
             $query->whereBetween('created_at', [$date_from, $date_to]);
         })->get();
 
-        $grand_total[] = ["GRAND TOTAL SUCCESS", "GRAND TOTAL IN PROGRESS"];
-        $grand_total[] = ["PHP " . $this->number_format_conversion($this->calculate_success_grand_totals($back_orders), 2), "PHP " . $this->number_format_conversion($this->calculate_inprogress_grand_totals($back_orders), 2)];
+        $grand_total[] = ["GRAND TOTAL SUCCESS", "GRAND TOTAL IN PROGRESS", "GRAND TOTAL CANCEL"];
+        $grand_total[] = ["PHP " . $this->number_format_conversion($this->calculate_success_grand_totals($back_orders)), "PHP " . $this->number_format_conversion($this->calculate_inprogress_grand_totals($back_orders)), "PHP " . $this->number_format_conversion($this->calculate_cancel_grand_totals($back_orders))];
 
         $results[] = [
             "PROCESSED BY",
@@ -67,8 +67,8 @@ class BackOrderController extends Controller
                 $backorder->discount->discount,
                 $backorder->quantity,
                 $backorder->status == 1 ? "Refunded" : "In progress",
-                "PHP " . $this->number_format_conversion($backorder->status == 1 ? $backorder->quantity * $backorder->price->price : 0, 2),
-                "PHP " . $this->number_format_conversion($backorder->status == 0 ? $backorder->quantity * $backorder->price->price : 0, 2),
+                "PHP " . $this->number_format_conversion($backorder->status == 1 ? $backorder->quantity * $backorder->price->price : 0),
+                "PHP " . $this->number_format_conversion($backorder->status == 0 ? $backorder->quantity * $backorder->price->price : 0),
                 Carbon::parse($backorder->created_at)->format('d-m-Y')
             ];
         }
@@ -107,6 +107,17 @@ class BackOrderController extends Controller
         $result = 0;
         foreach ($back_orders as $key => $backorder) {
             if ($backorder->status == 0) {
+                $result += $backorder->quantity * $backorder->price->price;
+            }
+        }
+        return $result;
+    }
+
+    private function calculate_cancel_grand_totals($back_orders)
+    {
+        $result = 0;
+        foreach ($back_orders as $key => $backorder) {
+            if ($backorder->status == 2) {
                 $result += $backorder->quantity * $backorder->price->price;
             }
         }
