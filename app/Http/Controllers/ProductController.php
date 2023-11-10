@@ -237,7 +237,7 @@ class ProductController extends Controller
                     $product->description["details"],
                     $product->quantity,
                     $product->current_discount->discount,
-                    "PHP " . number_format($product->current_price->price, 2),
+                    "PHP " . $this->number_format_conversion($product->current_price->price),
                     $product->category->name,
                     $product->user->name,
                     Carbon::parse($product->created_at)->format('d-m-Y'),
@@ -268,5 +268,19 @@ class ProductController extends Controller
         }
         // dd($results);
         return (new ProductsExport([$results], ['Inventory']))->download("Inventories.xlsx");
+    }
+    private function number_format_conversion($data)
+    {
+        $split_data = explode(".", strval($data));
+        $decimal = "";
+        try {
+            $decimal = strval($split_data[1]);
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+        $substring_decimal = $decimal == "" ? "00" : substr($decimal, 0, 2);
+        $validate_decimal = $substring_decimal;
+        $final_data = strval($split_data[0]) . "." . $validate_decimal;
+        return $final_data;
     }
 }
