@@ -4,6 +4,7 @@ import { router, useForm } from "@inertiajs/vue3";
 import Icon from "@/Components/Icon.vue";
 import Pagination2 from "@/Components/Pagination2.vue";
 import TextInput from "@/Components/TextInput.vue";
+import Input from "@/Components/Input.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import ConfirmDialogModal from "@/Components/ConfirmationModal.vue";
 

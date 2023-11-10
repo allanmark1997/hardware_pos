@@ -133,7 +133,17 @@ const back_order = () => {
         position: toast.POSITION.TOP_RIGHT,
       }
     );
-  } else {
+  } else if (form_back_order.quantity <= 0) {
+    toast.error(
+      "Can't allow request, quantity is zero or negative",
+      {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      }
+    );
+  }
+  else {
     form_back_order.post(
       route("products.back_order", form_back_order.product),
       {
@@ -148,11 +158,11 @@ const back_order = () => {
           form_back_order.reset();
         },
         onError: (error) => {
-          toast.error("Something went wrong " + error, {
-            autoClose: 1000,
-            transition: toast.TRANSITIONS.FLIP,
-            position: toast.POSITION.TOP_RIGHT,
-          });
+          // toast.error("Something went wrong " + error, {
+          //   autoClose: 1000,
+          //   transition: toast.TRANSITIONS.FLIP,
+          //   position: toast.POSITION.TOP_RIGHT,
+          // });
         },
       }
     );
@@ -456,6 +466,7 @@ onMounted(() => {
       <Input type="number" label="Enter product quantity" v-model="form_back_order.quantity" />
       <JetInputError :message="form_back_order.errors.quantity" class="mt-2" />
       <Input type="text" label="Enter your remarks" v-model="form_back_order.remarks" />
+      <JetInputError :message="form_back_order.errors.remarks" class="mt-2" />
     </template>
     <template #footer>
       <SecondaryButton @click="condfirmationBackOrderModal = false" class="mr-2">

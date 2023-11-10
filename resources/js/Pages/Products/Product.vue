@@ -97,11 +97,11 @@ const add_product = () => {
       post_images.value = [];
     },
     onError: (error) => {
-      toast.error("Something went wrong " + error, {
-        autoClose: 1000,
-        transition: toast.TRANSITIONS.FLIP,
-        position: toast.POSITION.TOP_RIGHT,
-      });
+      // toast.error("Something went wrong " + error, {
+      //   autoClose: 1000,
+      //   transition: toast.TRANSITIONS.FLIP,
+      //   position: toast.POSITION.TOP_RIGHT,
+      // });
     },
   });
 };
@@ -132,11 +132,11 @@ const add_category = () => {
       open_modal_add_category();
     },
     onError: (error) => {
-      toast.error("Something went wrong " + error, {
-        error: 1000,
-        transition: toast.TRANSITIONS.FLIP,
-        position: toast.POSITION.TOP_RIGHT,
-      });
+      // toast.error("Something went wrong " + error, {
+      //   error: 1000,
+      //   transition: toast.TRANSITIONS.FLIP,
+      //   position: toast.POSITION.TOP_RIGHT,
+      // });
     },
   });
 };

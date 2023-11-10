@@ -48,6 +48,7 @@ class User extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => 'required',
             'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:1024'],
+            'image' => ['mimes:jpg,jpeg,png', 'max:1024', 'required'],
 
         ]);
         $fullname = $request->fname . ' ' . $request->mname . ' ' . $request->lname;

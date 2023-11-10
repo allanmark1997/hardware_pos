@@ -102,10 +102,8 @@ class OrderController extends Controller
      */
     public function update(Request $request, Order $order)
     {
-        // dd($request->quantity);
         $order->update([
             "quantity" => $request->quantity,
-            "remarks" => $request->remarks
         ]);
         return back();
     }

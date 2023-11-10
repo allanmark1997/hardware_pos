@@ -200,6 +200,7 @@ class ProductController extends Controller
 
         $request->validate([
             'quantity' => ["required", "max:30", "integer"],
+            'remarks' => ["required"],
         ]);
 
         // $result = $product->quantity - $request->quantity;

@@ -52,7 +52,7 @@ class SupplierController extends Controller
             'address' => 'required',
             'mobile_no' => ['required', 'string', 'max:13'],
             'status' => 'required',
-            // 'image' => ['mimes:jpg,jpeg,png', 'max:1024'],
+            'image' => ['mimes:jpg,jpeg,png', 'max:1024', 'required'],
 
         ]);
 
