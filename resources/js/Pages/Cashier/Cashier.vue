@@ -1361,7 +1361,7 @@ const deduct_scan_item = (index) => {
               </tr>
               <tr>
                 <td>
-                  <Barcode :code="props.code" style="width:50px; height: 20px;" />
+                  <Barcode :code="props.code" style="width:60vmin; height: 35vmin;" />
                 </td>
               </tr>
               <tr>

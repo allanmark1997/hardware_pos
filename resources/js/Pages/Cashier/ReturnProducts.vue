@@ -954,7 +954,7 @@ const stringTruncateFromCenter = (str, maxLength) => {
             </tr>
             <tr>
               <td>
-                <BarcodeReturn :code="transaction.code" style="width:50px; height: 20px;" />
+                <BarcodeReturn :code="transaction.code" style="width:60vmin; height: 35vmin;" />
               </td>
             </tr>
             <tr>
