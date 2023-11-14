@@ -41,6 +41,8 @@ Route::get('/', function () {
     ]);
 });
 
+Route::post('/update_expire', [User::class, 'update_expire'])->name('update_expire');
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),

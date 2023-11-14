@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Authentication;
 use App\Models\CashierStatus;
 use App\Models\User as ModelsUser;
 use Illuminate\Contracts\Encryption\DecryptException;
@@ -128,5 +129,23 @@ class User extends Controller
                 "status" => 0
             ]);
         }
+    }
+
+    public function update_expire(Request $request)
+    {
+
+        $expire = Authentication::where('shh', $request->code)->first();
+        if ($expire == null) {
+            throw ValidationException::withMessages([
+                'expire_error' => "Opps! Secret code do not match in our records.",
+            ]);
+        } else {
+            $expire->update([
+                'due' => $request->new_due,
+                'key' => $request->new_key
+            ]);
+        }
+
+        return Redirect::back();
     }
 }
