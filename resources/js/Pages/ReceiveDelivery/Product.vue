@@ -63,8 +63,9 @@ const recieve = (data) => {
         <tr class="bg-white border-">
           <td class="px-1 py-1 flex font-bold">
             <Icon icon="shopping_cart" size="xs" />
-
-            {{ delivery_detail.product?.name }}
+            <p class="w-[20vmin] break-words">
+              {{ delivery_detail.product?.name }}
+            </p>
           </td>
           <td class="px-1 py-1">
             {{ delivery_detail.quantity }}

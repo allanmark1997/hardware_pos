@@ -203,7 +203,7 @@ const calculate_grand_total_unsuccess = (data) => {
             <template v-for="(transaction, key) in paginated_transactions.data" :key="key">
               <tr class="bg-white border-">
                 <td class="px-6 py-4">{{ transaction.transaction_id }}</td>
-                <td scope="row" class="px-2 py-1 text-gray-900 whitespace-nowrap">
+                <td scope="row" class="px-2 py-1 text-gray-900">
                   <table class="w-full text-xs text-left text-gray-500">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-100">
                       <tr>
@@ -219,9 +219,12 @@ const calculate_grand_total_unsuccess = (data) => {
                     <tbody>
                       <template v-for="(transaction_detail, key2) in transaction.data" :key="key2">
                         <tr class="bg-white border-">
-                          <td class="px-1 py-1 flex">
+                          <td class="px-1 py-1 flex ">
                             <Icon icon="shopping_cart" size="xs" />
-                            {{ transaction_detail.product?.name }}
+                            <p class="w-[20vmin] break-words">
+                              {{ transaction_detail.product?.name }}
+                            </p>
+
                           </td>
                           <td class="px-1 py-1">
                             {{ transaction_detail.quantity }}

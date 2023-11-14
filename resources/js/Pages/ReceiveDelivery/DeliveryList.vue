@@ -224,7 +224,7 @@ const authorize = () => {
                   </span>
                 </td> -->
 
-                <td scope="row" class="px-2 py-1 text-gray-900 whitespace-nowrap">
+                <td scope="row" class="px-2 py-1 text-gray-900 ">
                   <Product :delivery_details="delivery.details" />
                 </td>
                 <!-- <td class="px-6 py-4">
