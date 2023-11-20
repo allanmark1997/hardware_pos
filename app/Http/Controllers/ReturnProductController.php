@@ -65,7 +65,7 @@ class ReturnProductController extends Controller
             $return_product = ReturnProduct::where("transaction_detail_id", $product["product"]["id"])->first();
             // dd($product["quantity"] > $transaction_detail->quantity);
             if ($return_product != null) {
-                if (($return_product->quantity + $product["quantity"]) == $transaction_detail->quantity) {
+                if ($return_product->quantity == $transaction_detail->quantity) {
                     throw ValidationException::withMessages([
                         'transaction_validation' => "This product (" .  $transaction_detail->product->name . ") is already claimed."
                     ]);
