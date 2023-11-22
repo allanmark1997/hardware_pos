@@ -27,28 +27,24 @@ class ProductController extends Controller
         if (Auth::user()->type == 2) {
             return Redirect::route('cashier.index');
         } else {
-            if (Auth::user()->type != 0 && Auth::user()->type != 1) {
-                return Redirect::route('dashboard');
-            } else {
-                $search = $request->search ?? '';
-                $category = $request->category ?? '';
-                $products = product::with('user')->with('current_price')->with('current_discount')->when($search != null || $search != "", function ($query) use ($search) {
-                    $query->where("name", "LIKE", "%{$search}%");
-                })->when($category != null || $category != "", function ($query) use ($category) {
-                    $query->where("category_id", "LIKE", $category);
-                })->orderBy('created_at', 'desc')->paginate(12);
-                $categories = Category::orderBy('name', 'asc')->get();
-                $tax = Tax::orderBy('created_at', 'desc')->first();
-                $special_discount = SpecialDiscount::orderBy('created_at', 'desc')->first();
-                return Inertia::render('Products/Product', [
-                    "products" => $products,
-                    "search" => $search,
-                    "categories" => $categories,
-                    "category" => $category,
-                    "tax" => $tax,
-                    "special_discount" => $special_discount
-                ]);
-            }
+            $search = $request->search ?? '';
+            $category = $request->category ?? '';
+            $products = product::with('user')->with('current_price')->with('current_discount')->when($search != null || $search != "", function ($query) use ($search) {
+                $query->where("name", "LIKE", "%{$search}%");
+            })->when($category != null || $category != "", function ($query) use ($category) {
+                $query->where("category_id", "LIKE", $category);
+            })->orderBy('created_at', 'desc')->paginate(12);
+            $categories = Category::orderBy('name', 'asc')->get();
+            $tax = Tax::orderBy('created_at', 'desc')->first();
+            $special_discount = SpecialDiscount::orderBy('created_at', 'desc')->first();
+            return Inertia::render('Products/Product', [
+                "products" => $products,
+                "search" => $search,
+                "categories" => $categories,
+                "category" => $category,
+                "tax" => $tax,
+                "special_discount" => $special_discount
+            ]);
         }
     }
 

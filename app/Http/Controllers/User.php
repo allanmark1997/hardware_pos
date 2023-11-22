@@ -20,18 +20,14 @@ class User extends Controller
         if (Auth::user()->type == 2) {
             return Redirect::route('cashier.index');
         } else {
-            if (Auth::user()->type != 0 && Auth::user()->type != 1) {
-                return Redirect::route('dashboard');
-            } else {
-                $search = $request->search ?? "";
-                $users = ModelsUser::when($search != null || $search != "", function ($query) use ($search) {
-                    $query->where("name", "LIKE", "%{$search}%");
-                })->paginate(12);
-                return Inertia::render('UserManagement/Users', [
-                    'users' => $users,
-                    'search' => $search
-                ]);
-            }
+            $search = $request->search ?? "";
+            $users = ModelsUser::when($search != null || $search != "", function ($query) use ($search) {
+                $query->where("name", "LIKE", "%{$search}%");
+            })->paginate(12);
+            return Inertia::render('UserManagement/Users', [
+                'users' => $users,
+                'search' => $search
+            ]);
         }
     }
 

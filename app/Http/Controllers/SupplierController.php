@@ -19,18 +19,14 @@ class SupplierController extends Controller
         if (Auth::user()->type == 2) {
             return Redirect::route('cashier.index');
         } else {
-            if (Auth::user()->type != 0 && Auth::user()->type != 1) {
-                return Redirect::route('dashboard');
-            } else {
-                $search = $request->search ?? "";
-                $suppliers = Supplier::when($search != null || $search != "", function ($query) use ($search) {
-                    $query->where("supplier_name", "LIKE", "%{$search}%");
-                })->paginate(12);
-                return Inertia::render('SupplierManangement/Suppliers', [
-                    'suppliers' => $suppliers,
-                    'search' => $search
-                ]);
-            }
+            $search = $request->search ?? "";
+            $suppliers = Supplier::when($search != null || $search != "", function ($query) use ($search) {
+                $query->where("supplier_name", "LIKE", "%{$search}%");
+            })->paginate(12);
+            return Inertia::render('SupplierManangement/Suppliers', [
+                'suppliers' => $suppliers,
+                'search' => $search
+            ]);
         }
     }
 
