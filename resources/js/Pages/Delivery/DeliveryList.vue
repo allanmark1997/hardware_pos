@@ -5,17 +5,24 @@ import Icon from "@/Components/Icon.vue";
 import Pagination2 from "@/Components/Pagination2.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Input from "@/Components/Input.vue";
+import JetDialogModal from "@/Components/DialogModal.vue";
+
 
 import moment from "moment";
 import { inject, onMounted, provide, ref } from "vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 
 const props = defineProps(["deliveries", "date_from", "date_to", "search"]);
 
 const date_from = ref(props.date_from);
 const date_to = ref(props.date_to);
 const search = ref(props.search);
+
+const delivery_detail_modal = ref(false);
+const delivery_object = ref();
+const supplier_name = ref()
 
 // onMounted(()=>{
 //   console.log(props.deliveries)
@@ -146,19 +153,22 @@ const count_total_unsuccess = (data) => {
         <table class="w-full text-sm text-left text-gray-500">
           <thead class="text-xs text-white uppercase bg-yellow-500">
             <tr>
+              <th scope="col" class="px-6 py-3">Delivery ID</th>
               <th scope="col" class="px-6 py-3">Supplier name</th>
               <th scope="col" class="px-6 py-3">Receive by</th>
               <th scope="col" class="px-6 py-3">Status</th>
-              <th scope="col" class="px-6 py-3">Products</th>
               <th scope="col" class="px-6 py-3">Total Success</th>
               <th scope="col" class="px-6 py-3">Total Unsuccess</th>
-              <!-- <th scope="col" class="px-6 py-3">Remarks</th> -->
               <th scope="col" class="px-6 py-3">Created at</th>
             </tr>
           </thead>
           <tbody>
             <template v-for="(delivery, key) in deliveries.data" :key="key">
-              <tr class="bg-white border-">
+              <tr class="bg-white hover:bg-gray-100 cursor-pointer"
+                @click="(delivery_detail_modal = true, delivery_object = delivery.details, supplier_name = delivery.supplier?.supplier_name)">
+                <td class="px-6 py-4">
+                  {{ delivery.id }}
+                </td>
                 <td class="px-6 py-4">
                   <img class="h-8 w-8 rounded-full object-cover" :src="delivery.supplier.image"
                     :alt="delivery.supplier.supplier_name" />
@@ -179,64 +189,12 @@ const count_total_unsuccess = (data) => {
                     Unuccess
                   </span>
                 </td>
-
-                <td scope="row" class="px-2 py-1 text-gray-900 whitespace-nowrap">
-                  <table class="w-full text-xs text-left text-gray-500">
-                    <thead class="text-xs text-gray-700 uppercase bg-gray-100">
-                      <tr>
-                        <th scope="col" class="px-1 py-1">Product</th>
-                        <th scope="col" class="px-1 py-1">No.</th>
-                        <th scope="col" class="px-1 py-1">Price</th>
-                        <th scope="col" class="px-1 py-1">Status</th>
-                        <th scope="col" class="px-1 py-1">Sub-total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <template v-for="(delivery_detail, key2) in delivery.details" :key="key2">
-                        <tr class="bg-white border-">
-                          <td class="px-1 py-1 flex pt-2 font-bold">
-                            <Icon icon="shopping_cart" size="xs" />
-                            <p class="w-[20vmin] break-words">
-                              {{ delivery_detail.product?.name }}
-                            </p>
-                          </td>
-                          <td class="px-1 py-1">
-                            {{ delivery_detail.quantity }}
-                          </td>
-                          <td class="px-1 py-1">
-                            {{ convert_money(delivery_detail.price.price) }}
-                          </td>
-                          <td class="px-1 py-1">
-                            <small v-if="delivery_detail.status == 1"
-                              class="bg-green-400 rounded-md p-1 text-white flex gap-1">
-                              <Icon icon="check" size="sm" />
-                              Success
-                            </small>
-                            <small v-else class="bg-red-400 rounded-md p-1 text-white flex gap-1">
-                              <Icon icon="wrong" size="xs" />
-                              Unsuccess
-                            </small>
-                          </td>
-                          <td class="px-1 py-1">
-                            <small>{{
-                              convert_money(
-                                delivery_detail.quantity *
-                                delivery_detail.price.price
-                              )
-                            }}</small>
-                          </td>
-                        </tr>
-                      </template>
-                    </tbody>
-                  </table>
-                </td>
                 <td class="px-6 py-4">
                   {{ convert_money(count_total_success(delivery.details)) }}
                 </td>
                 <td class="px-6 py-4">
                   {{ convert_money(count_total_unsuccess(delivery.details)) }}
                 </td>
-                <!-- <td class="px-6 py-4">{{ delivery.remarks ?? "None" }}</td> -->
                 <td class="px-6 py-4 flex gap-2">
                   <Icon icon="calendar" size="md" />
                   {{ date_time(delivery.created_at) }}
@@ -254,4 +212,63 @@ const count_total_unsuccess = (data) => {
       </div>
     </div>
   </section>
+  <JetDialogModal :show="delivery_detail_modal" :maxWidth="'2xl'" @close="delivery_detail_modal = false">
+    <template #title>
+      <span class="text-gray-600 truncate"> Delivery details for ({{ supplier_name }})</span>
+    </template>
+    <template #content>
+      <table class="w-full text-xs text-left text-gray-500">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+          <tr>
+            <th scope="col" class="px-1 py-1">Product</th>
+            <th scope="col" class="px-1 py-1">No.</th>
+            <th scope="col" class="px-1 py-1">Price</th>
+            <th scope="col" class="px-1 py-1">Status</th>
+            <th scope="col" class="px-1 py-1">Sub-total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template v-for="(delivery_detail, key2) in delivery_object" :key="key2">
+            <tr class="bg-white border-">
+              <td class="px-1 py-1 flex pt-2 font-bold">
+                <Icon icon="shopping_cart" size="xs" />
+                <p class="w-[20vmin] break-words">
+                  {{ delivery_detail.product?.name }}
+                </p>
+              </td>
+              <td class="px-1 py-1">
+                {{ delivery_detail.quantity }}
+              </td>
+              <td class="px-1 py-1">
+                {{ convert_money(delivery_detail.price.price) }}
+              </td>
+              <td class="px-1 py-1">
+                <small v-if="delivery_detail.status == 1" class="bg-green-400 rounded-md p-1 text-white flex gap-1">
+                  <Icon icon="check" size="sm" />
+                  Success
+                </small>
+                <small v-else class="bg-red-400 rounded-md p-1 text-white flex gap-1">
+                  <Icon icon="wrong" size="xs" />
+                  Unsuccess
+                </small>
+              </td>
+              <td class="px-1 py-1">
+                <small>{{
+                  convert_money(
+                    delivery_detail.quantity *
+                    delivery_detail.price.price
+                  )
+                }}</small>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </template>
+    <template #footer>
+      <SecondaryButton class="mr-2 bg-red-300" @click="delivery_detail_modal = false">
+        Close
+      </SecondaryButton>
+    </template>
+  </JetDialogModal>
 </template>

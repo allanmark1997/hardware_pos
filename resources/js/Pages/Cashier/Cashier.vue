@@ -744,14 +744,14 @@ const deduct_scan_item = (index) => {
     </div>
     <div class="max-w-7xl mx-auto bg-white rounded mt-5 px-1">
       <div class="grid grid-cols-12 gap-2">
-        <div class="col-span-7 p-5">
+        <div class="col-span-5 p-5">
           <div class="product_list bg-gray-50 p-1 rounded-lg mt-3 min-h-[60vmin] overflow-auto">
             <div class="mt-24 flex max-w-lg mx-auto max-h-lg justify-center">
               <img v-if="scannedProductIMG" class="object-contain h-48 w-96" :src="scannedProductIMG" />
             </div>
           </div>
         </div>
-        <div class="col-span-5">
+        <div class="col-span-7">
           <div class="bg-white rounded-b-xl shadow-md p-5 flex justify-between max-h-[63vmin]">
             <div class="flex">
               <Icon icon="shopping_cart" size="sm"></Icon>
@@ -799,52 +799,6 @@ const deduct_scan_item = (index) => {
             </button>
           </form> -->
           <div class="relative mt-5 px-2 overflow-x-auto min-h-[45vmin] shadow-md">
-            <table class="w-full text-sm text-left text-gray-500">
-              <tbody>
-                <tr v-for="data in totalCart" class="bg-white border-b">
-                  <td class="px-6 py-4 font-semibold text-gray-900">Wrench</td>
-                  <td class="px-6 py-4">
-                    <div class="flex items-center space-x-3">
-                      <div>
-                        <div class="flex items-center space-x-3">
-                          <button
-                            class="inline-flex items-center justify-center p-1 text-sm font-medium h-6 w-6 text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200"
-                            type="button">
-                            <span class="sr-only">Quantity button</span>
-                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                              viewBox="0 0 18 2">
-                              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M1 1h16" />
-                            </svg>
-                          </button>
-                          <div>
-                            <input type="number" id="first_product"
-                              class="bg-gray-50 w-14 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-2.5 py-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                              placeholder="1" required />
-                          </div>
-                          <button
-                            class="inline-flex items-center justify-center h-6 w-6 p-1 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200"
-                            type="button">
-                            <span class="sr-only">Quantity button</span>
-                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                              viewBox="0 0 18 18">
-                              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 1v16M1 9h16" />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="px-6 py-4 font-semibold text-gray-900"></td>
-                  <td class="px-6 py-4 font-semibold text-gray-900">
-                    <button>
-                      <Icon icon="close_icon" size="sm" class="text-red" />
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
             <div v-if="form.products.length === 0" class="mx-auto text-center text-xs">
               Scan a product
             </div>
@@ -861,26 +815,30 @@ const deduct_scan_item = (index) => {
                         <p class="text-sm font-medium text-gray-900 truncate">
                           {{ items.name }}
                         </p>
-                      </div>
-                      <div class="inline-flex items-center text-base font-semibold text-gray-900 text-xs">
-                        {{ convert_money(items.current_price.price) }}
-                      </div>
-                      <div class="inline-flex items-center text-base font-semibold text-gray-900">
-                        <a class="bg-red-400 text-white hover:bg-red-500 cursor-pointer rounded-l-lg p-1 mr-2"
-                          @click="deduct_scan_item(key)">-</a>
-                        <small>x{{ items.cashier_quantity }}</small>
-                        <a class="bg-green-400 text-white hover:bg-green-500 cursor-pointer rounded-r-lg p-1 ml-2"
-                          @click="add_scan_item(key)">+</a>
-                      </div>
-                      <div class="inline-flex items-center text-base font-semibold text-gray-900 text-xs">
-                        {{
-                          convert_money(
-                            applyDiscount(
-                              items.current_price.price,
-                              items.current_discount.discount
-                            ).discountedPrice * items.cashier_quantity
-                          )
-                        }}
+                        <div class="flex justify-between">
+                          <div class="flex gap-4">
+                            <div class="inline-flex items-center text-base font-semibold text-gray-900 text-xs">
+                              {{ convert_money(items.current_price.price) }}
+                            </div>
+                            <div class="inline-flex items-center text-base font-semibold text-gray-900">
+                              <a class="bg-red-400 text-white hover:bg-red-500 cursor-pointer rounded-l-lg p-1 mr-2"
+                                @click="deduct_scan_item(key)">-</a>
+                              <small>x{{ items.cashier_quantity }}</small>
+                              <a class="bg-green-400 text-white hover:bg-green-500 cursor-pointer rounded-r-lg p-1 ml-2"
+                                @click="add_scan_item(key)">+</a>
+                            </div>
+                          </div>
+                          <div class="inline-flex items-center text-base font-semibold text-gray-900 text-xs">
+                            {{
+                              convert_money(
+                                applyDiscount(
+                                  items.current_price.price,
+                                  items.current_discount.discount
+                                ).discountedPrice * items.cashier_quantity
+                              )
+                            }}
+                          </div>
+                        </div>
                       </div>
                       <div
                         class="inline-flex items-center text-base font-semibold text-gray-900 text-xs bg-red-400 text-white p-2 rounded-lg hover:bg-red-500">
@@ -1205,17 +1163,15 @@ const deduct_scan_item = (index) => {
             <thead>
               <tr class="border mb-2">
                 <th><small>Retail</small></th>
-                <th><small>QTY</small></th>
                 <th><small>TOTAL</small></th>
               </tr>
             </thead>
             <tbody class="border">
               <tr v-for="(items, key) in form.products" :key="key">
                 <td>
-                  <small>{{ stringTruncateFromCenter(items.name, 18) }}
+                  <small>{{ stringTruncateFromCenter(items.name, 25) }}
                   </small>
-                </td>
-                <td style="width: 20px">
+                  <br>
                   <small style="font-size: 10px; word-break: break-all">{{
                     items.cashier_quantity
                   }}</small>

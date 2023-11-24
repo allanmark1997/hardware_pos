@@ -101,7 +101,7 @@ const logout = () => {
               </div>
               <div v-if="usePage().props.auth.user.type != 2" class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                 <NavLink :href="route('transactions.index')" :active="route().current('transactions.index')">
-                  Transactions
+                  Sale Transactions
                 </NavLink>
               </div>
               <div v-if="usePage().props.auth.user.type != 2" class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">

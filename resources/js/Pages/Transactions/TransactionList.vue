@@ -5,17 +5,24 @@ import Icon from "@/Components/Icon.vue";
 import Pagination2 from "@/Components/Pagination2.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Input from "@/Components/Input.vue";
+import JetDialogModal from "@/Components/DialogModal.vue";
+
 
 import moment from "moment";
 import { inject, onMounted, provide, ref } from "vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 
 const props = defineProps(["transactions", "date_from", "date_to", "search"]);
 
 const date_from = ref(props.date_from);
 const date_to = ref(props.date_to);
 const search = ref(props.search);
+
+const sale_detail_modal = ref(false);
+const sale_object = ref();
+const transaction_id = ref()
 
 // onMounted(()=>{
 //   console.log(props.deliveries)
@@ -203,7 +210,6 @@ const calculate_grand_total_unsuccess = (data) => {
                 Payment Method & Customer Type
               </th>
               <th scope="col" class="px-6 py-3">Tax & Discount</th>
-              <th scope="col" class="px-6 py-3">Products</th>
               <th scope="col" class="px-6 py-3">Total Discount & VAT</th>
               <th scope="col" class="px-6 py-3">Total Paid</th>
               <th scope="col" class="px-6 py-3">Customer Cash</th>
@@ -214,7 +220,8 @@ const calculate_grand_total_unsuccess = (data) => {
           </thead>
           <tbody>
             <template v-for="(transaction, key) in transactions.data" :key="key">
-              <tr class="bg-white border-">
+              <tr class="bg-white hover:bg-gray-100 cursor-pointer"
+                @click="(sale_detail_modal = true, sale_object = transaction.transaction_details, transaction_id = transaction.id)">
                 <td class="px-6 py-4">{{ transaction.id }}</td>
                 <td class="px-6 py-4">
                   <small class="flex gap-2">
@@ -274,76 +281,6 @@ const calculate_grand_total_unsuccess = (data) => {
                       transaction.special_discount?.discount ?? "0"
                     }}%</small>
                   </div>
-                </td>
-                <td scope="row" class="px-2 py-1 text-gray-900 ">
-                  <table class="w-full text-xs text-left text-gray-500">
-                    <thead class="text-xs text-gray-700 uppercase bg-gray-100">
-                      <tr>
-                        <th scope="col" class="px-1 py-1 flex">Product</th>
-                        <th scope="col" class="px-1 py-1">No.</th>
-                        <th scope="col" class="px-1 py-1">Price</th>
-                        <th scope="col" class="px-1 py-1">Discount %</th>
-                        <th scope="col" class="px-1 py-1">Status</th>
-                        <th scope="col" class="px-1 py-1">Total Discount</th>
-                        <th scope="col" class="px-1 py-1">Sub-total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <template v-for="(
-                          transaction_detail, key2
-                        ) in transaction.transaction_details" :key="key2">
-                        <tr class="bg-white border-">
-                          <td class="px-1 py-1 flex">
-                            <Icon icon="shopping_cart" size="xs" />
-                            <p class="w-[20vmin] break-words">
-                              {{ transaction_detail.product?.name }}
-                            </p>
-                          </td>
-                          <td class="px-1 py-1">
-                            {{ transaction_detail.quantity }}
-                          </td>
-                          <td class="px-1 py-1">
-                            {{ convert_money(transaction_detail.price.price) }}
-                          </td>
-                          <td class="px-1 py-1">
-                            {{ transaction_detail.sale_discount.discount }}%
-                          </td>
-                          <td class="px-1 py-1">
-                            <small v-if="transaction_detail.status == 0"
-                              class="bg-orange-400 rounded-sm p-[1px] text-white">
-                              Unsuccess
-                            </small>
-                            <small v-else-if="transaction_detail.status == 1"
-                              class="bg-green-400 rounded-sm p-[1px] text-white">
-                              Success
-                            </small>
-                            <small v-else-if="transaction_detail.status == 2"
-                              class="bg-orange-400 rounded-sm p-[1px] text-white">
-                              Pending Return
-                            </small>
-                            <small v-else-if="transaction_detail.status == 3"
-                              class="bg-red-400 rounded-sm p-[1px] text-white">
-                              Returned
-                            </small>
-                          </td>
-                          <td class="px-1 py-1">
-                            <small>{{
-                              convert_money(
-                                calculate_item_discount(transaction_detail)
-                              )
-                            }}</small>
-                          </td>
-                          <td class="px-1 py-1">
-                            <small>{{
-                              convert_money(
-                                calculate_sub_total(transaction_detail)
-                              )
-                            }}</small>
-                          </td>
-                        </tr>
-                      </template>
-                    </tbody>
-                  </table>
                 </td>
                 <td class="px-6 py-4">
                   <div class="flex rounded-lg bg-red-400 p-[3px] text-white">
@@ -442,4 +379,81 @@ const calculate_grand_total_unsuccess = (data) => {
       </div>
     </div>
   </section>
+
+  <JetDialogModal :show="sale_detail_modal" :maxWidth="'2xl'" @close="sale_detail_modal = false">
+    <template #title>
+      <span class="text-gray-600 truncate"> Sale details for Transaction ID({{ transaction_id }})</span>
+    </template>
+    <template #content>
+      <table class="w-full text-xs text-left text-gray-500">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+          <tr>
+            <th scope="col" class="px-1 py-1 flex">Product</th>
+            <th scope="col" class="px-1 py-1">No.</th>
+            <th scope="col" class="px-1 py-1">Price</th>
+            <th scope="col" class="px-1 py-1">Discount %</th>
+            <th scope="col" class="px-1 py-1">Status</th>
+            <th scope="col" class="px-1 py-1">Total Discount</th>
+            <th scope="col" class="px-1 py-1">Sub-total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template v-for="(
+                          transaction_detail, key2
+                        ) in sale_object" :key="key2">
+            <tr class="bg-white border-">
+              <td class="px-1 py-1 flex">
+                <Icon icon="shopping_cart" size="xs" />
+                <p class="w-[20vmin] break-words">
+                  {{ transaction_detail.product?.name }}
+                </p>
+              </td>
+              <td class="px-1 py-1">
+                {{ transaction_detail.quantity }}
+              </td>
+              <td class="px-1 py-1">
+                {{ convert_money(transaction_detail.price.price) }}
+              </td>
+              <td class="px-1 py-1">
+                {{ transaction_detail.sale_discount.discount }}%
+              </td>
+              <td class="px-1 py-1">
+                <small v-if="transaction_detail.status == 0" class="bg-orange-400 rounded-sm p-[1px] text-white">
+                  Unsuccess
+                </small>
+                <small v-else-if="transaction_detail.status == 1" class="bg-green-400 rounded-sm p-[1px] text-white">
+                  Success
+                </small>
+                <small v-else-if="transaction_detail.status == 2" class="bg-orange-400 rounded-sm p-[1px] text-white">
+                  Pending Return
+                </small>
+                <small v-else-if="transaction_detail.status == 3" class="bg-red-400 rounded-sm p-[1px] text-white">
+                  Returned
+                </small>
+              </td>
+              <td class="px-1 py-1">
+                <small>{{
+                  convert_money(
+                    calculate_item_discount(transaction_detail)
+                  )
+                }}</small>
+              </td>
+              <td class="px-1 py-1">
+                <small>{{
+                  convert_money(
+                    calculate_sub_total(transaction_detail)
+                  )
+                }}</small>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </template>
+    <template #footer>
+      <SecondaryButton class="mr-2 bg-red-300" @click="sale_detail_modal = false">
+        Close
+      </SecondaryButton>
+    </template>
+  </JetDialogModal>
 </template>
