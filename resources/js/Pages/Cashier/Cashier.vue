@@ -47,6 +47,9 @@ const item_count = ref(0);
 const item_grand_total = ref(0);
 
 const print_show = ref(false);
+const search_input_modal = ref(false);
+const search_input = ref("");
+const search_object = ref("");
 
 let temp_grand_total = ref(0);
 
@@ -104,10 +107,7 @@ onMounted(() => {
 const keydownHandler = (event) => {
   if (props.cashier_status == "false") {
     document.addEventListener("keydown", (e) => {
-      if (e.keyCode == 112 && router.page.component == "Cashier/Cashier") {
-        console.log("Start transaction.");
-        e.preventDefault();
-      } else if (
+      if (
         e.ctrlKey &&
         e.keyCode == 68 &&
         router.page.component == "Cashier/Cashier"
@@ -127,40 +127,21 @@ const keydownHandler = (event) => {
             position: toast.POSITION.TOP_RIGHT,
           });
         }
-
         e.preventDefault();
       } else if (
-        e.keyCode == 114 &&
-        router.page.component == "Cashier/Cashier"
-      ) {
-        console.log("Transaction .");
-        e.preventDefault();
-      } else if (
-        e.keyCode == 115 &&
-        router.page.component == "Cashier/Cashier"
-      ) {
-        console.log("Change Quantity.");
-        e.preventDefault();
-      } else if (
-        e.keyCode == 117 &&
-        router.page.component == "Cashier/Cashier"
-      ) {
-        console.log("Description.");
-        e.preventDefault();
-      } else if (
-        e.keyCode == 118 &&
-        router.page.component == "Cashier/Cashier"
-      ) {
-        console.log("Delete Item ");
-        e.preventDefault();
-      } else if (
-        e.ctrlKey &&
-        e.keyCode == 68 &&
+        e.keyCode == 46 &&
         router.page.component == "Cashier/Cashier"
       ) {
         if (!SKULookup.value) {
           deleteAllModal.value = !deleteAllModal.value;
         }
+        e.preventDefault();
+      }
+      else if (
+        e.keyCode == 45 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        search_input_modal.value = true
         e.preventDefault();
       } else if (
         e.ctrlKey &&
@@ -172,12 +153,6 @@ const keydownHandler = (event) => {
         if (!deleteAllModal.value) {
           SKULookup.value = !SKULookup.value;
         }
-        e.preventDefault();
-      } else if (
-        e.keyCode == 121 &&
-        router.page.component == "Cashier/Cashier"
-      ) {
-        console.log("Sales Return.");
         e.preventDefault();
       } else if (
         e.ctrlKey &&
@@ -220,13 +195,6 @@ const keydownHandler = (event) => {
       //   logout_confirm();
       // }
       else if (
-        logoutlModal.value == true &&
-        e.ctrlKey &&
-        e.keyCode == 78 &&
-        router.page.component == "Cashier/Cashier"
-      ) {
-        logoutlModal.value = !logoutlModal.value;
-      } else if (
         e.ctrlKey &&
         e.altKey &&
         e.keyCode == 80 &&
@@ -667,6 +635,15 @@ const deduct_scan_item = (index) => {
     }
   }
 }
+
+const search_product = () => {
+  console.log(search_object != null || search_object != '')
+  let scan_product = props.product.find(
+    (product) => product.barcode === search_input.value || product.name.toLowerCase() === search_input.value.toLowerCase()
+  );
+  console.log(scan_product)
+  search_object.value = scan_product
+}
 </script>
 <template>
   <Head :title="'Cashier'" />
@@ -676,7 +653,7 @@ const deduct_scan_item = (index) => {
       <h2 class="font-semibold text-lg text-gray-800 leading-tight">Cashier</h2>
     </template>
      -->
-  <div class="py-5">
+  <div class="py-5 relative">
     <div class="fixed m-[50%] z-[-1000]">
       <input id="prodBarcodeInput" v-model="prodScan" @change="addtoCart" />
       <input type="number" class="border-0 bg-transparent w-11" v-model="quantity" />
@@ -923,6 +900,40 @@ const deduct_scan_item = (index) => {
         </div>
       </div>
     </div>
+    <div class="fixed bottom-0 text-center text-xs mb-2 w-full">
+      <div class="grid grid-cols-12 gap-2 text-center bg-gray-200 p-2">
+        <div class="col-span-2">
+          <p>
+            CTRL + B - Scanner Ready
+          </p>
+        </div>
+        <div class="col-span-2">
+          <p>
+            CTRL + Shift + F - Open/Close search product
+          </p>
+        </div>
+        <div class="col-span-2">
+          <p>
+            CTRL + Arrow up - Add quantity to purchase
+          </p>
+        </div>
+        <div class="col-span-2">
+          <p>
+            CTRL + Arrow down - Deduct quantity to purchase
+          </p>
+        </div>
+        <div class="col-span-2">
+          <p>
+            CTRL + D - Add/Remove Special Discount
+          </p>
+        </div>
+        <div class="col-span-2">
+          <p>
+            DELETE - Delete all scanned items
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- MODAL FOR DATA -->
@@ -1092,6 +1103,33 @@ const deduct_scan_item = (index) => {
     </template>
   </ConfirmDialogModal>
 
+  <DialogModal :show="search_input_modal == true" @close="search_input_modal = false" maxWidth="2xl">
+    <template #title>
+      Find product
+    </template>
+    <template #content>
+      <Input label="Search barcode or product name" v-model="search_input" @keydown.enter="search_product()" />
+      <div class="h-[50vmin] overflow-auto mt-2">
+        <div v-if="search_object != '' && search_object != undefined" class="flex justify-between">
+          <div>
+            <div class="flex">
+              <img :src="search_object?.product_image"
+                class="max-w-2xl w-10 rounded-lg  mr-2 object-contain max-h-auto h-10">
+              <p class="w-full truncate">{{ search_object?.name }}</p>
+            </div>
+            <p>₱{{ search_object?.current_price?.price }}</p>
+            <p>Qty: {{ search_object?.quantity }}</p>
+          </div>
+          <div>
+            <Button class="text-lg">+</Button>
+          </div>
+        </div>
+        <div v-else-if="search_object == '' || search_object == undefined">
+          <p>No Search found!</p>
+        </div>
+      </div>
+    </template>
+  </DialogModal>
 
   <DialogModal :show="print_show == true" @close="print_show = false" maxWidth="2xl">
     <!-- <template #title> Are you sure you want to log-out?</template> -->

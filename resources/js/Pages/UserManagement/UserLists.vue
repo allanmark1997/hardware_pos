@@ -77,8 +77,12 @@ const function_update = () => {
                 (user) => user.type != 0 && props.users.data.length != 0
               )" :key="index" class="xl:w-1/3 md:w-1/2 p-4">
                 <div class="bg-gray-50 border border-1 border-yellow-400 shadow-xl p-6 rounded-lg">
-                  <img class="h-40 rounded max-w- object-fit object-center mb-6 mx-auto" :src="user.profile_photo_url"
-                    :alt="user.name" />
+                  <img v-if="user.profile_photo_path == null"
+                    class="h-40 rounded max-w- object-fit object-center mb-6 mx-auto" src="./../../../image/logo_main.png"
+                    alt="user image" />
+                  <img v-else class="h-40 rounded max-w- object-fit object-center mb-6 mx-auto"
+                    :src="user.profile_photo_url" :alt="user.name" />
+
                   <h3 class="tracking-widest text-indigo-500 text-xs font-medium title-font">
                     {{ user.email }}
                   </h3>
