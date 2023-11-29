@@ -424,9 +424,7 @@ const stringTruncateFromCenter = (str, maxLength) => {
               </div>
 
               <div class="md:flex no-wrap md:-mx-2 ">
-                <!-- Left Side -->
                 <div class="w-full md:w-3/12 md:mx-2">
-                  <!-- Profile Card -->
                   <div class="bg-white p-3 border-t-4 border-green-400">
                     <p class="text-left text-xs text-gray-700 font-bold">
                       #{{ transaction?.id }}
@@ -497,12 +495,8 @@ const stringTruncateFromCenter = (str, maxLength) => {
                       </li>
                     </ul>
                   </div>
-                  <!-- End of profile card -->
                 </div>
-                <!-- Right Side -->
                 <div class="w-full md:w-9/12 mx-2 h-100">
-                  <!-- Profile tab -->
-                  <!-- About Section -->
                   <div class="bg-white p-3 shadow-sm rounded-sm h-full" v-if="lists == false">
                     <div class="bg-gray-100 ">
                       <div class="flex items-center space-x-2 font-semibold text-gray-900 leading-8">
@@ -773,16 +767,6 @@ const stringTruncateFromCenter = (str, maxLength) => {
                             <Button v-if="detail?.status == 1" size="sm" @click="function_open_modal_return(detail)">
                               Return
                             </Button>
-                            <!-- <div class="items-center mb-4"> -->
-                            <!-- <input id="default-checkbox" type="checkbox" :value="detail" v-model="selected_products"
-                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">
-                              <label for="default-checkbox" class="ml-2 text-xs font-medium text-gray-900">
-                                Return
-                              </label> -->
-                            <!-- <Input type="number" label="Qty" :disabled="validate_input_qty(detail.id)" /> -->
-                            <!-- <ReturnItem /> -->
-                            <!-- </div> -->
-
                           </div>
                           <hr class="col-span-12 w-full">
 
@@ -791,8 +775,6 @@ const stringTruncateFromCenter = (str, maxLength) => {
                       </div>
                     </div>
                   </div>
-                  <!-- End of about section -->
-                  <!-- End of profile tab -->
                 </div>
               </div>
             </div>
