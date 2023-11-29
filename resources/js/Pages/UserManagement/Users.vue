@@ -348,7 +348,7 @@ const remove_image = (key) => {
       </template>
       <template #footer>
         <SecondaryButton @click="addModal = false" class="mr-2">
-          nevermind
+          Cancel
         </SecondaryButton>
         <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing" @click="add_user"
           class="bg-yellow-200 hover:bg-yellow-400">

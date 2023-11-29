@@ -444,7 +444,7 @@ onMounted(() => {
     </template>
     <template #footer>
       <SecondaryButton @click="condfirmationModal = false" class="mr-2">
-        nevermind
+        Cancel
       </SecondaryButton>
       <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing"
         class="bg-green-200 hover:bg-green-400" @click="remove_product">
@@ -470,7 +470,7 @@ onMounted(() => {
     </template>
     <template #footer>
       <SecondaryButton @click="condfirmationBackOrderModal = false" class="mr-2">
-        nevermind
+        Cancel
       </SecondaryButton>
       <Button :class="{ 'opacity-25': form_back_order.processing }" :disabled="form_back_order.processing"
         class="bg-green-200 hover:bg-green-400" @click="back_order">
@@ -667,7 +667,7 @@ onMounted(() => {
     </template>
     <template #footer>
       <SecondaryButton @click="updateModal = false" class="mr-2">
-        nevermind
+        Cancel
       </SecondaryButton>
       <Button :class="{ 'opacity-25': form_update.processing }" :disabled="form_update.processing"
         class="bg-green-200 hover:bg-green-400" @click="update_product">

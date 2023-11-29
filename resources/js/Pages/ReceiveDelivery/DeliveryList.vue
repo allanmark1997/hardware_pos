@@ -266,7 +266,7 @@ const authorize = () => {
     </template>
     <template #footer>
       <SecondaryButton @click="condfirmationModal = false" class="mr-2">
-        nevermind
+        Cancel
       </SecondaryButton>
       <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing"
         class="bg-green-200 hover:bg-green-400" @click="authorize">

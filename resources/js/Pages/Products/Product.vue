@@ -620,7 +620,7 @@ const remove_spec = (key) => {
       </template>
       <template #footer>
         <SecondaryButton @click="add_modal = false" class="mr-2 hover:bg-red-500">
-          nevermind
+          Cancel
         </SecondaryButton>
         <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing"
           class="bg-green-200 hover:bg-green-400" @click="add_product">
@@ -645,7 +645,7 @@ const remove_spec = (key) => {
       </template>
       <template #footer>
         <SecondaryButton @click="add_modal_category = false" class="mr-2 hover:bg-red-400">
-          nevermind
+          Cancel
         </SecondaryButton>
         <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing"
           class="bg-green-200 hover:bg-green-400" @click="add_category">
@@ -708,7 +708,7 @@ const remove_spec = (key) => {
       </template>
       <template #footer>
         <SecondaryButton @click="addTaxModal = false" class="mr-2">
-          nevermind
+          Cancel
         </SecondaryButton>
         <Button :class="{ 'opacity-25': form_tax.processing }" :disabled="form_tax.processing"
           class="bg-green-200 hover:bg-green-400" @click="create_tax">
@@ -732,7 +732,7 @@ const remove_spec = (key) => {
       </template>
       <template #footer>
         <SecondaryButton @click="updateTaxEditModal = false" class="mr-2">
-          nevermind
+          Cancel
         </SecondaryButton>
         <Button :class="{ 'opacity-25': form_tax.processing }" :disabled="form_tax.processing"
           class="bg-green-200 hover:bg-green-400" @click="update_tax">
@@ -756,7 +756,7 @@ const remove_spec = (key) => {
       </template>
       <template #footer>
         <SecondaryButton @click="addSpecialModal = false" class="mr-2">
-          nevermind
+          Cancel
         </SecondaryButton>
         <Button :class="{ 'opacity-25': form_special.processing }" :disabled="form_special.processing"
           class="bg-green-200 hover:bg-green-400" @click="create_special">
@@ -780,7 +780,7 @@ const remove_spec = (key) => {
       </template>
       <template #footer>
         <SecondaryButton @click="updateSpecialModal = false" class="mr-2">
-          nevermind
+          Cancel
         </SecondaryButton>
         <Button :class="{ 'opacity-25': form_special_update.processing }" :disabled="form_special_update.processing"
           class="bg-green-200 hover:bg-green-400" @click="update_special">

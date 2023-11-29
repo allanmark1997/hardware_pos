@@ -166,38 +166,43 @@ const keydownHandler = (event) => {
         router.page.component == "Cashier/Cashier"
       ) {
         addQuantitytoPurchase(true, false);
+        toast.success("Added purchase quantity to " + quantity.value, {
+          autoClose: 1000,
+          transition: toast.TRANSITIONS.FLIP,
+          position: toast.POSITION.TOP_RIGHT,
+        });
       } else if (
         e.ctrlKey &&
         e.keyCode == 40 &&
         router.page.component == "Cashier/Cashier"
       ) {
         addQuantitytoPurchase(false, true);
-      } else if (
+        toast.success("Minus purchase quantity to " + quantity.value, {
+          autoClose: 1000,
+          transition: toast.TRANSITIONS.FLIP,
+          position: toast.POSITION.TOP_RIGHT,
+        });
+      }
+      else if (
+        search_input_modal.value == true && e.ctrlKey && e.keyCode == 13
+      ) {
+        // alert("add search")
+        add_product_via_input_search()
+      }
+      else if (
+        search_input_modal.value == true && e.ctrlKey && e.altKey && e.keyCode == 70
+      ) {
+        setFocusToSearchboxInput()
+      }
+      else if (
         e.ctrlKey &&
         e.keyCode == 13 &&
         router.page.component == "Cashier/Cashier"
       ) {
         addtoCart();
       }
-      // else if (
-      //   e.ctrlKey &&
-      //   e.keyCode == 35 &&
-      //   router.page.component == "Cashier/Cashier"
-      // ) {
-      //   log_out();
-      // }
-      //  else if (
-      //   logoutlModal.value == true &&
-      //   e.ctrlKey &&
-      //   e.keyCode == 89 &&
-      //   router.page.component == "Cashier/Cashier"
-      // ) {
-      //   logout_confirm();
-      // }
       else if (
-        e.ctrlKey &&
-        e.altKey &&
-        e.keyCode == 80 &&
+        e.keyCode == 35 &&
         router.page.component == "Cashier/Cashier"
       ) {
         unsetFocusToTextBox();
@@ -556,6 +561,11 @@ const setFocusToTextBoxCash = () => {
   document.querySelector("#inputCash").focus();
 };
 
+const setFocusToSearchboxInput = () => {
+  document.querySelector("#prodBarcodeInput").blur();
+  document.querySelector("#search_input_product_barcode").focus();
+};
+
 const addQuantitytoPurchase = (add, subtract) => {
   if (add) {
     quantity.value++;
@@ -615,6 +625,7 @@ const remove_scan_item = (index) => {
   if (index > -1) { // only splice array when item is found
     form.products.splice(index, 1); // 2nd parameter means remove one item only
   }
+  scannedProductIMG.value = ""
 }
 const add_scan_item = (index) => {
   if (index > -1) { // only splice array when item is found
@@ -641,8 +652,65 @@ const search_product = () => {
   let scan_product = props.product.find(
     (product) => product.barcode === search_input.value || product.name.toLowerCase() === search_input.value.toLowerCase()
   );
-  console.log(scan_product)
   search_object.value = scan_product
+}
+
+const add_product_via_input_search = () => {
+  if (search_object.value == "" && search_object.value == undefined) {
+    toast.error("No search found!", {
+      autoClose: 1000,
+      transition: toast.TRANSITIONS.FLIP,
+      position: toast.POSITION.TOP_RIGHT,
+    });
+  }
+  else {
+    if (search_object.value.quantity <= 0) {
+      toast.error("Product is out of stock!", {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+      search_input.value = "";
+      quantity.value = 1;
+    } else {
+      let duplicate_auth = form.products.find(
+        (product) => product.barcode == search_object.value.barcode
+      );
+      let duplicate_index_auth = form.products.findIndex(
+        (product) => product.barcode == search_object.value.barcode
+      );
+      if (duplicate_auth == undefined) {
+        search_object.value.cashier_quantity = quantity.value;
+        form.products.push(search_object.value);
+        scannedProductIMG.value = search_object.value.product_image;
+        toast.success("Product added to cart!", {
+          autoClose: 1000,
+          transition: toast.TRANSITIONS.FLIP,
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        search_input.value = "";
+        quantity.value = 1;
+        search_input_modal.value = false;
+        search_object.value = ''
+      } else {
+        let quantity_add =
+          form.products[duplicate_index_auth].cashier_quantity + quantity.value;
+        form.products[duplicate_index_auth].cashier_quantity = quantity_add;
+        scannedProductIMG.value = search_object.value.product_image;
+        scannedProductIMG.value = search_object.value.product_image;
+        toast.success("Product added to cart!", {
+          autoClose: 1000,
+          transition: toast.TRANSITIONS.FLIP,
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        search_input.value = "";
+        quantity.value = 1;
+        search_input_modal.value = false;
+        search_object.value = ''
+
+      }
+    }
+  }
 }
 </script>
 <template>
@@ -659,76 +727,70 @@ const search_product = () => {
       <input type="number" class="border-0 bg-transparent w-11" v-model="quantity" />
     </div>
 
-    <!-- <button type="button" @click="addtoCart()"
-        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-1 ml-2 text-center inline-flex items-center mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M1 5h12m0 0L9 1m4 4L9 9" />
-        </svg>
-        <span class="sr-only">Icon description</span>
-      </button> -->
-    <!-- <input type="text" v-model="form.search" /> -->
-    <!-- <button @click="search_()" class="bg-red-200">scan</button> -->
-
-    <div class="flex max-w-7xl mx-auto justify-end">
-      <!-- <button
-        @click="log_out"
-        type="button"
-        class="focus:outline-none text-white bg-red-600 hover:bg-red-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 flex"
-      >
-        <Icon icon="logout" size="sm" />
-        Log out
-      </button> -->
-      <div class="sm:fixed sm:top-0 sm:left-0 p-6 text-right z-10">
-        <Link :href="route('cashier.index')"
-          class="font-semibold text-gray-600 hover:text-gray-900 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">
-        Dashboard
-        </Link>
+    <div class="-mt-4 flex justify-between">
+      <div class="ml-2">
+        <div class="flex max-w-7xl">
+          <p class="text-2xl text-gray-800">
+            <span class="font-bold">Barcode:</span>
+            <span class="text-3xl font-bold animate-ping">
+              {{
+                prodScan
+              }}
+            </span>
+          </p>
+        </div>
+        <div class="flex max-w-7xl mx-auto">
+          <p class="text-3xl text-gray-800">
+            <span class="font-bold">Grand Total:</span>
+            <span class="text-4xl font-bold">
+              {{
+                form.products.length == 0
+                ? convert_money(0)
+                : convert_money(
+                  applyTax(
+                    applyDiscount(
+                      item_grand_total,
+                      spDiscount == true ? special_discount.discount : 0
+                    ).discountedPrice
+                  )
+                )
+              }}
+            </span>
+          </p>
+        </div>
       </div>
+      <div>
+        <div class="flex max-w-7xl mx-auto justify-end">
+          <div class="mr-4 mt-2">
+            <Link :href="route('cashier.index')"
+              class="font-semibold text-gray-600 hover:text-gray-900 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">
+            Dashboard
+            </Link>
+          </div>
+        </div>
+        <div class="flex max-w-7xl mt-">
+          <kbd class="px-2 py-1.5 text-xl font-semibold text-white bg-yellow-700 border rounded-lg">Purchase Quantity: {{
+            quantity }}</kbd>
+        </div>
+        <div class="justify-end flex">
+          <button @click="cash_input_modal = true" type="button"
+            class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2">
+            Check out
+          </button>
+        </div>
+      </div>
+
     </div>
-    <div class="flex max-w-7xl mx-auto justify-end mt-6">
-      <kbd class="px-2 py-1.5 text-2xl font-semibold text-white bg-yellow-700 border rounded-lg">Purchase Quantity: {{
-        quantity }}</kbd>
-    </div>
-    <div class="flex max-w-7xl mx-auto justify-start">
-      <p class="text-2xl text-gray-800">
-        <span class="font-bold">Barcode:</span>
-        <span class="text-3xl font-bold animate-ping">
-          {{
-            prodScan
-          }}
-        </span>
-      </p>
-    </div>
-    <div class="flex max-w-7xl mx-auto justify-start">
-      <p class="text-4xl text-gray-800">
-        <span class="font-bold">Grand Total:</span>
-        <span class="text-5xl font-bold">
-          {{
-            form.products.length == 0
-            ? convert_money(0)
-            : convert_money(
-              applyTax(
-                applyDiscount(
-                  item_grand_total,
-                  spDiscount == true ? special_discount.discount : 0
-                ).discountedPrice
-              )
-            )
-          }}
-        </span>
-      </p>
-    </div>
-    <div class="max-w-7xl mx-auto bg-white rounded mt-5 px-1">
+    <div class="max-w-7xl mx-auto bg-white rounded mt-1 px-1">
       <div class="grid grid-cols-12 gap-2">
         <div class="col-span-5 p-5">
-          <div class="product_list bg-gray-50 p-1 rounded-lg mt-3 min-h-[60vmin] overflow-auto">
-            <div class="mt-24 flex max-w-lg mx-auto max-h-lg justify-center">
-              <img v-if="scannedProductIMG" class="object-contain h-48 w-96" :src="scannedProductIMG" />
+          <div class="product_list bg-gray-50 p-1 rounded-lg mt-3 min-h-[50vmin] overflow-auto">
+            <div class="mt-10 flex max-w-lg mx-auto max-h-lg justify-center">
+              <img v-if="scannedProductIMG" class="object-scale-down w-[35vmin] h-[35vmin]" :src="scannedProductIMG" />
             </div>
           </div>
         </div>
-        <div class="col-span-7">
+        <div class="col-span-7 text-xs">
           <div class="bg-white rounded-b-xl shadow-md p-5 flex justify-between max-h-[63vmin]">
             <div class="flex">
               <Icon icon="shopping_cart" size="sm"></Icon>
@@ -775,7 +837,7 @@ const search_product = () => {
               <Icon class="mr-5" icon="search_icon" size="xs" />
             </button>
           </form> -->
-          <div class="relative mt-5 px-2 overflow-x-auto min-h-[45vmin] shadow-md">
+          <div class="relative mt-5 px-2 overflow-x-auto min-h-[40vmin] shadow-md">
             <div v-if="form.products.length === 0" class="mx-auto text-center text-xs">
               Scan a product
             </div>
@@ -888,13 +950,6 @@ const search_product = () => {
                   )
                 }}
               </p>
-
-              <div class="justify-end flex">
-                <button @click="cash_input_modal = true" type="button"
-                  class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2">
-                  Check out
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -904,32 +959,38 @@ const search_product = () => {
       <div class="grid grid-cols-12 gap-2 text-center bg-gray-200 p-2">
         <div class="col-span-2">
           <p>
-            CTRL + B - Scanner Ready
+            <strong>CTRL + B</strong><span class="text-xs"> - Scanner Ready</span>
+          </p>
+          <p>
+            <strong>INSERT</strong> - Input Barcode or Product name
           </p>
         </div>
         <div class="col-span-2">
           <p>
-            CTRL + Shift + F - Open/Close search product
+            <strong>CTRL + Shift + F</strong> - Open/Close search product
           </p>
         </div>
         <div class="col-span-2">
           <p>
-            CTRL + Arrow up - Add quantity to purchase
+            <strong>CTRL + Arrow up</strong> - Add quantity to purchase
+          </p>
+          <p>
+            <strong>CTRL + Arrow down</strong> - Deduct quantity to purchase
           </p>
         </div>
         <div class="col-span-2">
           <p>
-            CTRL + Arrow down - Deduct quantity to purchase
+            <strong>END</strong> - Check out
           </p>
         </div>
         <div class="col-span-2">
           <p>
-            CTRL + D - Add/Remove Special Discount
+            <strong>CTRL + D</strong> - Add/Remove Special Discount
           </p>
         </div>
         <div class="col-span-2">
           <p>
-            DELETE - Delete all scanned items
+            <strong>DELETE</strong> - Delete all scanned items
           </p>
         </div>
       </div>
@@ -1108,7 +1169,12 @@ const search_product = () => {
       Find product
     </template>
     <template #content>
-      <Input label="Search barcode or product name" v-model="search_input" @keydown.enter="search_product()" />
+      <div class="flex gap-2">
+        <input class="rounded-lg w-full mb-2" type="text" v-model="search_input" id="search_input_product_barcode"
+          @keydown.enter="search_product()" />
+        <span title="Clear Search" class="bg-red-400 rounded-lg m-2 p-2">x</span>
+      </div>
+
       <div class="h-[50vmin] overflow-auto mt-2">
         <div v-if="search_object != '' && search_object != undefined" class="flex justify-between">
           <div>
@@ -1121,12 +1187,25 @@ const search_product = () => {
             <p>Qty: {{ search_object?.quantity }}</p>
           </div>
           <div>
-            <Button class="text-lg">+</Button>
+            <Button @click="add_product_via_input_search()" class="text-lg">+</Button>
           </div>
         </div>
         <div v-else-if="search_object == '' || search_object == undefined">
           <p>No Search found!</p>
         </div>
+      </div>
+    </template>
+    <template #footer>
+      <div class="flex justify-between gap-2 text-xs text-center">
+        <p>
+          <strong>CTRL + ALT + F </strong> - Focus Search box
+        </p>
+        <p>
+          <strong>CTRL + Enter </strong> - Add searched product
+        </p>
+        <p>
+          <strong>ESC</strong> - Close input Barcode and Product name
+        </p>
       </div>
     </template>
   </DialogModal>
