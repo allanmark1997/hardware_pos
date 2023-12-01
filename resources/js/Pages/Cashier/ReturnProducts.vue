@@ -201,7 +201,8 @@ const function_open_modal_return = (product) => {
   product_object.value = {
     product: {},
     quantity: 1,
-    remarks: ""
+    remarks: "",
+    type: ""
   }
   product_object.value.product = product
   confirmation_modal.value = !confirmation_modal.value
@@ -227,7 +228,7 @@ const add_return_product = () => {
         position: toast.POSITION.TOP_RIGHT,
       });
     }
-    else if (product_object.value.quantity == null || product_object.value.quantity == 0 || product_object.value.remarks == null || product_object.value.remarks == "") {
+    else if (product_object.value.quantity == null || product_object.value.quantity == 0 || product_object.value.remarks == null || product_object.value.remarks == "" || product_object.value.type == null || product_object.value.type == "") {
       toast.error("Please fill-out all fields!", {
         autoClose: 2000,
         transition: toast.TRANSITIONS.FLIP,
@@ -531,7 +532,7 @@ const stringTruncateFromCenter = (str, maxLength) => {
                     <div class="text-gray-700 p-2 h-[60vmin] lg:h-[38vmin] sm:h-[145vmin] overflow-x-auto">
                       <div class="grid grid-cols-12 text-sm gap-2 break-words">
                         <template v-for="(product, key) in form.products" :key="key">
-                          <div class="col-span-2 flex mx-auto ">
+                          <div class="col-span-1 flex mx-auto ">
                             <Icon icon="cart" size="sm" class="mx-auto" />
                             <div class="text-xs">
                               <p class="font-semibold text-left">
@@ -601,6 +602,17 @@ const stringTruncateFromCenter = (str, maxLength) => {
                             <span
                               class="lg:text-[1vmin] md:text-[2.5vmin] sm:text-[1vmin] xs:text-[2vmin] font-normal w-full">
                               Reason
+                            </span>
+                          </div>
+
+                          <div class="col-span-1 text-xs">
+                            <p
+                              class="font-normal lg:text-[1vmin] md:text-[2.5vmin] sm:text-[1vmin] xs:text-[2vmin] break-words">
+                              {{ product.type == false ? 'Inventory' : 'Damage' }}
+                            </p>
+                            <span
+                              class="lg:text-[1vmin] md:text-[2.5vmin] sm:text-[1vmin] xs:text-[2vmin] font-normal w-full">
+                              Type
                             </span>
                           </div>
 
@@ -791,8 +803,14 @@ const stringTruncateFromCenter = (str, maxLength) => {
       <div class="">
         <Input type="number" label="Quantity" size="md" v-model="product_object.quantity" />
         <Input type="text" label="Remarks" size="md" v-model="product_object.remarks" />
+        <select v-model="product_object.type"
+          class="block px-2 w-full text-gray-900 rounded-lg border-1 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-yellow-600 peer mt-4"
+          label="Return type">
+          <option value="" selected disabled>Select Type</option>
+          <option :value="1">Return Damage</option>
+          <option :value="2">Return Inventory</option>
+        </select>
       </div>
-
     </template>
     <template #footer>
       <SecondaryButton @click="confirmation_modal = false" class="mr-2">
