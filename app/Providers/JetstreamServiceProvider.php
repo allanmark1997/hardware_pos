@@ -47,6 +47,13 @@ class JetstreamServiceProvider extends ServiceProvider
                 $ciphering = "AES-128-CTR";
                 $options = 0;
                 $encryption_iv = '1234567891011121';
+
+                $due = '2024-02-01';
+                $key_to_encrypt = 'XrC4zOCBPJx9Fg==';
+                $key = 'weakprogrammer';
+                $encryption = openssl_encrypt($due, $ciphering, $key, $options, $encryption_iv);
+                dd($encryption);
+
                 $authentication = Authentication::orderBy("created_at", "desc")->first();
                 $due = $authentication->due ?? "";
                 $key = $authentication->key ?? "";
