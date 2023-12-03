@@ -15,7 +15,7 @@ class AuthSeeder extends Seeder
     public function run(): void
     {
         DB::table('authentications')->insert([
-            'due' => 'XrC4zOCBOJx/Hg==',
+            'due' => 'XrC4zOCBP5x/Hg==',
             'key' => 'IVCnqsFq/n8f',
             'shh' => '12345',
             'created_at' => Carbon::now(),
