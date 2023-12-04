@@ -853,13 +853,13 @@ const add_product_via_input_search = () => {
               <Icon class="mr-5" icon="search_icon" size="xs" />
             </button>
           </form> -->
-          <div class="relative mt-5 px-2 overflow-x-auto min-h-[40vmin] shadow-md">
+          <div class="relative mt-5 px-2 overflow-x-auto min-h-[35vmin] shadow-md">
             <div v-if="form.products.length === 0" class="mx-auto text-center text-xs">
               Scan a product
             </div>
 
             <div v-else class="w-full">
-              <div class="flow-root max-h-[50vmin] overflow-auto p-2" id="addedCartScrll">
+              <div class="flow-root max-h-[35vmin] overflow-auto p-2" id="addedCartScrll">
                 <ul role="addedlist" v-for="(items, key) in form.products" :key="key" class="divide-y divide-gray-200">
                   <li class="py-3 sm:py-4">
                     <div class="flex items-center space-x-4">
@@ -907,7 +907,7 @@ const add_product_via_input_search = () => {
               </div>
             </div>
           </div>
-          <div class="item-center p-5">
+          <div class="item-center p-2 text-xs">
             <div>
               <p>
                 <span class="font-bold">VAT({{ tax.tax }}%): </span>
