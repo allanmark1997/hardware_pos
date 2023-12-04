@@ -211,6 +211,7 @@ const calculate_grand_total_unsuccess = (data) => {
                         <th scope="col" class="px-1 py-1">No.</th>
                         <th scope="col" class="px-1 py-1">Price</th>
                         <th scope="col" class="px-1 py-1">Discount %</th>
+                        <th scope="col" class="px-1 py-1">Type</th>
                         <th scope="col" class="px-1 py-1">Total Discount</th>
                         <th scope="col" class="px-1 py-1">Sub-total</th>
                         <th scope="col" class="px-1 py-1">Created Date</th>
@@ -234,6 +235,11 @@ const calculate_grand_total_unsuccess = (data) => {
                           </td>
                           <td class="px-1 py-1">
                             {{ transaction_detail.sale_discount.discount }}%
+                          </td>
+                          <td class="px-1 py-1">
+                            <small v-if="transaction_detail.type == 1" class="bg-red-300 rounded-lg p-1">Damage</small>
+                            <small v-else-if="transaction_detail.type == 2"
+                              class="bg-green-300 rounded-lg p-1">Inventory</small>
                           </td>
                           <td class="px-1 py-1">
                             <small>{{

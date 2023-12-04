@@ -235,6 +235,22 @@ const keydownHandler = (event) => {
       ) {
         cash_input_modal.value = !cash_input_modal.value;
       } else if (
+        print_show.value == true &&
+        e.ctrlKey &&
+        e.altKey &&
+        e.keyCode == 89 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        print_checkout()
+      } else if (
+        print_show.value == true &&
+        e.ctrlKey &&
+        e.altKey &&
+        e.keyCode == 78 &&
+        router.page.component == "Cashier/Cashier"
+      ) {
+        print_show.value = !print_show.value;
+      } else if (
         deleteAllModal.value == true &&
         e.ctrlKey &&
         e.altKey &&

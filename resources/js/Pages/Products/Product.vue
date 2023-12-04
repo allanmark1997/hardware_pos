@@ -351,69 +351,12 @@ const remove_spec = (key) => {
           <div class="">
             <button @click="action_modal = true"
               class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
-              <a class="my-auto gap-2 item-center flex">
+              <a class="my-auto gap-2 item-center flex gap-1">
                 <Icon icon="option" size="sm" />
+                Settings
               </a>
             </button>
           </div>
-          <!-- <div class="grid grid-cols-5 gap-2 ml-1">
-            <button @click="open_modal_add"
-              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
-              <a class="my-auto gap-2 flex">
-                <Icon icon="cart" size="sm" />
-                <span>Add product</span>
-              </a>
-            </button>
-            <button @click="open_modal_add_category"
-              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
-              <a class="my-auto gap-2 flex">
-                <Icon icon="tag" size="sm" />
-                <span>Add category</span>
-              </a>
-            </button>
-
-            <button @click="open_modal_update_category"
-              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
-              <a class="my-auto gap-1 flex">
-                <Icon icon="pencil" size="sm" />
-                <span>Edit category</span>
-              </a>
-            </button>
-            <button v-if="props.tax?.tax == undefined || props.tax?.tax == null" @click="open_modal_add_tax"
-              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
-              <a class="my-auto gap-1 flex">
-                <Icon icon="tax" size="sm" />
-
-                <span>Add Tax</span>
-              </a>
-            </button>
-            <button v-if="props.tax?.tax != undefined || props.tax?.tax != null" @click="open_modal_update_tax"
-              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
-              <a class="my-auto gap-1 flex">
-                <Icon icon="tax" size="sm" />
-
-                <span>Edit Tax</span>
-              </a>
-            </button>
-            <button v-if="props.special_discount?.discount == undefined ||
-              props.special_discount?.discount == null
-              " @click="open_modal_add_special"
-              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
-              <a class="my-auto gap-1 flex">
-                <Icon icon="wheelchair" size="sm" />
-                <span>Add Special Discount</span>
-              </a>
-            </button>
-            <button v-if="props.special_discount?.discount != undefined ||
-              props.special_discount?.discount != null
-              " @click="open_modal_update_special"
-              class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
-              <a class="my-auto gap-1 flex">
-                <Icon icon="wheelchair" size="sm" />
-                <span>Edit Special Discount</span>
-              </a>
-            </button>
-          </div> -->
         </div>
 
         <div class="mt-2 overflow-hidden">
