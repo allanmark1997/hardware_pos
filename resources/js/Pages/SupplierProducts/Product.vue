@@ -189,8 +189,9 @@ const open_search_product = () => {
           <div class="">
             <button @click="action_modal = true"
               class="bg-yellow-400 text-sm lg:text-xs font-bold mb-2 mt-5 rounded-lg p-2 hover:bg-yellow-500 flex gap-2 item-center justify-center">
-              <a class="my-auto gap-2 item-center flex">
+              <a class="my-auto gap-2 item-center flex gap-1">
                 <Icon icon="option" size="sm" />
+                Settings
               </a>
             </button>
           </div>
@@ -262,8 +263,8 @@ const open_search_product = () => {
               <ul class="overflow-y-auto py-1 h-[20vmin] text-gray-700" aria-labelledby="dropdownUsersButton">
                 <li v-for="(product, index) in product_lists" :key="index">
                   <a v-if="product.name
-                      .toLowerCase()
-                      .includes(form.product_name.toLowerCase())
+                    .toLowerCase()
+                    .includes(form.product_name.toLowerCase())
                     " class="flex items-center py-2 px-4 hover:bg-gray-100 cursor-pointer" @click="
     (form.product_name = product.name),
     (form.product_id = product.id),
@@ -312,8 +313,8 @@ const open_search_product = () => {
               <ul class="overflow-y-auto py-1 h-[20vmin] text-gray-700" aria-labelledby="dropdownUsersButton">
                 <li v-for="(supplier, index) in suppliers" :key="index">
                   <a v-if="supplier.supplier_name
-                      .toLowerCase()
-                      .includes(form.supplier_name.toLowerCase())
+                    .toLowerCase()
+                    .includes(form.supplier_name.toLowerCase())
                     " class="flex items-center py-2 px-4 hover:bg-gray-100 cursor-pointer" @click="
     (form.supplier_name = supplier.supplier_name),
     (form.supplier_id = supplier.id),
