@@ -58,7 +58,7 @@ class OrderController extends Controller
             'quantity' => ["required", "integer"],
             'remarks' => ["required"],
         ]);
-        $order_find = Order::where("product_id", $request->product["product_id"])->where("status", 0)->first();
+        $order_find = Order::where("product_id", $request->product["product_id"])->where("supplier_id", $request->product["supplier_id"])->where("status", 0)->first();
         if ($order_find == null) {
             $order = Order::create([
                 "supplier_id" => $request->product["supplier_id"],
