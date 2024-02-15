@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('delivery_details', function (Blueprint $table) {
-            $table->dropColumn("price");
+            $table->foreignId("price_id")->after('delivery_id');
         });
     }
 
@@ -22,7 +22,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('delivery_details', function (Blueprint $table) {
-            //
         });
     }
 };

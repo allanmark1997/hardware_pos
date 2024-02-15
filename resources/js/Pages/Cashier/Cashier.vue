@@ -755,25 +755,6 @@ const add_product_via_input_search = () => {
             </span>
           </p>
         </div>
-        <div class="flex max-w-7xl mx-auto">
-          <p class="text-3xl text-gray-800">
-            <span class="font-bold">Grand Total:</span>
-            <span class="text-4xl font-bold">
-              {{
-                form.products.length == 0
-                ? convert_money(0)
-                : convert_money(
-                  applyTax(
-                    applyDiscount(
-                      item_grand_total,
-                      spDiscount == true ? special_discount.discount : 0
-                    ).discountedPrice
-                  )
-                )
-              }}
-            </span>
-          </p>
-        </div>
       </div>
       <div>
         <div class="flex max-w-7xl mx-auto justify-end">
@@ -784,10 +765,7 @@ const add_product_via_input_search = () => {
             </Link>
           </div>
         </div>
-        <div class="flex max-w-7xl mt-">
-          <kbd class="px-2 py-1.5 text-xl font-semibold text-white bg-yellow-700 border rounded-lg">Purchase Quantity: {{
-            quantity }}</kbd>
-        </div>
+
         <div class="justify-end flex">
           <button @click="cash_input_modal = true" type="button"
             class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2">
@@ -909,6 +887,11 @@ const add_product_via_input_search = () => {
           </div>
           <div class="item-center p-2 text-xs">
             <div>
+              <div class="flex max-w-7xl mt-2 float-right">
+                <kbd class="px-2 py-1.5 text-xl font-semibold text-white bg-yellow-700 border rounded-lg">Purchase
+                  Quantity: {{ quantity }}
+                </kbd>
+              </div>
               <p>
                 <span class="font-bold">VAT({{ tax.tax }}%): </span>
                 {{
@@ -967,46 +950,70 @@ const add_product_via_input_search = () => {
                 }}
               </p>
             </div>
+            <div class="flex max-w-7xl mx-auto">
+          <p class="text-2xl text-gray-800">
+            <span class="font-bold">Grand Total:</span>
+            <span class="text-3xl font-bold">
+              {{
+                form.products.length == 0
+                ? convert_money(0)
+                : convert_money(
+                  applyTax(
+                    applyDiscount(
+                      item_grand_total,
+                      spDiscount == true ? special_discount.discount : 0
+                    ).discountedPrice
+                  )
+                )
+              }}
+            </span>
+          </p>
+        </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="fixed bottom-0 text-center text-xs mb-2 w-full">
-      <div class="grid grid-cols-12 gap-2 text-center bg-gray-200 p-2">
-        <div class="col-span-2">
-          <p>
-            <strong>CTRL + B</strong><span class="text-xs"> - Scanner Ready</span>
+    <div class="fixed bottom-0 text-center text-xs mb-1 w-full">
+      <div class="grid grid-cols-12 gap-1 text-center bg-gray-200 p-1">
+        <div class="col-span-1">
+          <p class="bg-gray-500 text-white grid grid-cols-1">
+            <strong class="text-lg">CTRL + B</strong>
+            <span class="text-[1vmin] -mt-2">Scanner Ready</span>
           </p>
-          <p>
-            <strong>INSERT</strong> - Input Barcode or Product name
+        </div>
+        <div class="col-span-1">
+          <p class="bg-gray-500 text-white grid grid-cols-1">
+            <strong class="text-lg">INSERT</strong><span class="text-[1vmin] -mt-2">Input Barcode or Product name</span>
           </p>
         </div>
         <div class="col-span-2">
-          <p>
-            <strong>CTRL + Shift + F</strong> - Open/Close search product
+          <p class="bg-gray-500 text-white grid grid-cols-1">
+            <strong class="text-lg">CTRL + Shift + F</strong><span class="text-[1vmin] -mt-2">Open/Close search product</span>
           </p>
         </div>
         <div class="col-span-2">
-          <p>
-            <strong>CTRL + Arrow up</strong> - Add quantity to purchase
-          </p>
-          <p>
-            <strong>CTRL + Arrow down</strong> - Deduct quantity to purchase
+          <p class="bg-gray-500 text-white grid grid-cols-1">
+            <strong class="text-lg">CTRL + Arrow up</strong><span class="text-[1vmin] -mt-2">Add quantity to purchase</span>
           </p>
         </div>
         <div class="col-span-2">
-          <p>
-            <strong>END</strong> - Check out
+          <p class="bg-gray-500 text-white grid grid-cols-1">
+            <strong class="text-lg">CTRL + Arrow down</strong><span class="text-[1vmin] -mt-2">Deduct quantity to purchase</span>
           </p>
         </div>
         <div class="col-span-2">
-          <p>
-            <strong>CTRL + D</strong> - Add/Remove Special Discount
+          <p class="bg-gray-500 text-white grid grid-cols-1">
+            <strong class="text-lg">CTRL + D</strong> <span class="text-[1vmin] -mt-2">Add/Remove Special Discount</span> 
           </p>
         </div>
-        <div class="col-span-2">
-          <p>
-            <strong>DELETE</strong> - Delete all scanned items
+        <div class="col-span-1">
+          <p class="bg-gray-500 text-white grid grid-cols-1">
+            <strong class="text-lg">DELETE</strong><span class="text-[1vmin] -mt-2">Delete all scanned items</span> 
+          </p>
+        </div>
+        <div class="col-span-1">
+          <p class="bg-gray-500 text-white grid grid-cols-1">
+            <strong class="text-lg">END</strong> <span class="text-[1vmin] -mt-2">Check out</span>
           </p>
         </div>
       </div>
@@ -1077,7 +1084,8 @@ const add_product_via_input_search = () => {
         label="Customer's Name" :disabled="walk_in == true" />
       <Input id="inputCustomerAddress" class="rounded-lg w-full mb-2" type="text" label="Customer's Address"
         v-model="form.customer_address" :disabled="walk_in == true" />
-      <input id="inputCash" class="rounded-lg w-full mb-2" type="number" v-model="form.cash" @keyup.enter="check_out" />
+      <Input id="inputCash" class="rounded-lg w-full mb-2" type="number" v-model="form.cash" @keyup.enter="check_out" label="Amount Received" placeholder="Amount Received" />
+      <!-- <input id="inputCash" class="rounded-lg w-full mb-2" type="number" v-model="form.cash" @keyup.enter="check_out" label="Amount Received" placeholder="Amount Received" /> -->
     </template>
     <template #footer>
       <SecondaryButton @click="cash_input_modal = false" class="mr-2">
