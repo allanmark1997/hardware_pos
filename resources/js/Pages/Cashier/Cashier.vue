@@ -728,6 +728,55 @@ const add_product_via_input_search = () => {
     }
   }
 }
+
+const add_product_via_input_search_2 = (searched_product) => {
+  if (searched_product.quantity <= 0) {
+    toast.error("Product is out of stock!", {
+      autoClose: 1000,
+      transition: toast.TRANSITIONS.FLIP,
+      position: toast.POSITION.TOP_RIGHT,
+    });
+    // search_input.value = "";
+    quantity.value = 1;
+  } else {
+    let duplicate_auth = form.products.find(
+      (product) => product.barcode == searched_product.barcode
+    );
+    let duplicate_index_auth = form.products.findIndex(
+      (product) => product.barcode == searched_product.barcode
+    );
+    if (duplicate_auth == undefined) {
+      searched_product.cashier_quantity = quantity.value;
+      form.products.push(searched_product);
+      scannedProductIMG.value = searched_product.product_image;
+      toast.success("Product added to cart!", {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+      search_input.value = "";
+      quantity.value = 1;
+      search_input_modal.value = false;
+      searched_product = ''
+    } else {
+      let quantity_add =
+        form.products[duplicate_index_auth].cashier_quantity + quantity.value;
+      form.products[duplicate_index_auth].cashier_quantity = quantity_add;
+      scannedProductIMG.value = searched_product.product_image;
+      scannedProductIMG.value = searched_product.product_image;
+      toast.success("Product added to cart!", {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+      search_input.value = "";
+      quantity.value = 1;
+      search_input_modal.value = false;
+      searched_product = ''
+
+    }
+  }
+}
 </script>
 <template>
   <Head :title="'Cashier'" />
@@ -765,22 +814,15 @@ const add_product_via_input_search = () => {
             </Link>
           </div>
         </div>
-
-        <div class="justify-end flex">
-          <button @click="cash_input_modal = true" type="button"
-            class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2">
-            Check out
-          </button>
-        </div>
       </div>
 
     </div>
     <div class="max-w-7xl mx-auto bg-white rounded mt-1 px-1">
       <div class="grid grid-cols-12 gap-2">
         <div class="col-span-5 p-5">
-          <div class="product_list bg-gray-50 p-1 rounded-lg mt-3 min-h-[50vmin] overflow-auto">
+          <div class="product_list bg-gray-100 p-1 rounded-lg mt-3 min-h-[70vmin] overflow-auto">
             <div class="mt-10 flex max-w-lg mx-auto max-h-lg justify-center">
-              <img v-if="scannedProductIMG" class="object-scale-down w-[35vmin] h-[35vmin]" :src="scannedProductIMG" />
+              <img v-if="scannedProductIMG" class="object-scale-down w-[70vmin] h-[60vmin]" :src="scannedProductIMG" />
             </div>
           </div>
         </div>
@@ -951,24 +993,30 @@ const add_product_via_input_search = () => {
               </p>
             </div>
             <div class="flex max-w-7xl mx-auto">
-          <p class="text-2xl text-gray-800">
-            <span class="font-bold">Grand Total:</span>
-            <span class="text-3xl font-bold">
-              {{
-                form.products.length == 0
-                ? convert_money(0)
-                : convert_money(
-                  applyTax(
-                    applyDiscount(
-                      item_grand_total,
-                      spDiscount == true ? special_discount.discount : 0
-                    ).discountedPrice
-                  )
-                )
-              }}
-            </span>
-          </p>
-        </div>
+              <p class="text-2xl text-gray-800">
+                <span class="font-bold">Grand Total:</span>
+                <span class="text-3xl font-bold">
+                  {{
+                    form.products.length == 0
+                    ? convert_money(0)
+                    : convert_money(
+                      applyTax(
+                        applyDiscount(
+                          item_grand_total,
+                          spDiscount == true ? special_discount.discount : 0
+                        ).discountedPrice
+                      )
+                    )
+                  }}
+                </span>
+              </p>
+            </div>
+            <div class="justify-end flex">
+              <button @click="cash_input_modal = true" type="button"
+                class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 w-full mt-4">
+                Check out
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -988,27 +1036,30 @@ const add_product_via_input_search = () => {
         </div>
         <div class="col-span-2">
           <p class="bg-gray-500 text-white grid grid-cols-1">
-            <strong class="text-lg">CTRL + Shift + F</strong><span class="text-[1vmin] -mt-2">Open/Close search product</span>
+            <strong class="text-lg">CTRL + Shift + F</strong><span class="text-[1vmin] -mt-2">Open/Close search
+              product</span>
           </p>
         </div>
         <div class="col-span-2">
           <p class="bg-gray-500 text-white grid grid-cols-1">
-            <strong class="text-lg">CTRL + Arrow up</strong><span class="text-[1vmin] -mt-2">Add quantity to purchase</span>
+            <strong class="text-lg">CTRL + Arrow up</strong><span class="text-[1vmin] -mt-2">Add quantity to
+              purchase</span>
           </p>
         </div>
         <div class="col-span-2">
           <p class="bg-gray-500 text-white grid grid-cols-1">
-            <strong class="text-lg">CTRL + Arrow down</strong><span class="text-[1vmin] -mt-2">Deduct quantity to purchase</span>
+            <strong class="text-lg">CTRL + Arrow down</strong><span class="text-[1vmin] -mt-2">Deduct quantity to
+              purchase</span>
           </p>
         </div>
         <div class="col-span-2">
           <p class="bg-gray-500 text-white grid grid-cols-1">
-            <strong class="text-lg">CTRL + D</strong> <span class="text-[1vmin] -mt-2">Add/Remove Special Discount</span> 
+            <strong class="text-lg">CTRL + D</strong> <span class="text-[1vmin] -mt-2">Add/Remove Special Discount</span>
           </p>
         </div>
         <div class="col-span-1">
           <p class="bg-gray-500 text-white grid grid-cols-1">
-            <strong class="text-lg">DELETE</strong><span class="text-[1vmin] -mt-2">Delete all scanned items</span> 
+            <strong class="text-lg">DELETE</strong><span class="text-[1vmin] -mt-2">Delete all scanned items</span>
           </p>
         </div>
         <div class="col-span-1">
@@ -1084,7 +1135,8 @@ const add_product_via_input_search = () => {
         label="Customer's Name" :disabled="walk_in == true" />
       <Input id="inputCustomerAddress" class="rounded-lg w-full mb-2" type="text" label="Customer's Address"
         v-model="form.customer_address" :disabled="walk_in == true" />
-      <Input id="inputCash" class="rounded-lg w-full mb-2" type="number" v-model="form.cash" @keyup.enter="check_out" label="Amount Received" placeholder="Amount Received" />
+      <Input id="inputCash" class="rounded-lg w-full mb-2" type="number" v-model="form.cash" @keyup.enter="check_out"
+        label="Amount Received" placeholder="Amount Received" />
       <!-- <input id="inputCash" class="rounded-lg w-full mb-2" type="number" v-model="form.cash" @keyup.enter="check_out" label="Amount Received" placeholder="Amount Received" /> -->
     </template>
     <template #footer>
@@ -1193,42 +1245,68 @@ const add_product_via_input_search = () => {
       Find product
     </template>
     <template #content>
-      <div class="flex gap-2">
-        <input class="rounded-lg w-full mb-2" type="text" v-model="search_input" id="search_input_product_barcode"
-          @keydown.enter="search_product()" />
-        <span title="Clear Search" class="bg-red-400 rounded-lg m-2 p-2">x</span>
+      <div class="flex gap-1">
+        <input class="rounded-lg w-full mb-2" type="text" v-model="search_input" id="search_input_product_barcode" />
+        <!-- <input class="rounded-lg w-full mb-2" type="text" v-model="search_input" id="search_input_product_barcode"
+          @keydown.enter="search_product()" /> -->
+        <span title="Clear Search" class="bg-red-400 rounded-lg m-1 p-1 my-auto cursor-pointer" @click="search_input = ''">x</span>
       </div>
 
-      <div class="h-[50vmin] overflow-auto mt-2">
-        <div v-if="search_object != '' && search_object != undefined" class="flex justify-between">
+      <div class="h-[40vmin] overflow-auto mt-2  bg-gray-200 rounded-md">
+        <template v-for="(product, key) in product" :key="key">
+          <div v-if="product.name.toLocaleLowerCase().includes(search_input.toLocaleLowerCase()) && search_input != ''"
+            class="flex justify-between p-2 border border-b-gray-300">
+            <div>
+              <div class="flex">
+                <img :src="product?.product_image" class="max-w-2xl w-10 rounded-lg  mr-2 object-contain max-h-auto h-15">
+                <div>
+                  <p class="w-full truncate">{{ product?.name }}</p>
+                  <p>₱{{ product?.current_price?.price }}</p>
+                  <p>Qty: {{ product?.quantity }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="my-auto">
+              <Button @click="add_product_via_input_search_2(product)" class="text-lg">+</Button>
+            </div>
+          </div>
+        </template>
+        <!-- <div v-if="search_object != '' && search_object != undefined" class="flex justify-between bg-gray-200 p-2">
           <div>
             <div class="flex">
               <img :src="search_object?.product_image"
-                class="max-w-2xl w-10 rounded-lg  mr-2 object-contain max-h-auto h-10">
-              <p class="w-full truncate">{{ search_object?.name }}</p>
+                class="max-w-2xl w-10 rounded-lg  mr-2 object-contain max-h-auto h-15">
+              <div>
+                <p class="w-full truncate">{{ search_object?.name }}</p>
+                <p>₱{{ search_object?.current_price?.price }}</p>
+                <p>Qty: {{ search_object?.quantity }}</p>
+              </div>
             </div>
-            <p>₱{{ search_object?.current_price?.price }}</p>
-            <p>Qty: {{ search_object?.quantity }}</p>
           </div>
           <div>
-            <Button @click="add_product_via_input_search()" class="text-lg">+</Button>
+            <Button @click="add_product_via_input_search()" class="text-lg mx-auto">+</Button>
           </div>
         </div>
         <div v-else-if="search_object == '' || search_object == undefined">
           <p>No Search found!</p>
-        </div>
+        </div> -->
       </div>
     </template>
     <template #footer>
-      <div class="flex justify-between gap-2 text-xs text-center">
-        <p>
-          <strong>CTRL + ALT + F </strong> - Focus Search box
+      <div class="flex justify-between gap-2 text-center">
+        <p class="bg-gray-500 text-white grid grid-cols-1 p-1">
+          <strong class="text-lg pr-2 ml-2">CTRL + ALT + F </strong><span class="text-[1vmin] -mt-2">Focus Search
+            box</span>
         </p>
-        <p>
+        <!-- <p class="bg-gray-500 text-white grid grid-cols-1 p-1 pl-4 pr-4">
+          <strong class="text-lg">ENTER </strong><span class="text-[1vmin] -mt-2">Search product</span>
+        </p> -->
+        <!-- <p>
           <strong>CTRL + Enter </strong> - Add searched product
-        </p>
-        <p>
-          <strong>ESC</strong> - Close input Barcode and Product name
+        </p> -->
+        <p class="bg-gray-500 text-white grid grid-cols-1 p-1">
+          <strong class="text-lg pr-2 pl-2">ESC</strong><span class="text-[1vmin]">Close input Barcode and Product
+            name</span>
         </p>
       </div>
     </template>
@@ -1513,5 +1591,4 @@ const add_product_via_input_search = () => {
         </svg>&nbsp;Proceed (CTRL + ALT + Y)
       </Button>
     </template>
-  </DialogModal>
-</template>
+  </DialogModal></template>

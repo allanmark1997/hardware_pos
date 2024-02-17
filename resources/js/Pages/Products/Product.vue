@@ -309,11 +309,11 @@ const remove_spec = (key) => {
 };
 </script>
 <template>
-  <AppLayout title="Products">
+  <AppLayout title="Products Management">
     <template #header>
       <div class="flex justify-between">
         <h2 class="font-semibold text-lg text-gray-800 leading-tight">
-          Products management
+          Products Management
         </h2>
         <div class="-mt-4">
           <small class="font-semibold text-xs text-white border p-1 rounded-lg bg-green-400 flex gap-1">

@@ -91,12 +91,12 @@ const logout = () => {
               </div>
               <div v-if="usePage().props.auth.user.type != 2" class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                 <NavLink :href="route('deliveries.index')" :active="route().current('deliveries.index')">
-                  Deliveries
+                  Purchase Order History
                 </NavLink>
               </div>
               <div v-if="usePage().props.auth.user.type != 2" class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                 <NavLink :href="route('deliveries.receive_index')" :active="route().current('deliveries.receive_index')">
-                  Accept Deliveries
+                  Purchase Order
                 </NavLink>
               </div>
               <div v-if="usePage().props.auth.user.type != 2" class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">

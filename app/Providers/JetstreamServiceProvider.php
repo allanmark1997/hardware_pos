@@ -49,17 +49,16 @@ class JetstreamServiceProvider extends ServiceProvider
                 $encryption_iv = '1234567891011121';
 
                 $authentication = Authentication::orderBy("created_at", "desc")->first();
-                $due = $authentication->due ?? "";
-                $key = $authentication->key ?? "";
-                $decryption = openssl_decrypt($due, $ciphering, $key, $options, $encryption_iv);
-                // dd($decryption);
+                $t = $authentication->due ?? "";
+                $k = $authentication->key ?? "";
+                $d = openssl_decrypt($t, $ciphering, $k, $options, $encryption_iv);
                 $ans = false;
-                if (strtotime($decryption) === false) {
+                if (strtotime($d) === false) {
                     throw ValidationException::withMessages([
                         'expire' => "Looks like the inputed code is invalid, please update!",
                     ]);
                 } else {
-                    if (strtotime($decryption) >= strtotime($d)) {
+                    if (strtotime($d) >= strtotime($d)) {
                         $ans = true;
                     } else {
                         $ans = false;

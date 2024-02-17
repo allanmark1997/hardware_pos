@@ -8,11 +8,11 @@ import { inject, provide, ref } from "vue";
 const props = defineProps(["deliveries", "date_from", "date_to", "search"]);
 </script>
 <template>
-  <AppLayout title="Delivery Transactions">
+  <AppLayout title="Purchase Order History">
     <template #header>
       <div class="flex justify-between">
         <h2 class="font-semibold text-lg text-gray-800 leading-tight">
-          Delivery Transactions
+          Purchase Order History
         </h2>
       </div>
     </template>

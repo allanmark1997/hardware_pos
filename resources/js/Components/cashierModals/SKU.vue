@@ -49,7 +49,7 @@ onMounted(() => {
 
 <template>
   <div v-if="props.SKULookup" id="defaultModal" tabindex="-1" aria-hidden="true"
-    class="fixed top-0 left-0 right-0 backdrop-blur-sm  z-50 pt-52 flex justify-center  item-center w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    class="fixed top-0 left-0 right-0 backdrop-blur-sm z-50 pt-30 flex justify-center  item-center w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative w-full max-w-3xl max-h-full">
       <!-- Modal content -->
       <div class="relative bg-white rounded-lg shadow ">
@@ -103,7 +103,7 @@ onMounted(() => {
         <!-- Modal footer -->
         <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b ">
 
-          <div v-if="!shownProd.name" role="status"
+          <div v-if="!shownProd.name " role="status"
             class="space-y-8 animate-pulse md:space-y-0 md:space-x-8 md:flex md:items-center">
             <div class="flex items-center justify-center w-full h-48 bg-gray-300 rounded sm:w-96 ">
               <svg class="w-10 h-10 text-gray-200 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -124,7 +124,7 @@ onMounted(() => {
           </div>
           <!-- component -->
           <div v-else class="flex flex-col justify-center ">
-            <div
+            <div v-if="search != ''"
               class="relative flex flex-col md:flex-row md:space-x-5 space-y-3 md:space-y-0 rounded-xl shadow-lg p-3 max-w-xs md:max-w-3xl mx-auto border border-white bg-white">
               <div class="w-full md:w-1/3 bg-white grid place-items-center">
                 <img :src="shownProd.product_image" alt="tailwind logo" class="rounded-xl" />
