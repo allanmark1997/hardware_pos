@@ -62,7 +62,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => ["required", "unique:products", "max:255"],
+            'name' => ["required", "unique:products", "max:50"],
             'barcode' => ["required",  "unique:products"],
             'price' => ["required", "regex:/^[0-9]+(\.[0-9][0-9]?)?$/"],
             'category' => "required",
@@ -128,7 +128,7 @@ class ProductController extends Controller
         $extracted_path = explode("/", $product_current->product_image);
 
         $request->validate([
-            'name' => ["required", "max:30"],
+            'name' => ["required", "max:50"],
             'barcode' => ["required"],
             'price' => ["required", "regex:/^[0-9]+(\.[0-9][0-9]?)?$/", "min:0"],
             'category' => "required",
