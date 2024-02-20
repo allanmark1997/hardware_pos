@@ -44,12 +44,12 @@ const add_supplier = () => {
       status_label.value.reset();
       type_label.value.reset();
     },
-    onError: (error) => {
-      // toast.error("Something went wrong " + error, {
-      //   autoClose: 1000,
-      //   transition: toast.TRANSITIONS.FLIP,
-      //   position: toast.POSITION.TOP_RIGHT,
-      // });
+    onError: () => {
+      toast.error("Please fill out fields ", {
+        autoClose: 1000,
+        transition: toast.TRANSITIONS.FLIP,
+        position: toast.POSITION.TOP_RIGHT,
+      });
     },
   });
 };
