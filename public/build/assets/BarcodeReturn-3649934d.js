@@ -1,1 +1,0 @@
-import{c,e as r,o as t}from"./app-b9add7c4.js";import a from"./BarcodeSVG2-381fe5b8.js";const d={__name:"BarcodeReturn",props:["code"],setup(o){const e=o;return(n,s)=>e.code!=""?(t(),c(a,{key:0,code:e.code},null,8,["code"])):r("",!0)}};export{d as default};
