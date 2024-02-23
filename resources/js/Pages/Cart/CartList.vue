@@ -108,7 +108,7 @@ const delivery_ = () => {
       </div>
     </div>
   </div>
-  <div class="mb-12">
+  <div class="mb-[10vmin]">
   <template v-for="(supplier, key) in group_suppliers" :key="key">
     <div
       class="block rounded-lg bg-white text-center shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] mt-2">
