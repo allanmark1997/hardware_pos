@@ -160,7 +160,7 @@ const delivery_ = () => {
     </div>
   </template>
   <div
-    class="fixed bg-white border border-gray-200 rounded-md bottom-0 sm:w-[195vmin] md:w[200vmin] lg:w-[185vmin] xl:w-[158vmin] 2xl:w-[141vmin] p-2 gap-2 block rounded-lg text-right mt-2">
+    class="fixed bg-white border border-gray-200 rounded-md bottom-0 sm:w-[885px] md:w[1150px] lg:w-[1180px] xl:w-[1200px] 2xl:w-[1200px] p-2 gap-2 block rounded-lg text-right mt-2">
     <p class="text-right text-md justify-right">
       Total ({{ form.selected_product.length }}
       {{ form.selected_product.length <= 1 ? " item" : " items" }}): <span class="text-lg font-bold text-red-500">
