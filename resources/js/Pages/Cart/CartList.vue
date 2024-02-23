@@ -83,7 +83,7 @@ const delivery_ = () => {
   form.post(route("deliveries.store"), {
     preserveScroll: true,
     onSuccess: () => {
-      toast.success("Successfully added in deliveries", {
+      toast.success("Successfully added in purchase order", {
         autoClose: 1000,
         transition: toast.TRANSITIONS.FLIP,
         position: toast.POSITION.TOP_RIGHT,
@@ -108,7 +108,7 @@ const delivery_ = () => {
       </div>
     </div>
   </div>
-  <template v-for="(supplier, key) in group_suppliers" :key="key">
+  <template v-for="(supplier, key) in group_suppliers" :key="key" class="mb-10">
     <div
       class="block rounded-lg bg-white text-center shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] mt-2">
       <div class="border-b-2 border-neutral-100 px-6 py-3 text-left flex gap-2">

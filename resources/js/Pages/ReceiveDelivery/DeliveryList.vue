@@ -109,7 +109,7 @@ const open_authorize = (data) => {
   });
   if (data.details.length == temp_counter) {
     toast.warn(
-      "Accepting deliveries without selecting products may return as unsuccessful delivery transactions",
+      "Accepting purchase order without selecting products may return as unsuccessful delivery transactions",
       {
         autoClose: 3000,
         transition: toast.TRANSITIONS.FLIP,
@@ -125,7 +125,7 @@ const authorize = () => {
   form.post(route("authenticate_user.authenticate_user"), {
     preserveScroll: true,
     onSuccess: () => {
-      toast.success("Delivery has been authorized", {
+      toast.success("Purchase order has been authorized", {
         autoClose: 1000,
         transition: toast.TRANSITIONS.FLIP,
         position: toast.POSITION.TOP_RIGHT,
@@ -138,7 +138,7 @@ const authorize = () => {
       form.put(route("deliveries.authenticate", form.delivery), {
         preserveScroll: true,
         onSuccess: () => {
-          toast.success("Delivery set as delivered", {
+          toast.success("Purchase order set as delivered", {
             autoClose: 1000,
             transition: toast.TRANSITIONS.FLIP,
             position: toast.POSITION.TOP_RIGHT,
@@ -173,7 +173,7 @@ const authorize = () => {
             @keyup.enter="function_filter_range" />
         </div>
         <div class="flex">
-          <Input v-model="search" class="rounded-lg w-[30vmin]" type="text" label="Search delivery"
+          <Input v-model="search" class="rounded-lg w-[30vmin]" type="text" label="Search supplier name"
             @keyup.enter="search_" />
         </div>
         <button v-if="date_from || date_to || search" class="h-10 my-auto mt-5" @click="function_filter_remove">

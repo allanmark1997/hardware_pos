@@ -86,11 +86,11 @@ onMounted(() => {
               <span class="sr-only">Loading...</span>
             </div>
 
-            <div v-else role="status" class="space-y-1  md:space-y-0 md:space-x-1 md:flex md:items-center">
+            <div v-else role="status" class="space-y-1  md:space-y-0 md:space-x-1 md:flex md:items-center overflow-y-auto">
               <div v-for="items in props.products">
                 <button type="button" v-if="items.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())"
                   @click="showProduct(items)"
-                  class="inline-flex items-center px-1 py-1 text-sm font-medium text-center text-white bg-orange-700 rounded-lg hover:bg-orange-800 focus:ring-4 focus:outline-none focus:ring-orange-300 overflow-hidden">
+                  class="inline-flex items-center px-1 py-1 text-sm font-medium text-center text-white bg-orange-700 rounded-lg hover:bg-orange-800 focus:ring-4 focus:outline-none focus:ring-orange-300">
                   <img :src="items.product_image" class="max-w-2xl w-10 rounded-lg  mr-2 object-contain max-h-auto h-10">
                   {{ items.name }}<br>₱ {{ items.current_price.price }}
                 </button>

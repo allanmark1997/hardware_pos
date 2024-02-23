@@ -132,7 +132,7 @@ const count_total_unsuccess = (data) => {
             @keyup.enter="function_filter_range" />
         </div>
         <div class="flex">
-          <Input v-model="search" class="rounded-lg w-[30vmin]" type="text" label="Search delivery"
+          <Input v-model="search" class="rounded-lg w-[30vmin]" type="text" label="Search supplier name"
             @keyup.enter="search_" />
         </div>
         <button v-if="date_from || date_to || search" class="h-10 my-auto mt-5" @click="function_filter_remove">
@@ -154,6 +154,7 @@ const count_total_unsuccess = (data) => {
           <thead class="text-xs text-white uppercase bg-yellow-500">
             <tr>
               <th scope="col" class="px-6 py-3">Delivery ID</th>
+              <th scope="col" class="px-6 py-3">Supplier ID</th>
               <th scope="col" class="px-6 py-3">Supplier name</th>
               <th scope="col" class="px-6 py-3">Receive by</th>
               <th scope="col" class="px-6 py-3">Status</th>
@@ -168,6 +169,9 @@ const count_total_unsuccess = (data) => {
                 @click="(delivery_detail_modal = true, delivery_object = delivery.details, supplier_name = delivery.supplier?.supplier_name)">
                 <td class="px-6 py-4">
                   {{ delivery.id }}
+                </td>
+                <td class="px-6 py-4">
+                  {{ delivery.supplier.id }}
                 </td>
                 <td class="px-6 py-4">
                   <img class="h-8 w-8 rounded-full object-cover" :src="delivery.supplier.image"
@@ -220,8 +224,9 @@ const count_total_unsuccess = (data) => {
       <table class="w-full text-xs text-left text-gray-500">
         <thead class="text-xs text-gray-700 uppercase bg-gray-100">
           <tr>
+            <th scope="col" class="px-1 py-1">Delivery details ID</th>
             <th scope="col" class="px-1 py-1">Product</th>
-            <th scope="col" class="px-1 py-1">No.</th>
+            <th scope="col" class="px-1 py-1">QTY</th>
             <th scope="col" class="px-1 py-1">Price</th>
             <th scope="col" class="px-1 py-1">Status</th>
             <th scope="col" class="px-1 py-1">Sub-total</th>
@@ -230,6 +235,9 @@ const count_total_unsuccess = (data) => {
         <tbody>
           <template v-for="(delivery_detail, key2) in delivery_object" :key="key2">
             <tr class="bg-white border-">
+              <td class="px-1 py-1">
+                {{ delivery_detail.id }}
+              </td>
               <td class="px-1 py-1 flex pt-2 font-bold">
                 <Icon icon="shopping_cart" size="xs" />
                 <p class="w-[20vmin] break-words">

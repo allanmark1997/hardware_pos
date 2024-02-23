@@ -387,7 +387,7 @@ onMounted(() => {
           <span class="font-bold mb-5 uppercase text-yellow-700">
             Details:<br />
           </span>
-          <p class="text-gray-900 overflow-auto max-h-80">
+          <p style="white-space: pre-line;" class="text-gray-900 overflow-auto max-h-80">
             {{ detailModalData.ProdDetail }}
           </p>
         </div>
