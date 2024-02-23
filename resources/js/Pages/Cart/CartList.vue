@@ -108,7 +108,8 @@ const delivery_ = () => {
       </div>
     </div>
   </div>
-  <template v-for="(supplier, key) in group_suppliers" :key="key" class="mb-10">
+  <div class="mb-12">
+  <template v-for="(supplier, key) in group_suppliers" :key="key">
     <div
       class="block rounded-lg bg-white text-center shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] mt-2">
       <div class="border-b-2 border-neutral-100 px-6 py-3 text-left flex gap-2">
@@ -159,6 +160,7 @@ const delivery_ = () => {
       <!-- <div class="border-t-2 border-neutral-100 px-6 py-3">2 days ago</div> -->
     </div>
   </template>
+</div>
   <div
     class="fixed bg-white border border-gray-200 rounded-md bottom-0 sm:w-[885px] md:w[1150px] lg:w-[1180px] xl:w-[1200px] 2xl:w-[1200px] p-2 gap-2 block rounded-lg text-right mt-2">
     <p class="text-right text-md justify-right">
