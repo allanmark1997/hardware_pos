@@ -777,6 +777,11 @@ const add_product_via_input_search_2 = (searched_product) => {
     }
   }
 }
+
+const function_fix_number = (data) => {
+  var temp_data = parseFloat(data).toFixed(2);
+  return temp_data;
+}
 </script>
 <template>
   <Head :title="'Cashier'" />
@@ -1249,7 +1254,8 @@ const add_product_via_input_search_2 = (searched_product) => {
         <input class="rounded-lg w-full mb-2" type="text" v-model="search_input" id="search_input_product_barcode" />
         <!-- <input class="rounded-lg w-full mb-2" type="text" v-model="search_input" id="search_input_product_barcode"
           @keydown.enter="search_product()" /> -->
-        <span title="Clear Search" class="bg-red-400 rounded-lg m-1 p-1 my-auto cursor-pointer" @click="search_input = ''">x</span>
+        <span title="Clear Search" class="bg-red-400 rounded-lg m-1 p-1 my-auto cursor-pointer"
+          @click="search_input = ''">x</span>
       </div>
 
       <div class="h-[40vmin] overflow-auto mt-2  bg-gray-200 rounded-md">
@@ -1505,7 +1511,7 @@ const add_product_via_input_search_2 = (searched_product) => {
               <tr class="border mb-2">
                 <td>
                   <small>CHANGE:
-                    {{ convert_money(form.cash - (form.products.length == 0
+                    {{ convert_money(function_fix_number(form.cash) - function_fix_number((form.products.length == 0
                       ? 0
                       :
                       applyTax(
@@ -1514,7 +1520,7 @@ const add_product_via_input_search_2 = (searched_product) => {
                           spDiscount == true ? special_discount.discount : 0
                         ).discountedPrice
                       )
-                    )) }}
+                    ))) }}
                   </small>
                 </td>
               </tr>
@@ -1553,17 +1559,30 @@ const add_product_via_input_search_2 = (searched_product) => {
             </p>
           </div>
           <div class="col-span-full">
-            <p class="text-2xl">Change: <span class="text-4xl font-bold">{{ convert_money(form.cash -
-              (form.products.length == 0
-                ? 0
-                :
-                applyTax(
-                  applyDiscount(
-                    item_grand_total,
-                    spDiscount == true ? special_discount.discount : 0
-                  ).discountedPrice
-                )
-              )) }}</span>
+            <p class="text-2xl">Change: <span class="text-4xl font-bold">
+                {{ convert_money(function_fix_number(form.cash) -
+                  function_fix_number((form.products.length == 0
+                    ? 0
+                    :
+                    applyTax(
+                      applyDiscount(
+                        item_grand_total,
+                        spDiscount == true ? special_discount.discount : 0
+                      ).discountedPrice
+                    )
+                  ))),
+                  console.log(function_fix_number((form.products.length == 0
+                    ? 0
+                    :
+                    applyTax(
+                      applyDiscount(
+                        item_grand_total,
+                        spDiscount == true ? special_discount.discount : 0
+                      ).discountedPrice
+                    )
+                  )))
+                }}
+              </span>
             </p>
           </div>
           <div class="col-span-full">
@@ -1591,4 +1610,5 @@ const add_product_via_input_search_2 = (searched_product) => {
         </svg>&nbsp;Proceed (CTRL + ALT + Y)
       </Button>
     </template>
-  </DialogModal></template>
+  </DialogModal>
+</template>
