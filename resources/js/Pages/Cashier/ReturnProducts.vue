@@ -168,7 +168,7 @@ const calculate_grandtotal_with_vat = () => {
 
 const calculate_customer_change = () => {
   let customerChange = 0;
-  customerChange = props.transaction?.cash - calculate_grandtotal_with_vat();
+  customerChange = parseFloat(props.transaction?.cash).toFixed(2) - parseFloat(calculate_grandtotal_with_vat()).toFixed(2);
   return customerChange;
 }
 
