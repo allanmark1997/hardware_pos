@@ -265,7 +265,10 @@ onMounted(() => {
                   <span v-if="product.product.quantity == 0" class="italic text-xs text-red-500">- (Out of stocks)</span>
                 </h1>
                 <h2 class="tracking-widest text-lg title-font font-bold text-gray-500">
-                  {{ convert_money(product.price.price) }}
+                  {{ convert_money(product.price.price) }} <span class="text-xs text-green-400">(Profit {{ convert_money(product.product.current_price.price - product.price.price) }})</span>
+                </h2>
+                <h2 class="tracking-widest text-sm title-font font-bold text-yellow-500 ">
+                  Selling price at {{ convert_money(product.product.current_price.price) }}
                 </h2>
 
                 <!-- <svg
